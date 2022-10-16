@@ -7,7 +7,11 @@ import (
 )
 
 var (
+	// user not found
 	ErrUserNotFound  = errors.New("can`t find user")
+	// duplicate UserId
+	ErrUserExists    = errors.New("user already exists")
+	// duplicate data, for unique sql column etc
 	ErrDuplicateUser = errors.New("duplicate user data")
 )
 

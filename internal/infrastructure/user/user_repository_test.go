@@ -5,16 +5,16 @@ import (
 	"testing"
 
 	"nory/internal/domain"
-	. "nory/internal/infrastructure/user/repository"
+	. "nory/internal/infrastructure/user"
 
 	"github.com/stretchr/testify/assert"
 )
 
-func TestRepository(t *testing.T) {
+func TestUserRepository(t *testing.T) {
 	repos := []Repository{
 		{
 			Name: "memory",
-			R:    NewRepositoryMem(),
+			R:    NewUserRepositoryMem(),
 		},
 	}
 
@@ -45,7 +45,7 @@ func (r Repository) testCreate(t *testing.T) {
 		{"success create", domain.User{Username: "bar", UserId: "bar"}, nil},
 		{"success create", domain.User{Username: "baz", UserId: "baz"}, nil},
 		{"duplicate username", domain.User{Username: "foo"}, domain.ErrDuplicateUser},
-		{"duplicate id", domain.User{UserId: "foo"}, domain.ErrDuplicateUser},
+		{"duplicate id", domain.User{UserId: "foo"}, domain.ErrUserExists},
 	}
 
 	for _, tc := range testCases {
@@ -59,10 +59,10 @@ func (r Repository) testCreate(t *testing.T) {
 }
 
 func (r Repository) testGet(t *testing.T) {
-	testCases := []struct{
+	testCases := []struct {
 		Name string
-		Id string
-		Err error
+		Id   string
+		Err  error
 	}{
 		{"success", "foo", nil},
 		{"success", "bar", nil},
@@ -84,10 +84,10 @@ func (r Repository) testGet(t *testing.T) {
 }
 
 func (r Repository) testUpdate(t *testing.T) {
-	testCases := []struct{
+	testCases := []struct {
 		Name string
 		User domain.User
-		Err error
+		Err  error
 	}{
 		{"success", domain.User{UserId: "foo", Username: "foo-bar"}, nil},
 		{"duplicate username", domain.User{UserId: "bar", Username: "foo-bar"}, domain.ErrDuplicateUser},
@@ -96,26 +96,33 @@ func (r Repository) testUpdate(t *testing.T) {
 	for _, tc := range testCases {
 		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
-			err := r.R.UpdateUser(context.Background(), &tc.User)
-			assert.Equal(t, tc.Err, err, "missmatch error")
-			u, err := r.R.GetUser(context.Background(), tc.User.UserId)
+			prev, err := r.R.GetUser(context.Background(), tc.User.UserId)
 			assert.Equal(t, nil, err, "unexpected error received")
+
+			err = r.R.UpdateUser(context.Background(), &tc.User)
+			assert.Equal(t, tc.Err, err, "missmatch error")
+
+			curr, err := r.R.GetUser(context.Background(), tc.User.UserId)
+			assert.Equal(t, nil, err, "unexpected error received")
+
 			if tc.Err == nil {
-				assert.Equal(t, tc.User.Username, u.Username)
+				assert.Equal(t, prev.UserId, curr.UserId, "update should not change user id")
+				assert.Equal(t, prev.CreatedAt, curr.CreatedAt, "update should not change created at")
+				assert.Equal(t, tc.User.Username, curr.Username)
 			}
 		})
 	}
 }
 
 func (r Repository) testDelete(t *testing.T) {
-	testCases := []struct{
+	testCases := []struct {
 		Name string
-		Id string
-		Err error
+		Id   string
+		Err  error
 	}{
 		{"delete existing user", "foo", nil},
 		{"delete unexists", "foo", nil},
-		{"delete unexists", "foo", nil},
+		{"delete unexists", "foo-bar-baz", nil},
 		{"delete existing user", "bar", nil},
 		{"delete existing user", "baz", nil},
 	}

@@ -2,7 +2,13 @@ package domain
 
 import (
 	"context"
+	"errors"
 	"time"
+)
+
+var (
+	ErrClassNotFound = errors.New("class not found")
+	ErrClassExists   = errors.New("class already exists")
 )
 
 type Class struct {
@@ -15,8 +21,9 @@ type Class struct {
 }
 
 type ClassRepository interface {
-	Create(ctx *context.Context, class Class) error
-	GetById(ctx *context.Context, classId string) (Class, error)
-	GetOwnedBy(ctx *context.Context, ownerId string) ([]Class, error)
-	Delete(ctx *context.Context, classId string) error
+	GetClass(ctx context.Context, classId string) (*Class, error)
+	GetByOwnedBy(ctx context.Context, ownerId string) ([]*Class, error)
+	CreateClass(ctx context.Context, class *Class) error
+	DeleteClass(ctx context.Context, classId string) error
+	UpdateClass(ctx context.Context, class *Class) error
 }
