@@ -1,0 +1,28 @@
+version: "3"
+
+dotenv:
+  - .env
+
+tasks:
+  install-deps:
+    cmds:
+      - go mod tidy
+
+  test:
+    method: none
+    sources:
+      - "**/*.go"
+    cmds:
+      - go test -run {{default "''" .GO_TEST_FILTER}} {{.GO_TEST_FLAGS}} {{default "./..." .CLI_ARGS}}
+
+  migrations:create:
+    cmds:
+      - migrate create -dir migrations -seq -ext sql {{.CLI_ARGS}}
+
+  auth:login:
+    cmds:
+      - deno run --unstable -A cmd/deno/login.ts
+
+  auth:signup:
+    cmds:
+      - deno run --unstable -A cmd/deno/signup.ts
