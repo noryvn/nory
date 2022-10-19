@@ -4,9 +4,9 @@ dotenv:
   - .env
 
 tasks:
-  install-deps:
+  start:
     cmds:
-      - go mod tidy
+      - go run ./cmd/server
 
   test:
     method: none

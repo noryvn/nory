@@ -4,7 +4,6 @@ go 1.19
 
 require (
 	github.com/gofiber/fiber/v2 v2.38.1
-	github.com/gofiber/helmet/v2 v2.2.17
 	github.com/nedpals/supabase-go v0.2.0
 	github.com/stretchr/testify v1.8.0
 )

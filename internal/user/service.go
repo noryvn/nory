@@ -20,6 +20,7 @@ func (up *UserProfile) GetUser() *domain.User {
 	u.CreatedAt = up.CreatedAt
 	u.Username = up.Username
 	u.Name = up.Name
+	u.Email = up.Email
 	return u
 }
 func (up *UserProfile) SetUser(u *domain.User) {
