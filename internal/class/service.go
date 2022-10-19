@@ -1,6 +1,6 @@
 package class
 
-import "nory/internal/domain"
+import "nory/domain"
 
 type ClassService struct {
 	classRepository domain.ClassRepository

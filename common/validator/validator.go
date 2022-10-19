@@ -7,7 +7,7 @@ import (
 
 	"github.com/go-playground/validator/v10"
 
-	"nory/internal/interfaces"
+	"nory/common/response"
 )
 
 var (
@@ -49,5 +49,5 @@ func ValidateStruct(s any, message string) error {
 		path = strings.SplitN(path, ".", 2)[1]
 		errs[path] = append(errs[path], fe.Error())
 	}
-	return interfaces.NewResponseBadRequest(message, errs)
+	return response.NewBadRequest(message, errs)
 }

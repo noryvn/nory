@@ -3,7 +3,7 @@ package auth
 import (
 	"github.com/gofiber/fiber/v2"
 
-	"nory/internal/domain"
+	"nory/domain"
 )
 
 func GetUser(c *fiber.Ctx) (*domain.User, error) {

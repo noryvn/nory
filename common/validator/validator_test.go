@@ -3,8 +3,8 @@ package validator_test
 import (
 	"testing"
 
-	. "nory/internal/infrastructure/validator"
-	"nory/internal/interfaces"
+	. "nory/common/validator"
+	"nory/common/response"
 )
 
 func TestValidator(t *testing.T) {
@@ -48,7 +48,7 @@ func TestValidator(t *testing.T) {
 			if err == nil && len(tc.errorsPath) == 0 {
 				return
 			}
-			res, ok := err.(*interfaces.ResponseError)
+			res, ok := err.(*response.ResponseError)
 			if !ok {
 				t.Errorf("unknown error: %v", err)
 				return

@@ -1,7 +1,7 @@
 package user
 
 import (
-	"nory/internal/infrastructure/auth"
+	"nory/common/auth"
 
 	"github.com/gofiber/fiber/v2"
 )

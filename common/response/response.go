@@ -1,4 +1,4 @@
-package interfaces
+package response
 
 import "github.com/gofiber/fiber/v2"
 
@@ -30,7 +30,7 @@ func (r *Response[T]) Respond(c *fiber.Ctx) error {
 	return c.Status(r.Code).JSON(r)
 }
 
-func NewResponseBadRequest(msg string, errs map[string][]string) *ResponseError {
+func NewBadRequest(msg string, errs map[string][]string) *ResponseError {
 	return &ResponseError{
 		Code:    400,
 		Message: msg,
@@ -38,21 +38,21 @@ func NewResponseBadRequest(msg string, errs map[string][]string) *ResponseError 
 	}
 }
 
-func NewResponseUnathorized(msg string) *ResponseError {
+func NewUnathorized(msg string) *ResponseError {
 	return &ResponseError{
 		Code:    401,
 		Message: msg,
 	}
 }
 
-func NewResponseTooManyRequest(msg string) *ResponseError {
+func NewTooManyRequest(msg string) *ResponseError {
 	return &ResponseError{
 		Code:    429,
 		Message: msg,
 	}
 }
 
-func NewResponse[T any](code int, data T) Response[T] {
+func New[T any](code int, data T) Response[T] {
 	return Response[T]{
 		Code: code,
 		Data: data,

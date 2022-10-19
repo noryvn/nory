@@ -5,7 +5,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 
-	"nory/internal/domain"
+	"nory/domain"
 )
 
 func MockMiddleware(c *fiber.Ctx) error {

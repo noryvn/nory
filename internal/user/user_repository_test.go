@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"nory/internal/domain"
-	. "nory/internal/infrastructure/user"
+	"nory/domain"
+	. "nory/internal/user"
 
 	"github.com/stretchr/testify/assert"
 )

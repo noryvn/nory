@@ -4,7 +4,7 @@ import (
 	"context"
 	"sync"
 
-	"nory/internal/domain"
+	"nory/domain"
 )
 
 type ClassRepositoryMem struct {

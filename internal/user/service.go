@@ -3,8 +3,8 @@ package user
 import (
 	"context"
 
-	"nory/internal/domain"
-	"nory/internal/interfaces"
+	"nory/domain"
+	"nory/common/response"
 )
 
 type UserProfile struct {
@@ -34,9 +34,9 @@ type UserService struct {
 	ClassRepository domain.ClassRepository
 }
 
-func (us UserService) GetUserProfile(ctx context.Context, user *domain.User) (interfaces.Response[*UserProfile], error) {
+func (us UserService) GetUserProfile(ctx context.Context, user *domain.User) (response.Response[*UserProfile], error) {
 	up := &UserProfile{}
-	res := interfaces.NewResponse(200, up)
+	res := response.New(200, up)
 	classes, err := us.ClassRepository.GetByOwnerId(ctx, user.UserId)
 	if err != nil {
 		return res, err

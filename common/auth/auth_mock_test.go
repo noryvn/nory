@@ -9,16 +9,16 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/stretchr/testify/assert"
 
-	"nory/internal/domain"
-	. "nory/internal/infrastructure/auth"
-	"nory/internal/interfaces"
+	"nory/domain"
+	. "nory/common/auth"
+	"nory/common/response"
 )
 
 func TestAuthMock(t *testing.T) {
 	app := fiber.New(fiber.Config{
 		Immutable: true,
 		ErrorHandler: func(c *fiber.Ctx, err error) error {
-			res, ok := err.(*interfaces.ResponseError)
+			res, ok := err.(*response.ResponseError)
 			if !ok {
 				return fiber.DefaultErrorHandler(c, err)
 			}
@@ -62,7 +62,7 @@ func TestAuthMock(t *testing.T) {
 			req.Header.Set("name", tc.User.Name)
 			req.Header.Set("created-at", tc.User.CreatedAt.Format(time.RFC3339))
 
-			resp, err := app.Test(req, 2)
+			resp, err := app.Test(req, 10)
 			assert.Equal(t, nil, err, "unexpected error")
 			assert.Equal(t, tc.Code, resp.StatusCode, "missmatch status code")
 
