@@ -11,8 +11,6 @@ var (
 	ErrUserNotFound = errors.New("can`t find user")
 	// used for duplicate UserId
 	ErrUserExists = errors.New("user already exists")
-	// used for duplicate data, username, or unique sql column etc
-	ErrDuplicateUser = errors.New("duplicate user data")
 )
 
 type User struct {
@@ -21,7 +19,19 @@ type User struct {
 
 	Username string `json:"username"`
 	Name     string `json:"name"`
-	Email string `json:"email"`
+	Email    string `json:"email"`
+}
+
+func (u *User) Update(uu *User) {
+	if uu.Username != "" {
+		u.Username = uu.Username
+	}
+	if uu.Name != "" {
+		u.Name = uu.Name
+	}
+	if uu.Email != "" {
+		u.Email = uu.Email
+	}
 }
 
 type UserRepository interface {

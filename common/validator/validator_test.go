@@ -3,8 +3,8 @@ package validator_test
 import (
 	"testing"
 
-	. "nory/common/validator"
 	"nory/common/response"
+	. "nory/common/validator"
 )
 
 func TestValidator(t *testing.T) {

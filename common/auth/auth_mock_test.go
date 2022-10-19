@@ -9,9 +9,9 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/stretchr/testify/assert"
 
-	"nory/domain"
 	. "nory/common/auth"
 	"nory/common/response"
+	"nory/domain"
 )
 
 func TestAuthMock(t *testing.T) {

@@ -2,26 +2,48 @@ package user_test
 
 import (
 	"context"
+	"os"
 	"testing"
 
 	"nory/domain"
 	. "nory/internal/user"
 
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/stretchr/testify/assert"
+)
+
+const (
+	userFoo = "09229265-d53c-44fd-a791-cb686b3e61d6"
+	userBar = "eef59eb4-ef31-4491-bc7e-77026f4cb5e8"
+	userBaz = "f44a1fc5-b7bf-40e4-be55-0eb9dfb886c7"
+	userQux = "cde9b03c-311d-443d-901c-45473f453305"
 )
 
 func TestUserRepository(t *testing.T) {
 	t.Parallel()
+	pool, err := pgxpool.New(context.Background(), os.Getenv("DATABASE_URL"))
+	if err != nil {
+		t.Error(err)
+	}
 	repos := []Repository{
 		{
 			Name: "memory",
 			R:    NewUserRepositoryMem(),
+			Skip: false,
+		},
+		{
+			Name: "postgres",
+			R:    NewUserRepositroyPostgres(pool),
+			Skip: os.Getenv("DATABASE_URL") == "",
 		},
 	}
 
 	for _, repo := range repos {
 		repo := repo
 		t.Run(repo.Name, func(t *testing.T) {
+			if repo.Skip {
+				t.Skipf("skipping %s", repo.Name)
+			}
 			t.Parallel()
 			t.Run("create", repo.testCreate)
 			t.Run("get", repo.testGet)
@@ -34,6 +56,7 @@ func TestUserRepository(t *testing.T) {
 type Repository struct {
 	Name string
 	R    domain.UserRepository
+	Skip bool
 }
 
 func (r Repository) testCreate(t *testing.T) {
@@ -42,11 +65,11 @@ func (r Repository) testCreate(t *testing.T) {
 		User domain.User
 		Err  error
 	}{
-		{"success create", domain.User{Username: "foo", UserId: "foo"}, nil},
-		{"success create", domain.User{Username: "bar", UserId: "bar"}, nil},
-		{"success create", domain.User{Username: "baz", UserId: "baz"}, nil},
-		{"duplicate username", domain.User{Username: "foo"}, domain.ErrDuplicateUser},
-		{"duplicate id", domain.User{UserId: "foo"}, domain.ErrUserExists},
+		{"success create", domain.User{Username: "foo", Email: "foo@bel.ia", UserId: userFoo}, nil},
+		{"success create", domain.User{Username: "bar", Email: "bar@bel.ia", UserId: userBar}, nil},
+		{"success create", domain.User{Username: "baz", Email: "baz@bel.ia", UserId: userBaz}, nil},
+		{"duplicate username", domain.User{Username: "foo", UserId: "c3b3685f-796a-4a2f-a34a-2ca8fbcd44c4"}, domain.ErrUserExists},
+		{"duplicate id", domain.User{UserId: userFoo}, domain.ErrUserExists},
 	}
 
 	for _, tc := range testCases {
@@ -65,10 +88,8 @@ func (r Repository) testGet(t *testing.T) {
 		Id   string
 		Err  error
 	}{
-		{"success", "foo", nil},
-		{"success", "bar", nil},
-		{"failed", "qux", domain.ErrUserNotFound},
-		{"failed", "hai", domain.ErrUserNotFound},
+		{"success", userFoo, nil},
+		{"failed", userQux, domain.ErrUserNotFound},
 	}
 
 	for _, tc := range testCases {
@@ -77,7 +98,7 @@ func (r Repository) testGet(t *testing.T) {
 			t.Helper()
 			u, err := r.R.GetUser(context.Background(), tc.Id)
 			assert.Equal(t, tc.Err, err, "missmatch error")
-			if tc.Err == nil {
+			if tc.Err == nil && err == nil{
 				assert.Equal(t, tc.Id, u.UserId, "missmatch user id")
 			}
 		})
@@ -90,8 +111,8 @@ func (r Repository) testUpdate(t *testing.T) {
 		User domain.User
 		Err  error
 	}{
-		{"success", domain.User{UserId: "foo", Username: "foo-bar"}, nil},
-		{"duplicate username", domain.User{UserId: "bar", Username: "foo-bar"}, domain.ErrDuplicateUser},
+		{"success", domain.User{UserId: userFoo, Username: "foo-bar"}, nil},
+		{"duplicate username", domain.User{UserId: userBar, Username: "foo-bar"}, domain.ErrUserExists},
 	}
 
 	for _, tc := range testCases {
@@ -106,7 +127,7 @@ func (r Repository) testUpdate(t *testing.T) {
 			curr, err := r.R.GetUser(context.Background(), tc.User.UserId)
 			assert.Equal(t, nil, err, "unexpected error received")
 
-			if tc.Err == nil {
+			if tc.Err == nil && err == nil {
 				assert.Equal(t, prev.UserId, curr.UserId, "update should not change user id")
 				assert.Equal(t, prev.CreatedAt, curr.CreatedAt, "update should not change created at")
 				assert.Equal(t, tc.User.Username, curr.Username)
@@ -121,11 +142,10 @@ func (r Repository) testDelete(t *testing.T) {
 		Id   string
 		Err  error
 	}{
-		{"delete existing user", "foo", nil},
-		{"delete unexists", "foo", nil},
-		{"delete unexists", "foo-bar-baz", nil},
-		{"delete existing user", "bar", nil},
-		{"delete existing user", "baz", nil},
+		{"delete existing user", userFoo, nil},
+		{"delete unexists", userQux, nil},
+		{"delete existing user", userBar, nil},
+		{"delete existing user", userBaz, nil},
 	}
 
 	for _, tc := range testCases {

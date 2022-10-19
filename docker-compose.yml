@@ -6,5 +6,3 @@ services:
       - 8081:8080
       - 26257:26257
     command: start-single-node --insecure
-    volumes:
-      - ./volume/cockroach-data:/cockroach/cockroach-data

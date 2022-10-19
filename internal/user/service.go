@@ -3,8 +3,8 @@ package user
 import (
 	"context"
 
-	"nory/domain"
 	"nory/common/response"
+	"nory/domain"
 )
 
 type UserProfile struct {

@@ -6,7 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-type server struct{
+type server struct {
 	us UserService
 }
 
