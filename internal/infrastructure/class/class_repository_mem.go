@@ -28,7 +28,7 @@ func (crm *ClassRepositoryMem) GetClass(ctx context.Context, classId string) (*d
 	return c, nil
 }
 
-func (crm *ClassRepositoryMem) GetByOwnedBy(ctx context.Context, ownerId string) ([]*domain.Class, error) {
+func (crm *ClassRepositoryMem) GetByOwnerId(ctx context.Context, ownerId string) ([]*domain.Class, error) {
 	crm.mx.Lock()
 	defer crm.mx.Unlock()
 	var classes []*domain.Class
@@ -63,7 +63,11 @@ func (crm *ClassRepositoryMem) UpdateClass(ctx context.Context, class *domain.Cl
 	if err != nil {
 		return err
 	}
-	c.Description = class.Description
-	c.Name = class.Name
+	if class.Description != "" {
+		c.Description = class.Description
+	}
+	if class.Name != "" {
+		c.Name = class.Name
+	}
 	return nil
 }

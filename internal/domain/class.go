@@ -12,17 +12,17 @@ var (
 )
 
 type Class struct {
-	ClassId   string
-	OwnerId   string
-	CreatedAt time.Time
+	ClassId   string    `json:"classId"`
+	OwnerId   string    `json:"ownerId"`
+	CreatedAt time.Time `json:"createdAt"`
 
-	Name        string
-	Description string
+	Name        string `json:"name"`
+	Description string `json:"description"`
 }
 
 type ClassRepository interface {
 	GetClass(ctx context.Context, classId string) (*Class, error)
-	GetByOwnedBy(ctx context.Context, ownerId string) ([]*Class, error)
+	GetByOwnerId(ctx context.Context, ownerId string) ([]*Class, error)
 	CreateClass(ctx context.Context, class *Class) error
 	DeleteClass(ctx context.Context, classId string) error
 	UpdateClass(ctx context.Context, class *Class) error

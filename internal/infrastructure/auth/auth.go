@@ -7,25 +7,21 @@ import (
 	"nory/internal/interfaces"
 )
 
-var (
-	mock = false
-)
+var ErrUserNotFound = interfaces.NewResponseUnathorized("can not found authenticated user")
 
-func SetMock(m bool) {
-	mock = m
-}
+var userLocalKey = "authenticated user"
 
 type Auth struct {
-	supabase supabase.Auth
+	SupabaseAuth *supabase.Auth
 }
 
-func (a *Auth) MiddlewareFiber(c *fiber.Ctx) error {
+func (a *Auth) Middleware(c *fiber.Ctx) error {
 	bearer := c.Get("authorization")
 	if len(bearer) < 7 {
 		return interfaces.NewResponseUnathorized("authorization header not valid")
 	}
 	token := string(bearer[7:])
-	user, err := a.supabase.User(c.Context(), token)
+	user, err := a.SupabaseAuth.User(c.Context(), token)
 	if err != nil {
 		return err
 	}

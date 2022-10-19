@@ -48,7 +48,7 @@ func TestValidator(t *testing.T) {
 			if err == nil && len(tc.errorsPath) == 0 {
 				return
 			}
-			res, ok := err.(interfaces.ResponseError)
+			res, ok := err.(*interfaces.ResponseError)
 			if !ok {
 				t.Errorf("unknown error: %v", err)
 				return

@@ -1,32 +1,53 @@
 package interfaces
 
+import "github.com/gofiber/fiber/v2"
+
 type Response[T any] struct {
-	Code    int
-	Data    T                   `json:",omitempty"`
-	Message string              `json:",omitempty"`
-	Errors  map[string][]string `json:",omitempty`
+	Code    int                 `json:"code"`
+	Data    T                   `json:"data,omitempty"`
+	Message string              `json:"message,omitempty"`
+	Errors  map[string][]string `json:"errors,omitempty"`
 }
 
 type ResponsePaginate[T any] struct {
-	Code int
-	Data []T
+	Code int `json:"code"`
+	Data []T `json:"data"`
 
 	Pagination struct {
-		Page       int
-		Items      int
-		TotalItems int
-	}
+		Page       int `json:"page"`
+		Items      int `json:"items"`
+		TotalItems int `json:"totalItems"`
+	} `json:"pagination"`
 }
 
-type ResponseError Response[*struct{}]
+type ResponseError = Response[*struct{}]
 
-func (r ResponseError) Error() string {
+func (r *Response[T]) Error() string {
 	return r.Message
 }
 
-func NewResponseUnathorized(msg string) ResponseError {
-	return ResponseError{
+func (r *Response[T]) Respond(c *fiber.Ctx) error {
+	return c.Status(r.Code).JSON(r)
+}
+
+func NewResponseBadRequest(msg string, errs map[string][]string) *ResponseError {
+	return &ResponseError{
+		Code:    400,
+		Message: msg,
+		Errors:  errs,
+	}
+}
+
+func NewResponseUnathorized(msg string) *ResponseError {
+	return &ResponseError{
 		Code:    401,
+		Message: msg,
+	}
+}
+
+func NewResponseTooManyRequest(msg string) *ResponseError {
+	return &ResponseError{
+		Code:    429,
 		Message: msg,
 	}
 }

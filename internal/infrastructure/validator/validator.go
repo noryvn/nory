@@ -43,15 +43,11 @@ func ValidateStruct(s any, message string) error {
 	if !ok {
 		return err
 	}
-	res := interfaces.ResponseError{
-		Code:    400,
-		Message: message,
-		Errors:  map[string][]string{},
-	}
+	errs := map[string][]string{}
 	for _, fe := range vErr {
 		path := fe.Namespace()
 		path = strings.SplitN(path, ".", 2)[1]
-		res.Errors[path] = append(res.Errors[path], fe.Error())
+		errs[path] = append(errs[path], fe.Error())
 	}
-	return res
+	return interfaces.NewResponseBadRequest(message, errs)
 }

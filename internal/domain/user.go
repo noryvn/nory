@@ -8,19 +8,19 @@ import (
 
 var (
 	// user not found
-	ErrUserNotFound  = errors.New("can`t find user")
-	// duplicate UserId
-	ErrUserExists    = errors.New("user already exists")
-	// duplicate data, for unique sql column etc
+	ErrUserNotFound = errors.New("can`t find user")
+	// used for duplicate UserId
+	ErrUserExists = errors.New("user already exists")
+	// used for duplicate data, username, or unique sql column etc
 	ErrDuplicateUser = errors.New("duplicate user data")
 )
 
 type User struct {
-	UserId    string
-	CreatedAt time.Time
+	UserId    string    `json:"userId"`
+	CreatedAt time.Time `json:"createdAt"`
 
-	Username string
-	Name     string
+	Username string `json:"username"`
+	Name     string `json:"name"`
 }
 
 type UserRepository interface {

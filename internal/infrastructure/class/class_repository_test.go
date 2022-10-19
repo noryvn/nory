@@ -11,6 +11,7 @@ import (
 )
 
 func TestClassRepository(t *testing.T) {
+	t.Parallel()
 	repos := []classRepository{
 		{
 			Name: "memory",
@@ -118,7 +119,7 @@ func (cr classRepository) testGetByOwnerId(t *testing.T) {
 	for _, tc := range testCases {
 		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
-			classes, err := cr.R.GetByOwnedBy(context.Background(), tc.OwnerId)
+			classes, err := cr.R.GetByOwnerId(context.Background(), tc.OwnerId)
 			assert.Equal(t, tc.Err, err, "missmatch error")
 			if err == nil {
 				assert.Equal(t, tc.Len, len(classes), "unexpected class received")

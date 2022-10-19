@@ -11,6 +11,7 @@ import (
 )
 
 func TestUserRepository(t *testing.T) {
+	t.Parallel()
 	repos := []Repository{
 		{
 			Name: "memory",
