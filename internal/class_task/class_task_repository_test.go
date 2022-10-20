@@ -1,4 +1,4 @@
-package class_task_test
+package classtask_test
 
 import (
 	"context"

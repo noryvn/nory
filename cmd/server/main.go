@@ -9,22 +9,25 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"nory/internal/user"
+	"nory/internal/class"
 )
 
 func main() {
 	addr := getEnv("SERVER_ADDRESS", ":8080")
 
-	db, err := pgxpool.New(context.Background(), mustGetEnv("DATABASE_URL"))
+	pool, err := pgxpool.New(context.Background(), mustGetEnv("DATABASE_URL"))
 	if err != nil {
 		panic(err)
 	}
 
-	userRepository := user.NewUserRepositoryPostgres(db)
+	userRepository := user.NewUserRepositoryPostgres(pool)
+	classRepository := class.NewClassRepositoryPostgres(pool)
 
 	userApp := user.CreateApp(user.UserService{
 		UserRepository:  userRepository,
-		ClassRepository: nil,
+		ClassRepository: classRepository,
 	})
+
 	app := fiber.New()
 	app.Mount("/user", userApp)
 	err = app.Listen(addr)
