@@ -45,10 +45,10 @@ func TestUserRepository(t *testing.T) {
 				t.Skipf("skipping %s", repo.Name)
 			}
 			t.Parallel()
-			t.Run("create", repo.testCreate)
-			t.Run("get", repo.testGet)
-			t.Run("update", repo.testUpdate)
-			t.Run("delete", repo.testDelete)
+			t.Run("CreateUser", repo.testCreateUser)
+			t.Run("GetUser", repo.testGetUser)
+			t.Run("UpdateUser", repo.testUpdateUser)
+			t.Run("DeleteUser", repo.testDeleteUser)
 		})
 	}
 }
@@ -59,7 +59,7 @@ type Repository struct {
 	Skip bool
 }
 
-func (r Repository) testCreate(t *testing.T) {
+func (r *Repository) testCreateUser(t *testing.T) {
 	testCases := []struct {
 		Name string
 		User domain.User
@@ -82,7 +82,7 @@ func (r Repository) testCreate(t *testing.T) {
 	}
 }
 
-func (r Repository) testGet(t *testing.T) {
+func (r *Repository) testGetUser(t *testing.T) {
 	testCases := []struct {
 		Name string
 		Id   string
@@ -98,14 +98,14 @@ func (r Repository) testGet(t *testing.T) {
 			t.Helper()
 			u, err := r.R.GetUser(context.Background(), tc.Id)
 			assert.Equal(t, tc.Err, err, "missmatch error")
-			if tc.Err == nil && err == nil{
+			if tc.Err == nil && err == nil {
 				assert.Equal(t, tc.Id, u.UserId, "missmatch user id")
 			}
 		})
 	}
 }
 
-func (r Repository) testUpdate(t *testing.T) {
+func (r *Repository) testUpdateUser(t *testing.T) {
 	testCases := []struct {
 		Name string
 		User domain.User
@@ -136,7 +136,7 @@ func (r Repository) testUpdate(t *testing.T) {
 	}
 }
 
-func (r Repository) testDelete(t *testing.T) {
+func (r *Repository) testDeleteUser(t *testing.T) {
 	testCases := []struct {
 		Name string
 		Id   string
@@ -154,6 +154,8 @@ func (r Repository) testDelete(t *testing.T) {
 			t.Helper()
 			err := r.R.DeleteUser(context.Background(), tc.Id)
 			assert.Equal(t, tc.Err, err, "missmatch error")
+			_, err = r.R.GetUser(context.Background(), tc.Id)
+			assert.Equal(t, domain.ErrUserNotFound, err)
 		})
 	}
 }

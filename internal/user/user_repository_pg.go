@@ -41,6 +41,7 @@ func (urp *UserRepositoryPostgres) GetUser(ctx context.Context, id string) (*dom
 	}
 	return u, nil
 }
+
 func (urp *UserRepositoryPostgres) DeleteUser(ctx context.Context, id string) error {
 	_, err := urp.pool.Exec(
 		ctx,
@@ -49,6 +50,7 @@ func (urp *UserRepositoryPostgres) DeleteUser(ctx context.Context, id string) er
 	)
 	return err
 }
+
 func (urp *UserRepositoryPostgres) CreateUser(ctx context.Context, user *domain.User) error {
 	_, err := urp.pool.Exec(
 		ctx,
@@ -63,6 +65,7 @@ func (urp *UserRepositoryPostgres) CreateUser(ctx context.Context, user *domain.
 	}
 	return err
 }
+
 func (urp *UserRepositoryPostgres) UpdateUser(ctx context.Context, user *domain.User) error {
 	u, err := urp.GetUser(ctx, user.UserId)
 	if err != nil {
@@ -71,14 +74,9 @@ func (urp *UserRepositoryPostgres) UpdateUser(ctx context.Context, user *domain.
 	u.Update(user)
 	_, err = urp.pool.Exec(
 		ctx,
-		`UPDATE app_user
-		SET username = $1,
-			name = $2,
-			email = $3
-		WHERE user_id = $4`,
+		`UPDATE app_user SET username = $1, name = $2 WHERE user_id = $3`,
 		u.Username,
 		u.Name,
-		u.Email,
 		u.UserId,
 	)
 	if pgerr, ok := err.(*pgconn.PgError); ok && pgerr.Code == "23505" {

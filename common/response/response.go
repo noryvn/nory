@@ -20,13 +20,17 @@ type ResponsePaginate[T any] struct {
 	} `json:"pagination"`
 }
 
-type ResponseError = Response[*struct{}]
+func (r *Response[T]) Respond(c *fiber.Ctx) error {
+	return c.Status(r.Code).JSON(r)
+}
 
-func (r *Response[T]) Error() string {
+type ResponseError Response[*struct{}]
+
+func (r *ResponseError) Error() string {
 	return r.Message
 }
 
-func (r *Response[T]) Respond(c *fiber.Ctx) error {
+func (r *ResponseError) Respond(c *fiber.Ctx) error {
 	return c.Status(r.Code).JSON(r)
 }
 
@@ -57,4 +61,12 @@ func New[T any](code int, data T) Response[T] {
 		Code: code,
 		Data: data,
 	}
+}
+
+func ErrorHandler(c *fiber.Ctx, err error) error {
+	res, ok := err.(*ResponseError)
+	if ok {
+		return res.Respond(c)
+	}
+	return fiber.DefaultErrorHandler(c, err)
 }

@@ -6,6 +6,7 @@ require (
 	github.com/gofiber/fiber/v2 v2.38.1
 	github.com/jackc/pgx/v5 v5.0.3
 	github.com/nedpals/supabase-go v0.2.0
+	github.com/rs/xid v1.4.0
 	github.com/stretchr/testify v1.8.0
 )
 

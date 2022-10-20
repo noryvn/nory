@@ -20,6 +20,15 @@ type Class struct {
 	Description string `json:"description"`
 }
 
+func (c *Class) Update(cc *Class) {
+	if cc.Name != "" {
+		c.Name = cc.Name
+	}
+	if cc.Description != "" {
+		c.Description = cc.Description
+	}
+}
+
 type ClassRepository interface {
 	GetClass(ctx context.Context, classId string) (*Class, error)
 	GetByOwnerId(ctx context.Context, ownerId string) ([]*Class, error)

@@ -12,7 +12,7 @@ import (
 
 func TestClassRepository(t *testing.T) {
 	t.Parallel()
-	repos := []classRepository{
+	repos := []Repository{
 		{
 			Name: "memory",
 			R:    NewClassRepositoryMem(),
@@ -31,12 +31,12 @@ func TestClassRepository(t *testing.T) {
 	}
 }
 
-type classRepository struct {
+type Repository struct {
 	Name string
 	R    domain.ClassRepository
 }
 
-func (cr classRepository) testCreate(t *testing.T) {
+func (r *Repository) testCreate(t *testing.T) {
 	testCases := []struct {
 		Name  string
 		Class domain.Class
@@ -51,13 +51,13 @@ func (cr classRepository) testCreate(t *testing.T) {
 	for _, tc := range testCases {
 		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
-			err := cr.R.CreateClass(context.Background(), &tc.Class)
+			err := r.R.CreateClass(context.Background(), &tc.Class)
 			assert.Equal(t, tc.Err, err, "missmatch err")
 		})
 	}
 }
 
-func (cr classRepository) testDelete(t *testing.T) {
+func (r *Repository) testDelete(t *testing.T) {
 	testCases := []struct {
 		Name    string
 		ClassId string
@@ -73,13 +73,13 @@ func (cr classRepository) testDelete(t *testing.T) {
 	for _, tc := range testCases {
 		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
-			err := cr.R.DeleteClass(context.Background(), tc.ClassId)
+			err := r.R.DeleteClass(context.Background(), tc.ClassId)
 			assert.Equal(t, tc.Err, err, "missmatch err")
 		})
 	}
 }
 
-func (cr classRepository) testGet(t *testing.T) {
+func (r *Repository) testGet(t *testing.T) {
 	testCases := []struct {
 		Name    string
 		ClassId string
@@ -95,7 +95,7 @@ func (cr classRepository) testGet(t *testing.T) {
 	for _, tc := range testCases {
 		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
-			c, err := cr.R.GetClass(context.Background(), tc.ClassId)
+			c, err := r.R.GetClass(context.Background(), tc.ClassId)
 			assert.Equal(t, tc.Err, err)
 			if tc.Err == nil {
 				assert.Equal(t, tc.ClassId, c.ClassId, "unexpected class id")
@@ -104,7 +104,7 @@ func (cr classRepository) testGet(t *testing.T) {
 	}
 }
 
-func (cr classRepository) testGetByOwnerId(t *testing.T) {
+func (r *Repository) testGetByOwnerId(t *testing.T) {
 	testCases := []struct {
 		Name    string
 		OwnerId string
@@ -119,7 +119,7 @@ func (cr classRepository) testGetByOwnerId(t *testing.T) {
 	for _, tc := range testCases {
 		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
-			classes, err := cr.R.GetByOwnerId(context.Background(), tc.OwnerId)
+			classes, err := r.R.GetByOwnerId(context.Background(), tc.OwnerId)
 			assert.Equal(t, tc.Err, err, "missmatch error")
 			if err == nil {
 				assert.Equal(t, tc.Len, len(classes), "unexpected class received")
@@ -131,7 +131,7 @@ func (cr classRepository) testGetByOwnerId(t *testing.T) {
 	}
 }
 
-func (cr classRepository) testUpdate(t *testing.T) {
+func (r *Repository) testUpdate(t *testing.T) {
 	testCases := []struct {
 		Name  string
 		Class domain.Class
@@ -143,13 +143,13 @@ func (cr classRepository) testUpdate(t *testing.T) {
 	for _, tc := range testCases {
 		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
-			prev, err := cr.R.GetClass(context.Background(), tc.Class.ClassId)
+			prev, err := r.R.GetClass(context.Background(), tc.Class.ClassId)
 			assert.Equal(t, nil, err, "unexpected error")
 
-			err = cr.R.UpdateClass(context.Background(), &tc.Class)
+			err = r.R.UpdateClass(context.Background(), &tc.Class)
 			assert.Equal(t, tc.Err, err, "missmatch error")
 
-			curr, err := cr.R.GetClass(context.Background(), tc.Class.ClassId)
+			curr, err := r.R.GetClass(context.Background(), tc.Class.ClassId)
 			assert.Equal(t, nil, err, "unexpected error")
 
 			if tc.Err == nil {

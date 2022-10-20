@@ -63,11 +63,6 @@ func (urm *UserRepositoryMem) UpdateUser(ctx context.Context, u *domain.User) er
 	if err != nil {
 		return err
 	}
-	if u.Name != "" {
-		uu.Name = u.Name
-	}
-	if u.Username != "" {
-		uu.Username = u.Username
-	}
+	uu.Update(u)
 	return nil
 }
