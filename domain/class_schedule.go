@@ -1,15 +1,18 @@
 package domain
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 type ClassSchedule struct {
 	ScheduleId string `json:"scheduleId"`
 	ClassId    string `json:"-"`
 
-	Name     string `json:"name"`
-	StartAt  string `json:"startAt"`
-	Duration int16  `json:"duration"`
-	Day      int8   `json:"day"`
+	Name     string        `json:"name"`
+	StartAt  time.Duration `json:"startAt"`
+	Duration int16         `json:"duration"`
+	Day      int8          `json:"day"`
 }
 
 type ClassScheduleRepository interface {

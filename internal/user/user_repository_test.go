@@ -33,7 +33,7 @@ func TestUserRepository(t *testing.T) {
 		},
 		{
 			Name: "postgres",
-			R:    NewUserRepositroyPostgres(pool),
+			R:    NewUserRepositoryPostgres(pool),
 			Skip: os.Getenv("DATABASE_URL") == "",
 		},
 	}

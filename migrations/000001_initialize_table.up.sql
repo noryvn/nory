@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS app_user (
 	user_id UUID UNIQUE NOT NULL,
 	created_at TIMESTAMP DEFAULT NOW(),
 
-	username VARCHAR(20) UNIQUE NOT NULL,
+	username VARCHAR(20) NOT NULL,
 	name VARCHAR(32) NOT NULL,
 	email VARCHAR(254) UNIQUE NOT NULL,
 
@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS app_user (
 
 -- some times username will be used in WHERE clause
 CREATE INDEX IF NOT EXISTS user_id_index ON app_user(user_id, username);
+CREATE UNIQUE INDEX lower_username ON app_user(LOWER(username));
 
 CREATE TABLE IF NOT EXISTS class (
 	class_id VARCHAR(20) UNIQUE NOT NULL,

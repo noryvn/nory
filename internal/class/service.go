@@ -1,7 +1,14 @@
 package class
 
-import "nory/domain"
+import (
+	"context"
+
+	"nory/domain"
+)
 
 type ClassService struct {
-	ClassRepository domain.ClassRepository
+	ClassRepository     domain.ClassRepository
+	ClassTaskRepository domain.ClassTaskRepository
 }
+
+func (cs *ClassService) GetClass(ctx context.Context) {}

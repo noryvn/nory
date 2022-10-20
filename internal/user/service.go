@@ -23,6 +23,7 @@ func (up *UserProfile) GetUser() *domain.User {
 	u.Email = up.Email
 	return u
 }
+
 func (up *UserProfile) SetUser(u *domain.User) {
 	up.UserId = u.UserId
 	up.CreatedAt = u.CreatedAt
@@ -38,7 +39,7 @@ type UserService struct {
 func (us UserService) GetUserProfile(ctx context.Context, user *domain.User) (response.Response[*UserProfile], error) {
 	up := &UserProfile{}
 	res := response.New(200, up)
-	classes, err := us.ClassRepository.GetByOwnerId(ctx, user.UserId)
+	classes, err := us.ClassRepository.GetClassesByOwnerId(ctx, user.UserId)
 	if err != nil {
 		return res, err
 	}

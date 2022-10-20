@@ -38,6 +38,7 @@ func (ctrm *ClassTaskRepositoryMem) GetTask(ctx context.Context, taskId string) 
 	}
 	return task, nil
 }
+
 func (ctrm *ClassTaskRepositoryMem) GetTasks(ctx context.Context, classId string) ([]*domain.ClassTask, error) {
 	ctrm.mx.Lock()
 	defer ctrm.mx.Unlock()
@@ -50,7 +51,7 @@ func (ctrm *ClassTaskRepositoryMem) GetTasks(ctx context.Context, classId string
 	return tasks, nil
 }
 
-func (ctrm *ClassTaskRepositoryMem) GetTasksDate(ctx context.Context, classId string, dueDate time.Time) ([]*domain.ClassTask, error) {
+func (ctrm *ClassTaskRepositoryMem) GetTasksWithDate(ctx context.Context, classId string, dueDate time.Time) ([]*domain.ClassTask, error) {
 	ctrm.mx.Lock()
 	defer ctrm.mx.Unlock()
 	tasks := make([]*domain.ClassTask, 0)

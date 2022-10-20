@@ -68,5 +68,5 @@ func ErrorHandler(c *fiber.Ctx, err error) error {
 	if ok {
 		return res.Respond(c)
 	}
-	return fiber.DefaultErrorHandler(c, err)
+	return err
 }

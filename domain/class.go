@@ -7,8 +7,10 @@ import (
 )
 
 var (
+	// class not found
 	ErrClassNotFound = errors.New("class not found")
-	ErrClassExists   = errors.New("class already exists")
+	// conflicting data, unique constraint and etc.
+	ErrClassExists = errors.New("class already exists")
 )
 
 type Class struct {
@@ -31,7 +33,7 @@ func (c *Class) Update(cc *Class) {
 
 type ClassRepository interface {
 	GetClass(ctx context.Context, classId string) (*Class, error)
-	GetByOwnerId(ctx context.Context, ownerId string) ([]*Class, error)
+	GetClassesByOwnerId(ctx context.Context, ownerId string) ([]*Class, error)
 	CreateClass(ctx context.Context, class *Class) error
 	DeleteClass(ctx context.Context, classId string) error
 	UpdateClass(ctx context.Context, class *Class) error

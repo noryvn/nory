@@ -12,8 +12,8 @@ import (
 )
 
 var (
-	AbelBirthday = time.Date(2005, time.August, 11, 0, 0, 0, 0, time.Local)
-	Now = time.Now()
+	AbelBirthday = time.Date(2005, time.August, 11, 0, 0, 0, 0, time.UTC)
+	Now          = time.Now()
 )
 
 func TestClassTaskRepository(t *testing.T) {
@@ -34,7 +34,7 @@ func TestClassTaskRepository(t *testing.T) {
 			t.Run("CreateTask", repo.testCreateTask)
 			t.Run("GetTasks", repo.testGetTask)
 			t.Run("GetTasks", repo.testGetTasks)
-			t.Run("GetTasksDate", repo.testGetTasksDate)
+			t.Run("GetTasksWithDate", repo.testGetTasksWithDate)
 			t.Run("UpdateTask", repo.testUpdateTasks)
 			t.Run("DeleteTask", repo.testDeleteTask)
 		})
@@ -42,10 +42,10 @@ func TestClassTaskRepository(t *testing.T) {
 }
 
 type Repository struct {
-	Name string
-	R    domain.ClassTaskRepository
-	Skip bool
-	Tasks  []domain.ClassTask
+	Name  string
+	R     domain.ClassTaskRepository
+	Skip  bool
+	Tasks []domain.ClassTask
 }
 
 func (r *Repository) testCreateTask(t *testing.T) {
@@ -57,7 +57,7 @@ func (r *Repository) testCreateTask(t *testing.T) {
 		{"success", domain.ClassTask{ClassId: "foo", DueDate: AbelBirthday, TaskId: "abelia narindi agsya"}, nil},
 		{"success", domain.ClassTask{ClassId: "foo", DueDate: Now, Name: "abelia narindi agsya"}, nil},
 		{"success", domain.ClassTask{ClassId: "bar", DueDate: AbelBirthday, Description: "abelia narindi agsya"}, nil},
-		{"success", domain.ClassTask{ClassId: "baz", DueDate: Now }, nil},
+		{"success", domain.ClassTask{ClassId: "baz", DueDate: Now}, nil},
 	}
 
 	for _, tc := range testCases {
@@ -68,7 +68,9 @@ func (r *Repository) testCreateTask(t *testing.T) {
 			err := r.R.CreateTask(context.Background(), &task)
 			assert.Equal(t, tc.Err, err, "missmatch error")
 			assert.NotEqual(t, tc.Task.TaskId, task.TaskId, "CreateTask should update (*ClassTask).TaskId to generated id")
-			r.Tasks = append(r.Tasks, task)
+			if err == nil {
+				r.Tasks = append(r.Tasks, task)
+			}
 		})
 	}
 }
@@ -83,10 +85,10 @@ func (r *Repository) testGetTask(t *testing.T) {
 
 func (r *Repository) testGetTasks(t *testing.T) {
 	testCases := []struct {
-		Name string
+		Name    string
 		ClassId string
-		Len int
-		Err  error
+		Len     int
+		Err     error
 	}{
 		{"success", "foo", 2, nil},
 		{"success", "bar", 1, nil},
@@ -108,13 +110,13 @@ func (r *Repository) testGetTasks(t *testing.T) {
 	}
 }
 
-func (r *Repository) testGetTasksDate(t *testing.T) {
+func (r *Repository) testGetTasksWithDate(t *testing.T) {
 	testCases := []struct {
-		Name string
+		Name    string
 		ClassId string
 		DueDate time.Time
-		Len int
-		Err  error
+		Len     int
+		Err     error
 	}{
 		{"success", "foo", AbelBirthday, 1, nil},
 		{"success", "foo", Now, 1, nil},
@@ -127,7 +129,7 @@ func (r *Repository) testGetTasksDate(t *testing.T) {
 		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Helper()
-			tasks, err := r.R.GetTasksDate(context.Background(), tc.ClassId, tc.DueDate)
+			tasks, err := r.R.GetTasksWithDate(context.Background(), tc.ClassId, tc.DueDate)
 			assert.Equal(t, tc.Err, err, "missmatch error")
 			assert.Equal(t, tc.Len, len(tasks), "unexpected result length")
 			for _, task := range tasks {
@@ -145,7 +147,6 @@ func (r *Repository) testUpdateTasks(t *testing.T) {
 		Err  error
 	}{
 		{"success", r.Tasks[0], nil},
-
 	}
 
 	for _, tc := range testCases {

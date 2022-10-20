@@ -5,6 +5,8 @@ import (
 	"sync"
 
 	"nory/domain"
+
+	"github.com/rs/xid"
 )
 
 type ClassRepositoryMem struct {
@@ -23,12 +25,12 @@ func (crm *ClassRepositoryMem) GetClass(ctx context.Context, classId string) (*d
 	defer crm.mx.Unlock()
 	c, ok := crm.m[classId]
 	if !ok {
-		return c, domain.ErrClassNotFound
+		return nil, domain.ErrClassNotFound
 	}
 	return c, nil
 }
 
-func (crm *ClassRepositoryMem) GetByOwnerId(ctx context.Context, ownerId string) ([]*domain.Class, error) {
+func (crm *ClassRepositoryMem) GetClassesByOwnerId(ctx context.Context, ownerId string) ([]*domain.Class, error) {
 	crm.mx.Lock()
 	defer crm.mx.Unlock()
 	var classes []*domain.Class
@@ -44,9 +46,7 @@ func (crm *ClassRepositoryMem) GetByOwnerId(ctx context.Context, ownerId string)
 func (crm *ClassRepositoryMem) CreateClass(ctx context.Context, class *domain.Class) error {
 	crm.mx.Lock()
 	defer crm.mx.Unlock()
-	if _, ok := crm.m[class.ClassId]; ok {
-		return domain.ErrClassExists
-	}
+	class.ClassId = xid.New().String()
 	crm.m[class.ClassId] = class
 	return nil
 }
