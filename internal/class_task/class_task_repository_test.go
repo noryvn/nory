@@ -161,6 +161,9 @@ func (r *Repository) testDeleteTask(t *testing.T) {
 	for _, task := range r.Tasks {
 		err := r.R.DeleteTask(context.Background(), task.TaskId)
 		assert.Equal(t, nil, err, "unexpected error")
+
+		_, err = r.R.GetTask(context.Background(), task.TaskId)
+		assert.Equal(t, domain.ErrClassTaskNotFound, err, "failed deleting task")
 	}
 
 	testCases := []struct {
