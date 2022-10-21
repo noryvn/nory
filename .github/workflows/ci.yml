@@ -28,12 +28,5 @@ jobs:
       - name: run vet
         run: go vet ./...
 
-      - name: compose up
-        uses: isbang/compose-action@v1.3.2
-        with:
-          compose-file: ./docker-compose.yml
-
       - name: run test
         run: go test -race -vet=off ./...
-        env:
-          DATABASE_URL: "postgres://root:@localhost:26257/"
