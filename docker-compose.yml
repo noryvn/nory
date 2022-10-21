@@ -8,6 +8,8 @@ services:
     command: start-single-node --insecure
   migrate:
     image: migrate/migrate
+    depends_on:
+      - cockroach
     volumes:
       - ./migrations:/migrations
     command: -path /migrations -database cockroachdb://root:@cockroach:26257/ up 1
