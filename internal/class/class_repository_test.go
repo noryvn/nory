@@ -46,9 +46,9 @@ func TestClassRepository(t *testing.T) {
 			}
 			if r.Name == "postgres" {
 				userRepo := user.NewUserRepositoryPostgres(pool)
-				assert.Nil(t, userRepo.CreateUser(context.Background(), &domain.User{UserId: userFoo, Email: userFoo, Username: "userFoo" }))
-				assert.Nil(t, userRepo.CreateUser(context.Background(), &domain.User{UserId: userBar, Email: userBar, Username: "userBar" }))
-				assert.Nil(t, userRepo.CreateUser(context.Background(), &domain.User{UserId: userBaz, Email: userBaz, Username: "userBaz" }))
+				assert.Nil(t, userRepo.CreateUser(context.Background(), &domain.User{UserId: userFoo, Email: userFoo, Username: "userFoo"}))
+				assert.Nil(t, userRepo.CreateUser(context.Background(), &domain.User{UserId: userBar, Email: userBar, Username: "userBar"}))
+				assert.Nil(t, userRepo.CreateUser(context.Background(), &domain.User{UserId: userBaz, Email: userBaz, Username: "userBaz"}))
 				t.Cleanup(func() {
 					userRepo.DeleteUser(context.Background(), userFoo)
 					userRepo.DeleteUser(context.Background(), userBar)
@@ -66,9 +66,9 @@ func TestClassRepository(t *testing.T) {
 }
 
 type Repository struct {
-	Name string
-	R    domain.ClassRepository
-	Skip bool
+	Name    string
+	R       domain.ClassRepository
+	Skip    bool
 	Classes []domain.Class
 }
 

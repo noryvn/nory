@@ -56,8 +56,8 @@ func NewTooManyRequest(msg string) *ResponseError {
 	}
 }
 
-func New[T any](code int, data T) Response[T] {
-	return Response[T]{
+func New[T any](code int, data T) *Response[T] {
+	return &Response[T]{
 		Code: code,
 		Data: data,
 	}

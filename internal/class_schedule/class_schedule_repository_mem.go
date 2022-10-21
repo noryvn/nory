@@ -10,7 +10,7 @@ import (
 
 type ClassScheduleRepositoryMem struct {
 	mx sync.Mutex
-	m map[string]*domain.ClassSchedule
+	m  map[string]*domain.ClassSchedule
 }
 
 func NewClassScheduleRepositoryMem() *ClassScheduleRepositoryMem {
@@ -18,7 +18,6 @@ func NewClassScheduleRepositoryMem() *ClassScheduleRepositoryMem {
 		m: make(map[string]*domain.ClassSchedule),
 	}
 }
-
 
 func (csrm *ClassScheduleRepositoryMem) CreateSchedule(ctx context.Context, schedule *domain.ClassSchedule) error {
 	csrm.mx.Lock()

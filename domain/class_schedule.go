@@ -22,7 +22,7 @@ type ClassSchedule struct {
 
 type ClassScheduleRepository interface {
 	CreateSchedule(ctx context.Context, schedule *ClassSchedule) error
-	GetSchedule(ctx context.Context, scheduleId string) (*ClassSchedule ,error)
+	GetSchedule(ctx context.Context, scheduleId string) (*ClassSchedule, error)
 	GetSchedules(ctx context.Context, classId string) ([]*ClassSchedule, error)
 	DeleteSchedule(ctx context.Context, scheduleId string) error
 	ClearSchedules(ctx context.Context, classId string, day int8) error

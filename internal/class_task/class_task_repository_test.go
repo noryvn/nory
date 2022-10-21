@@ -34,7 +34,7 @@ func TestClassTaskRepository(t *testing.T) {
 			t.Run("CreateTask", repo.testCreateTask)
 			t.Run("GetTasks", repo.testGetTask)
 			t.Run("GetTasks", repo.testGetTasks)
-			t.Run("GetTasksWithDate", repo.testGetTasksWithDate)
+			t.Run("GetTasksWithRange", repo.testGetTasksWithRange)
 			t.Run("UpdateTask", repo.testUpdateTasks)
 			t.Run("DeleteTask", repo.testDeleteTask)
 		})
@@ -110,31 +110,35 @@ func (r *Repository) testGetTasks(t *testing.T) {
 	}
 }
 
-func (r *Repository) testGetTasksWithDate(t *testing.T) {
+func (r *Repository) testGetTasksWithRange(t *testing.T) {
 	testCases := []struct {
 		Name    string
 		ClassId string
-		DueDate time.Time
+		From time.Time
+		To time.Time
 		Len     int
 		Err     error
 	}{
-		{"success", "foo", AbelBirthday, 1, nil},
-		{"success", "foo", Now, 1, nil},
-		{"bar has 0 with due date now", "bar", Now, 0, nil},
-		{"baz has 1 with due date Now", "baz", Now, 1, nil},
-		{"ClassID not exists", "qux", Now, 0, nil},
+		{"success", "foo", AbelBirthday, Now.Add(24 * time.Hour), 2, nil},
+		{"success", "bar", AbelBirthday, Now.Add(24 * time.Hour), 1, nil},
+		{"success", "baz", AbelBirthday, Now.Add(24 * time.Hour), 1, nil},
+		{"success", "qux", AbelBirthday, Now.Add(24 * time.Hour), 0, nil},
+		{"success", "foo", AbelBirthday, AbelBirthday.Add(24 * time.Hour), 1, nil},
+		{"success", "foo", Now, Now.Add(24 * time.Hour), 1, nil},
+		{"bar has 0 with due date now", "bar", Now, Now.Add(24 * time.Hour), 0, nil},
+		{"baz has 1 with due date Now", "baz", Now, Now.Add(24 * time.Hour), 1, nil},
+		{"ClassID not exists", "qux", Now, Now.Add(24 * time.Hour), 0, nil},
 	}
 
 	for _, tc := range testCases {
 		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Helper()
-			tasks, err := r.R.GetTasksWithDate(context.Background(), tc.ClassId, tc.DueDate)
+			tasks, err := r.R.GetTasksWithRange(context.Background(), tc.ClassId, tc.From, tc.To)
 			assert.Equal(t, tc.Err, err, "missmatch error")
 			assert.Equal(t, tc.Len, len(tasks), "unexpected result length")
 			for _, task := range tasks {
 				assert.Equal(t, tc.ClassId, task.ClassId, "unknown ClassId")
-				assert.Equal(t, tc.DueDate, task.DueDate, "unknown DueDate")
 			}
 		})
 	}

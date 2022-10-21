@@ -7,6 +7,19 @@ type server struct {
 }
 
 func CreateApp(classService ClassService) *fiber.App {
+	s := &server{
+		cs: classService,
+	}
 	app := fiber.New()
+	app.Get("/info", s.ClassInfo)
+	app.Get("/tasks", s.ClassTasks)
 	return app
+}
+
+func (s *server) ClassInfo(c *fiber.Ctx) error {
+	return nil
+}
+
+func (s *server) ClassTasks(c *fiber.Ctx) error {
+	return nil
 }

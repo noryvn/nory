@@ -36,7 +36,7 @@ type ClassTaskRepository interface {
 	CreateTask(ctx context.Context, task *ClassTask) error
 	GetTask(ctx context.Context, taskId string) (*ClassTask, error)
 	GetTasks(ctx context.Context, classId string) ([]*ClassTask, error)
-	GetTasksWithDate(ctx context.Context, classId string, dueDate time.Time) ([]*ClassTask, error)
+	GetTasksWithRange(ctx context.Context, classId string, from, to time.Time) ([]*ClassTask, error)
 	UpdateTask(ctx context.Context, task *ClassTask) error
 	DeleteTask(ctx context.Context, taskId string) error
 }

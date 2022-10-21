@@ -36,7 +36,7 @@ type UserService struct {
 	ClassRepository domain.ClassRepository
 }
 
-func (us UserService) GetUserProfile(ctx context.Context, user *domain.User) (response.Response[*UserProfile], error) {
+func (us UserService) GetUserProfile(ctx context.Context, user *domain.User) (*response.Response[*UserProfile], error) {
 	up := &UserProfile{}
 	res := response.New(200, up)
 	classes, err := us.ClassRepository.GetClassesByOwnerId(ctx, user.UserId)

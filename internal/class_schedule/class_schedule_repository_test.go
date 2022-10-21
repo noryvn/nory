@@ -21,7 +21,7 @@ func TestClassScheduleRepository(t *testing.T) {
 	repos := []Repository{
 		{
 			Name: "memory",
-			R: NewClassScheduleRepositoryMem(),
+			R:    NewClassScheduleRepositoryMem(),
 		},
 	}
 
@@ -42,17 +42,17 @@ func TestClassScheduleRepository(t *testing.T) {
 }
 
 type Repository struct {
-	Name string
-	R domain.ClassScheduleRepository
-	Skip bool
+	Name      string
+	R         domain.ClassScheduleRepository
+	Skip      bool
 	Schedules []domain.ClassSchedule
 }
 
 func (r *Repository) testCreateSchedule(t *testing.T) {
-	testCases := []struct{
-		Name string
+	testCases := []struct {
+		Name     string
 		Schedule domain.ClassSchedule
-		Err error
+		Err      error
 	}{
 		{"success", domain.ClassSchedule{ClassId: classFoo, Day: int8(2)}, nil},
 		{"success", domain.ClassSchedule{ClassId: classFoo, Day: int8(1)}, nil},
@@ -76,10 +76,10 @@ func (r *Repository) testCreateSchedule(t *testing.T) {
 }
 
 func (r *Repository) testGetSchedule(t *testing.T) {
-	testCases := []struct{
-		Name string
+	testCases := []struct {
+		Name       string
 		ScheduleId string
-		Err error
+		Err        error
 	}{
 		{"success", r.Schedules[0].ScheduleId, nil},
 		{"not found", xid.New().String(), domain.ErrClassScheduleNotFound},
@@ -98,11 +98,11 @@ func (r *Repository) testGetSchedule(t *testing.T) {
 }
 
 func (r *Repository) testGetSchedules(t *testing.T) {
-	testCases := []struct{
-		Name string
+	testCases := []struct {
+		Name    string
 		ClassId string
-		Len int
-		Err error
+		Len     int
+		Err     error
 	}{
 		{"2 class same day 1 different day", classFoo, 3, nil},
 		{"2 class same day", classBar, 2, nil},
@@ -123,12 +123,12 @@ func (r *Repository) testGetSchedules(t *testing.T) {
 }
 
 func (r *Repository) testClearSchedules(t *testing.T) {
-	testCases := []struct{
-		Name string
+	testCases := []struct {
+		Name    string
 		ClassId string
-		Day int8
-		Len int
-		Err error
+		Day     int8
+		Len     int
+		Err     error
 	}{
 		{"success", classFoo, 2, 2, nil},
 		{"success", classBar, 1, 0, nil},
@@ -155,4 +155,3 @@ func (r *Repository) testDeleteSchedule(t *testing.T) {
 		assert.Equal(t, domain.ErrClassScheduleNotFound, err, "schedule not deleted properly")
 	}
 }
-

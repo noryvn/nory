@@ -40,11 +40,17 @@ func (ctrm *ClassTaskRepositoryMem) GetTask(ctx context.Context, taskId string) 
 }
 
 func (ctrm *ClassTaskRepositoryMem) GetTasks(ctx context.Context, classId string) ([]*domain.ClassTask, error) {
+	return ctrm.GetTasksWithRange(ctx, classId, time.Unix(1, 0), time.Date(2030, time.August, 11, 0, 0, 0, 0, time.UTC))
+}
+
+func (ctrm *ClassTaskRepositoryMem) GetTasksWithRange(ctx context.Context, classId string, from, to time.Time) ([]*domain.ClassTask, error) {
 	ctrm.mx.Lock()
 	defer ctrm.mx.Unlock()
 	tasks := make([]*domain.ClassTask, 0)
 	for _, task := range ctrm.m {
-		if task.ClassId == classId {
+		if task.ClassId == classId &&
+			!task.DueDate.Before(from) &&
+			task.DueDate.Before(to) {
 			tasks = append(tasks, task)
 		}
 	}

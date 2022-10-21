@@ -11,7 +11,7 @@ import (
 	"nory/domain"
 )
 
-type ClassRepositoryPostgres struct{
+type ClassRepositoryPostgres struct {
 	pool *pgxpool.Pool
 }
 
@@ -99,4 +99,3 @@ func (crp *ClassRepositoryPostgres) UpdateClass(ctx context.Context, class *doma
 	)
 	return err
 }
-

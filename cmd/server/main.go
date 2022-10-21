@@ -8,8 +8,8 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	"nory/internal/user"
 	"nory/internal/class"
+	"nory/internal/user"
 )
 
 func main() {
