@@ -10,6 +10,8 @@ services:
     image: migrate/migrate
     depends_on:
       - cockroach
+    links:
+      - cockroach
     volumes:
       - ./migrations:/migrations
     command: -path /migrations -database cockroachdb://root:@cockroach:26257/ up 1
