@@ -36,4 +36,4 @@ jobs:
       - name: run test
         run: go test -race -vet=off ./...
         env:
-          DATABASE_URL="cockroachdb://root:@localhost:26257/"
+          DATABASE_URL: "cockroachdb://root:@localhost:26257/"
