@@ -29,7 +29,7 @@ jobs:
         run: go vet ./...
 
       - name: compose up
-        uses: isbang/compose-action@v1
+        uses: isbang/compose-action@v1.3.2
         with:
           compose-file: ./docker-compose.yml
 
