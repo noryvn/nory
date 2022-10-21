@@ -54,6 +54,7 @@ func TestAuthMock(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Helper()
 			t.Parallel()
+			tc.User.CreatedAt = tc.User.CreatedAt.UTC()
 
 			body := domain.User{}
 			req := httptest.NewRequest("GET", "/", nil)
