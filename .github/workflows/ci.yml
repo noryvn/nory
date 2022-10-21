@@ -28,5 +28,12 @@ jobs:
       - name: run vet
         run: go vet ./...
 
+      - name: compose up
+        uses: isbang/compose-action@v1
+        with:
+          compose-file: ./docker-compose.yml
+
       - name: run test
         run: go test -race -vet=off ./...
+        env:
+          DATABASE_URL="cockroachdb://root:@localhost:26257/"

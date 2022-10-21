@@ -6,3 +6,7 @@ services:
       - 8081:8080
       - 26257:26257
     command: start-single-node --insecure
+  migrate:
+    image: migrate/migrate
+    volumes: ./migrations:/migrations
+    command: -path /migrations -database cockroachdb://root:@cockroach:26257/ up 1
