@@ -11,7 +11,6 @@ type UserProfile struct {
 	domain.User
 
 	OwnedClass  int `json:"ownedClass"`
-	JoinedClass int `json:"joinedClass"`
 }
 
 func (up *UserProfile) GetUser() *domain.User {
