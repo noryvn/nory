@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/jackc/pgx/v5"
@@ -28,18 +29,16 @@ func (urp *UserRepositoryPostgres) GetUser(ctx context.Context, id string) (*dom
 		Email:     "",
 	}
 	row := urp.pool.QueryRow(ctx, "SELECT username, name, email, created_at FROM app_user WHERE user_id = $1", id)
-	if err := row.Scan(
+	err := row.Scan(
 		&u.Username,
 		&u.Name,
 		&u.Email,
 		&u.CreatedAt,
-	); err != nil {
-		if err == pgx.ErrNoRows {
-			err = domain.ErrUserNotExists
-		}
-		return nil, err
+	)
+	if errors.Is(err, pgx.ErrNoRows) {
+		err = domain.ErrUserNotExists
 	}
-	return u, nil
+	return u, err
 }
 
 func (urp *UserRepositoryPostgres) DeleteUser(ctx context.Context, id string) error {

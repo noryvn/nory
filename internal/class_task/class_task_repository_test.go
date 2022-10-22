@@ -2,27 +2,46 @@ package classtask_test
 
 import (
 	"context"
+	"os"
 	"testing"
 	"time"
 
 	"nory/domain"
 	"nory/internal/class"
 	. "nory/internal/class_task"
+	"nory/internal/user"
 
+	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/rs/xid"
 	"github.com/stretchr/testify/assert"
 )
 
 var (
 	AbelBirthday = time.Date(2005, time.August, 11, 0, 0, 0, 0, time.UTC)
-	Now          = time.Now()
+	Now          = time.Now().UTC().Round(time.Hour)
+	Tomorrow     = Now.Add(24 * time.Hour)
 )
 
 func TestClassTaskRepository(t *testing.T) {
+	pool, err := pgxpool.New(context.Background(), os.Getenv("DATABASE_URL"))
+	if err != nil {
+		t.Error(err)
+	}
+
 	repos := []Repository{
 		{
-			Name: "memory",
-			ClassTaskRepository:    NewClassTaskRepositoryMem(),
-			ClassRepository: class.NewClassRepositoryMem(),
+			Name:                "memory",
+			ClassTaskRepository: NewClassTaskRepositoryMem(),
+			ClassRepository:     class.NewClassRepositoryMem(),
+			UserRepository:      user.NewUserRepositoryMem(),
+		},
+		{
+			Name:                "postgres",
+			ClassTaskRepository: NewClassTaskRepositoryPostgres(pool),
+			ClassRepository:     class.NewClassRepositoryPostgres(pool),
+			UserRepository:      user.NewUserRepositoryPostgres(pool),
+			Skip:                os.Getenv("DATABASE_URL") == "",
 		},
 	}
 
@@ -45,14 +64,15 @@ func TestClassTaskRepository(t *testing.T) {
 }
 
 type Repository struct {
-	Name  string
-	ClassTaskRepository     domain.ClassTaskRepository
-	ClassRepository domain.ClassRepository
-	Skip  bool
+	Name                string
+	ClassTaskRepository domain.ClassTaskRepository
+	ClassRepository     domain.ClassRepository
+	UserRepository      domain.UserRepository
+	Skip                bool
 
-	tasks []domain.ClassTask
+	tasks   []domain.ClassTask
 	classes map[string]string
-	t *testing.T
+	t       *testing.T
 }
 
 func (r *Repository) getClass(name string) string {
@@ -62,9 +82,19 @@ func (r *Repository) getClass(name string) string {
 	if id, ok := r.classes[name]; ok {
 		return id
 	}
-	class := &domain.Class{}
-	err := r.ClassRepository.CreateClass(context.Background(), class)
+
+	u := &domain.User{
+		UserId:   uuid.NewString(),
+		Email:    xid.New().String(),
+		Username: xid.New().String(),
+	}
+	err := r.UserRepository.CreateUser(context.Background(), u)
 	assert.Nil(r.t, err)
+
+	class := &domain.Class{OwnerId: u.UserId}
+	err = r.ClassRepository.CreateClass(context.Background(), class)
+	assert.Nil(r.t, err)
+
 	r.classes[name] = class.ClassId
 	return class.ClassId
 }
@@ -88,8 +118,8 @@ func (r *Repository) testCreateTask(t *testing.T) {
 			task := tc.Task
 			err := r.ClassTaskRepository.CreateTask(context.Background(), &task)
 			assert.Equal(t, tc.Err, err, "missmatch error")
-			assert.NotEqual(t, tc.Task.TaskId, task.TaskId, "CreateTask should update (*ClassTask).TaskId to generated id")
 			if err == nil {
+				assert.NotEqual(t, tc.Task.TaskId, task.TaskId, "CreateTask should update (*ClassTask).TaskId to generated id")
 				r.tasks = append(r.tasks, task)
 			}
 		})
@@ -99,7 +129,7 @@ func (r *Repository) testCreateTask(t *testing.T) {
 func (r *Repository) testGetTask(t *testing.T) {
 	for _, taskSc := range r.tasks {
 		task, err := r.ClassTaskRepository.GetTask(context.Background(), taskSc.TaskId)
-		assert.Equal(t, nil, err, "unexpected error")
+		assert.Nil(t, err, "unexpected error")
 		assert.Equal(t, taskSc, *task, "unknown TaskId")
 	}
 }
@@ -141,15 +171,15 @@ func (r *Repository) testGetTasksWithRange(t *testing.T) {
 		Len     int
 		Err     error
 	}{
-		{"success", "foo", AbelBirthday, Now.Add(24 * time.Hour), 2, nil},
-		{"success", "bar", AbelBirthday, Now.Add(24 * time.Hour), 1, nil},
-		{"success", "baz", AbelBirthday, Now.Add(24 * time.Hour), 1, nil},
-		{"success", "qux", AbelBirthday, Now.Add(24 * time.Hour), 0, nil},
+		{"success", "foo", AbelBirthday, Tomorrow, 2, nil},
+		{"success", "bar", AbelBirthday, Tomorrow, 1, nil},
+		{"success", "baz", AbelBirthday, Tomorrow, 1, nil},
+		{"success", "qux", AbelBirthday, Tomorrow, 0, nil},
 		{"success", "foo", AbelBirthday, AbelBirthday.Add(24 * time.Hour), 1, nil},
-		{"success", "foo", Now, Now.Add(24 * time.Hour), 1, nil},
-		{"bar has 0 with due date now", "bar", Now, Now.Add(24 * time.Hour), 0, nil},
-		{"baz has 1 with due date Now", "baz", Now, Now.Add(24 * time.Hour), 1, nil},
-		{"ClassID not exists", "qux", Now, Now.Add(24 * time.Hour), 0, nil},
+		{"success", "foo", Now, Tomorrow, 1, nil},
+		{"bar has 0 with due date now", "bar", Now, Tomorrow, 0, nil},
+		{"baz has 1 with due date Now", "baz", Now, Tomorrow, 1, nil},
+		{"ClassID not exists", "qux", Now, Tomorrow, 0, nil},
 	}
 
 	for _, tc := range testCases {
@@ -191,20 +221,5 @@ func (r *Repository) testDeleteTask(t *testing.T) {
 
 		_, err = r.ClassTaskRepository.GetTask(context.Background(), task.TaskId)
 		assert.Equal(t, domain.ErrClassTaskNotExists, err, "failed deleting task")
-	}
-
-	testCases := []struct {
-		ClassId string
-	}{
-		{"foo"},
-		{"bar"},
-		{"baz"},
-	}
-
-	for _, tc := range testCases {
-		id := r.getClass(tc.ClassId)
-		tasks, err := r.ClassTaskRepository.GetTasks(context.Background(), id)
-		assert.Equal(t, nil, err)
-		assert.Equal(t, 0, len(tasks), "failed deleting task")
 	}
 }

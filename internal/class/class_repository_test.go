@@ -109,7 +109,6 @@ func (r *Repository) testCreate(t *testing.T) {
 			if err == nil {
 				assert.NotEqual(t, tc.Class.ClassId, class.ClassId, "CreateClass must update (Class).ClassId to generated id")
 				r.classes = append(r.classes, class)
-				t.Log(class)
 			}
 		})
 	}
@@ -154,7 +153,6 @@ func (r *Repository) testGet(t *testing.T) {
 		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			c, err := r.ClassRepository.GetClass(context.Background(), tc.ClassId)
-			t.Log(c, tc.ClassId, err)
 			assert.Equal(t, tc.Err, err, "missmatch error")
 			if err == nil {
 				assert.NotNil(t, c)

@@ -45,7 +45,7 @@ func (cst classServiceTest) classInfo(t *testing.T) {
 	res, err := cst.classService.GetClassInfo(context.Background(), classA.ClassId)
 	assert.Nil(t, err)
 	assert.Equal(t, 200, res.Code)
-	assert.Equal(t, classA.ClassId, res.Data.ClassId)
+	assert.Equal(t, classA, res.Data)
 }
 
 func (cst classServiceTest) classTasks(t *testing.T) {

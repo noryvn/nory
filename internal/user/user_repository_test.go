@@ -27,14 +27,14 @@ func TestUserRepository(t *testing.T) {
 	}
 	repos := []Repository{
 		{
-			Name: "memory",
-			R:    NewUserRepositoryMem(),
-			Skip: false,
+			Name:           "memory",
+			UserRepository: NewUserRepositoryMem(),
+			Skip:           false,
 		},
 		{
-			Name: "postgres",
-			R:    NewUserRepositoryPostgres(pool),
-			Skip: os.Getenv("DATABASE_URL") == "",
+			Name:           "postgres",
+			UserRepository: NewUserRepositoryPostgres(pool),
+			Skip:           os.Getenv("DATABASE_URL") == "",
 		},
 	}
 
@@ -54,9 +54,9 @@ func TestUserRepository(t *testing.T) {
 }
 
 type Repository struct {
-	Name string
-	R    domain.UserRepository
-	Skip bool
+	Name           string
+	UserRepository domain.UserRepository
+	Skip           bool
 }
 
 func (r *Repository) testCreateUser(t *testing.T) {
@@ -76,7 +76,7 @@ func (r *Repository) testCreateUser(t *testing.T) {
 		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Helper()
-			err := r.R.CreateUser(context.Background(), &tc.User)
+			err := r.UserRepository.CreateUser(context.Background(), &tc.User)
 			assert.Equal(t, tc.Err, err, "missmatch error")
 		})
 	}
@@ -96,7 +96,7 @@ func (r *Repository) testGetUser(t *testing.T) {
 		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Helper()
-			u, err := r.R.GetUser(context.Background(), tc.Id)
+			u, err := r.UserRepository.GetUser(context.Background(), tc.Id)
 			assert.Equal(t, tc.Err, err, "missmatch error")
 			if tc.Err == nil && err == nil {
 				assert.Equal(t, tc.Id, u.UserId, "missmatch user id")
@@ -118,13 +118,13 @@ func (r *Repository) testUpdateUser(t *testing.T) {
 	for _, tc := range testCases {
 		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
-			prev, err := r.R.GetUser(context.Background(), tc.User.UserId)
+			prev, err := r.UserRepository.GetUser(context.Background(), tc.User.UserId)
 			assert.Equal(t, nil, err, "unexpected error received")
 
-			err = r.R.UpdateUser(context.Background(), &tc.User)
+			err = r.UserRepository.UpdateUser(context.Background(), &tc.User)
 			assert.Equal(t, tc.Err, err, "missmatch error")
 
-			curr, err := r.R.GetUser(context.Background(), tc.User.UserId)
+			curr, err := r.UserRepository.GetUser(context.Background(), tc.User.UserId)
 			assert.Equal(t, nil, err, "unexpected error received")
 
 			if tc.Err == nil && err == nil {
@@ -152,9 +152,9 @@ func (r *Repository) testDeleteUser(t *testing.T) {
 		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Helper()
-			err := r.R.DeleteUser(context.Background(), tc.Id)
+			err := r.UserRepository.DeleteUser(context.Background(), tc.Id)
 			assert.Equal(t, tc.Err, err, "missmatch error")
-			_, err = r.R.GetUser(context.Background(), tc.Id)
+			_, err = r.UserRepository.GetUser(context.Background(), tc.Id)
 			assert.Equal(t, domain.ErrUserNotExists, err)
 		})
 	}

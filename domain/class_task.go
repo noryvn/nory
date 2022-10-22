@@ -32,7 +32,7 @@ func (ct *ClassTask) Update(task *ClassTask) {
 }
 
 type ClassTaskRepository interface {
-	// CreateTask should update (ClassTask).TaskId to generated id from database or etc.
+	// CreateTask should update (*ClassTask).TaskId to generated id from database or etc.
 	CreateTask(ctx context.Context, task *ClassTask) error
 	GetTask(ctx context.Context, taskId string) (*ClassTask, error)
 	GetTasks(ctx context.Context, classId string) ([]*ClassTask, error)

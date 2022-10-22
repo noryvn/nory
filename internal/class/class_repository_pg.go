@@ -2,6 +2,7 @@ package class
 
 import (
 	"context"
+	"errors"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
@@ -24,18 +25,16 @@ func (crp *ClassRepositoryPostgres) GetClass(ctx context.Context, classId string
 		ClassId: classId,
 	}
 	row := crp.pool.QueryRow(ctx, "SELECT owner_id, created_at, name, description FROM class WHERE class_id = $1", classId)
-	if err := row.Scan(
+	err := row.Scan(
 		&class.OwnerId,
 		&class.CreatedAt,
 		&class.Name,
 		&class.Description,
-	); err != nil {
-		if err == pgx.ErrNoRows {
-			err = domain.ErrClassNotExists
-		}
-		return nil, err
+	)
+	if errors.Is(err, pgx.ErrNoRows) {
+		err = domain.ErrClassNotExists
 	}
-	return class, nil
+	return class, err
 }
 
 func (crp *ClassRepositoryPostgres) GetClassesByOwnerId(ctx context.Context, ownerId string) ([]*domain.Class, error) {
