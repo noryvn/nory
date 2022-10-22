@@ -90,7 +90,20 @@ func (ctrp *ClassTaskRepositoryPostgres) GetTasksWithRange(ctx context.Context, 
 }
 
 func (ctrp *ClassTaskRepositoryPostgres) UpdateTask(ctx context.Context, task *domain.ClassTask) error {
-	return nil
+	ct, err := ctrp.GetTask(ctx, task.TaskId)
+	if err != nil {
+		return err
+	}
+	ct.Update(task)
+	_, err = ctrp.pool.Exec(
+		ctx,
+		"UPDATE class_task SET name = $1, description = $2, due_date = $3 WHERE task_id = $4",
+		ct.Name,
+		ct.Description,
+		ct.DueDate,
+		ct.TaskId,
+	)
+	return err
 }
 
 func (ctrp *ClassTaskRepositoryPostgres) DeleteTask(ctx context.Context, taskId string) error {

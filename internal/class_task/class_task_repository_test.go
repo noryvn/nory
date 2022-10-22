@@ -130,7 +130,7 @@ func (r *Repository) testGetTask(t *testing.T) {
 	for _, taskSc := range r.tasks {
 		task, err := r.ClassTaskRepository.GetTask(context.Background(), taskSc.TaskId)
 		assert.Nil(t, err, "unexpected error")
-		assert.Equal(t, taskSc, *task, "unknown TaskId")
+		assert.Equal(t, taskSc, *task, "unknown task")
 	}
 }
 
@@ -210,6 +210,19 @@ func (r *Repository) testUpdateTasks(t *testing.T) {
 		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Helper()
+			before := tc.Task
+			before.Name = "Abelia"
+			before.Description = xid.New().String()
+
+			err := r.ClassTaskRepository.UpdateTask(context.Background(), &before)
+			assert.Equal(t, tc.Err, err)
+			if err != nil {
+				return
+			}
+
+			after, err := r.ClassTaskRepository.GetTask(context.Background(), before.TaskId)
+			assert.Nil(t, err)
+			assert.Equal(t, before, *after)
 		})
 	}
 }
@@ -217,7 +230,7 @@ func (r *Repository) testUpdateTasks(t *testing.T) {
 func (r *Repository) testDeleteTask(t *testing.T) {
 	for _, task := range r.tasks {
 		err := r.ClassTaskRepository.DeleteTask(context.Background(), task.TaskId)
-		assert.Equal(t, nil, err, "unexpected error")
+		assert.Nil(t, err, "unexpected error")
 
 		_, err = r.ClassTaskRepository.GetTask(context.Background(), task.TaskId)
 		assert.Equal(t, domain.ErrClassTaskNotExists, err, "failed deleting task")

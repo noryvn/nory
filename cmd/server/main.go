@@ -25,7 +25,7 @@ func main() {
 
 	userRepository := user.NewUserRepositoryPostgres(pool)
 	classRepository := class.NewClassRepositoryPostgres(pool)
-	classTaskRepository := classtask.NewClassTaskRepositoryMem()
+	classTaskRepository := classtask.NewClassTaskRepositoryPostgres(pool)
 
 	userRoute := user.Route(user.UserService{
 		UserRepository:  userRepository,
