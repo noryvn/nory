@@ -114,8 +114,8 @@ func (r *Repository) testGetTasksWithRange(t *testing.T) {
 	testCases := []struct {
 		Name    string
 		ClassId string
-		From time.Time
-		To time.Time
+		From    time.Time
+		To      time.Time
 		Len     int
 		Err     error
 	}{

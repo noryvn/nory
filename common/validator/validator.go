@@ -34,7 +34,7 @@ func init() {
 	})
 }
 
-func ValidateStruct(s any, message string) error {
+func ValidateStruct(s any) error {
 	err := validate.Struct(s)
 	if err == nil {
 		return nil
@@ -43,11 +43,9 @@ func ValidateStruct(s any, message string) error {
 	if !ok {
 		return err
 	}
-	errs := map[string][]string{}
+	message := ""
 	for _, fe := range vErr {
-		path := fe.Namespace()
-		path = strings.SplitN(path, ".", 2)[1]
-		errs[path] = append(errs[path], fe.Error())
+		message = fe.Error()
 	}
-	return response.NewBadRequest(message, errs)
+	return response.NewBadRequest(message)
 }

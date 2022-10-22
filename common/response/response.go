@@ -3,25 +3,20 @@ package response
 import "github.com/gofiber/fiber/v2"
 
 type Response[T any] struct {
-	Code    int                 `json:"code"`
-	Data    T                   `json:"data,omitempty"`
-	Message string              `json:"message,omitempty"`
-	Errors  map[string][]string `json:"errors,omitempty"`
-}
-
-type ResponsePaginate[T any] struct {
-	Code int `json:"code"`
-	Data []T `json:"data"`
-
-	Pagination struct {
-		Page       int `json:"page"`
-		Items      int `json:"items"`
-		TotalItems int `json:"totalItems"`
-	} `json:"pagination"`
+	Code    int    `json:"code"`
+	Data    T      `json:"data"`
+	Message string `json:"message,omitempty"`
 }
 
 func (r *Response[T]) Respond(c *fiber.Ctx) error {
 	return c.Status(r.Code).JSON(r)
+}
+
+func New[T any](code int, data T) *Response[T] {
+	return &Response[T]{
+		Code: code,
+		Data: data,
+	}
 }
 
 type ResponseError Response[*struct{}]
@@ -34,11 +29,10 @@ func (r *ResponseError) Respond(c *fiber.Ctx) error {
 	return c.Status(r.Code).JSON(r)
 }
 
-func NewBadRequest(msg string, errs map[string][]string) *ResponseError {
+func NewBadRequest(msg string) *ResponseError {
 	return &ResponseError{
 		Code:    400,
 		Message: msg,
-		Errors:  errs,
 	}
 }
 
@@ -53,13 +47,6 @@ func NewTooManyRequest(msg string) *ResponseError {
 	return &ResponseError{
 		Code:    429,
 		Message: msg,
-	}
-}
-
-func New[T any](code int, data T) *Response[T] {
-	return &Response[T]{
-		Code: code,
-		Data: data,
 	}
 }
 

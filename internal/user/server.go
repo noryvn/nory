@@ -10,11 +10,11 @@ type server struct {
 	us UserService
 }
 
-func CreateApp(userService UserService) *fiber.App {
+func Route(userService UserService) func(router fiber.Router) {
 	s := server{userService}
-	app := fiber.New()
-	app.Get("/profile", s.GetUserProfile)
-	return app
+	return func(router fiber.Router) {
+		router.Get("/profile", s.GetUserProfile)
+	}
 }
 
 func (s server) GetUserProfile(c *fiber.Ctx) error {

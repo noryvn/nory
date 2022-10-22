@@ -2,6 +2,7 @@ package class
 
 import (
 	"context"
+	"time"
 
 	"nory/common/response"
 	"nory/domain"
@@ -17,6 +18,18 @@ func (cs *ClassService) GetClassInfo(ctx context.Context, classId string) (*resp
 	return response.New(200, class), err
 }
 
-func (cs *ClassService) GetClassTasks(ctx context.Context, classId string) (*response.Response[[]*domain.ClassTask], error) {
-	return nil, nil
+func (cs *ClassService) GetClassTasks(ctx context.Context, classId string, from, to time.Time) (*response.Response[[]*domain.ClassTask], error) {
+	if from.IsZero() {
+		from = time.Now()
+	}
+	if to.IsZero() {
+		to = from.Add(24 * time.Hour)
+	}
+	tasks, err := cs.ClassTaskRepository.GetTasksWithRange(ctx, classId, from, to)
+	return response.New(200, tasks), err
+}
+
+func (cs *ClassService) CreateClass(ctx context.Context, class *domain.Class) (*response.Response[*domain.Class], error) {
+	err := cs.ClassRepository.CreateClass(ctx, class)
+	return response.New(200, class), err
 }

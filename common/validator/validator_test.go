@@ -3,8 +3,9 @@ package validator_test
 import (
 	"testing"
 
-	"nory/common/response"
 	. "nory/common/validator"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestValidator(t *testing.T) {
@@ -19,47 +20,37 @@ func TestValidator(t *testing.T) {
 	}
 
 	testCase := []struct {
-		name       string
-		data       any
-		errorsPath []string
+		name string
+		data any
+		err  bool
 	}{
 		{
-			name:       "pass validation",
-			data:       foo{"bar", "baz"},
-			errorsPath: []string{},
+			name: "pass validation",
+			data: foo{"bar", "baz"},
+			err:  false,
 		},
 		{
-			name:       "failed validation",
-			data:       foo{"", "baz-baz"},
-			errorsPath: []string{"name", "n1ck"},
+			name: "failed validation",
+			data: foo{"", "baz-baz"},
+			err:  true,
 		},
 		{
-			name:       "failed nested validation",
-			data:       nestedFoo{"bar", foo{"", "bazz"}},
-			errorsPath: []string{"foo.name", "foo.n1ck", "bar"},
+			name: "failed nested validation",
+			data: nestedFoo{"bar", foo{"", "bazz"}},
+			err:  true,
 		},
 	}
 
 	for _, tc := range testCase {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
+			t.Helper()
 			t.Parallel()
-			err := ValidateStruct(tc.data, "")
-			if err == nil && len(tc.errorsPath) == 0 {
-				return
-			}
-			res, ok := err.(*response.ResponseError)
-			if !ok {
-				t.Errorf("unknown error: %v", err)
-				return
-			}
-			if len(tc.errorsPath) != len(res.Errors) {
-				t.Error("missmatch error count")
-			}
-			for _, p := range tc.errorsPath {
-				if _, ok := res.Errors[p]; !ok {
-					t.Errorf("missing expected error %s", p)
-				}
+			err := ValidateStruct(tc.data)
+			if tc.err {
+				assert.NotNil(t, err, "validate struct not return erro while error expected")
+			} else {
+				assert.Nil(t, err, "validate struct return error while not expected")
 			}
 		})
 	}
