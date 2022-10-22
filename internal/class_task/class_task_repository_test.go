@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"nory/domain"
+	"nory/internal/class"
 	. "nory/internal/class_task"
 
-	"github.com/rs/xid"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -21,19 +21,21 @@ func TestClassTaskRepository(t *testing.T) {
 	repos := []Repository{
 		{
 			Name: "memory",
-			R:    NewClassTaskRepositoryMem(),
+			ClassTaskRepository:    NewClassTaskRepositoryMem(),
+			ClassRepository: class.NewClassRepositoryMem(),
 		},
 	}
 
 	for _, repo := range repos {
 		repo := repo
 		t.Run(repo.Name, func(t *testing.T) {
+			repo.t = t
 			if repo.Skip {
 				t.Skipf("skipping %s", repo.Name)
 			}
 			t.Parallel()
 			t.Run("CreateTask", repo.testCreateTask)
-			t.Run("GetTasks", repo.testGetTask)
+			t.Run("GetTask", repo.testGetTask)
 			t.Run("GetTasks", repo.testGetTasks)
 			t.Run("GetTasksWithRange", repo.testGetTasksWithRange)
 			t.Run("UpdateTask", repo.testUpdateTasks)
@@ -44,9 +46,27 @@ func TestClassTaskRepository(t *testing.T) {
 
 type Repository struct {
 	Name  string
-	R     domain.ClassTaskRepository
+	ClassTaskRepository     domain.ClassTaskRepository
+	ClassRepository domain.ClassRepository
 	Skip  bool
-	Tasks []domain.ClassTask
+
+	tasks []domain.ClassTask
+	classes map[string]string
+	t *testing.T
+}
+
+func (r *Repository) getClass(name string) string {
+	if r.classes == nil {
+		r.classes = make(map[string]string)
+	}
+	if id, ok := r.classes[name]; ok {
+		return id
+	}
+	class := &domain.Class{}
+	err := r.ClassRepository.CreateClass(context.Background(), class)
+	assert.Nil(r.t, err)
+	r.classes[name] = class.ClassId
+	return class.ClassId
 }
 
 func (r *Repository) testCreateTask(t *testing.T) {
@@ -55,10 +75,10 @@ func (r *Repository) testCreateTask(t *testing.T) {
 		Task domain.ClassTask
 		Err  error
 	}{
-		{"success", domain.ClassTask{ClassId: "foo", DueDate: AbelBirthday, TaskId: "abelia narindi agsya"}, nil},
-		{"success", domain.ClassTask{ClassId: "foo", DueDate: Now, Name: "abelia narindi agsya"}, nil},
-		{"success", domain.ClassTask{ClassId: "bar", DueDate: AbelBirthday, Description: "abelia narindi agsya"}, nil},
-		{"success", domain.ClassTask{ClassId: "baz", DueDate: Now}, nil},
+		{"success", domain.ClassTask{ClassId: r.getClass("foo"), DueDate: AbelBirthday, TaskId: "abelia narindi agsya"}, nil},
+		{"success", domain.ClassTask{ClassId: r.getClass("foo"), DueDate: Now, Name: "abelia narindi agsya"}, nil},
+		{"success", domain.ClassTask{ClassId: r.getClass("bar"), DueDate: AbelBirthday, Description: "abelia narindi agsya"}, nil},
+		{"success", domain.ClassTask{ClassId: r.getClass("baz"), DueDate: Now}, nil},
 	}
 
 	for _, tc := range testCases {
@@ -66,24 +86,21 @@ func (r *Repository) testCreateTask(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Helper()
 			task := tc.Task
-			err := r.R.CreateTask(context.Background(), &task)
+			err := r.ClassTaskRepository.CreateTask(context.Background(), &task)
 			assert.Equal(t, tc.Err, err, "missmatch error")
 			assert.NotEqual(t, tc.Task.TaskId, task.TaskId, "CreateTask should update (*ClassTask).TaskId to generated id")
 			if err == nil {
-				r.Tasks = append(r.Tasks, task)
+				r.tasks = append(r.tasks, task)
 			}
 		})
 	}
 }
 
 func (r *Repository) testGetTask(t *testing.T) {
-	for _, taskSc := range r.Tasks {
-		task, err := r.R.GetTask(context.Background(), taskSc.TaskId)
+	for _, taskSc := range r.tasks {
+		task, err := r.ClassTaskRepository.GetTask(context.Background(), taskSc.TaskId)
 		assert.Equal(t, nil, err, "unexpected error")
 		assert.Equal(t, taskSc, *task, "unknown TaskId")
-
-		_, err = r.R.GetTask(context.Background(), xid.New().String())
-		assert.Equal(t, err, domain.ErrClassTaskNotExists)
 	}
 }
 
@@ -104,11 +121,12 @@ func (r *Repository) testGetTasks(t *testing.T) {
 		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Helper()
-			tasks, err := r.R.GetTasks(context.Background(), tc.ClassId)
+			id := r.getClass(tc.ClassId)
+			tasks, err := r.ClassTaskRepository.GetTasks(context.Background(), id)
 			assert.Equal(t, tc.Err, err, "missmatch error")
 			assert.Equal(t, tc.Len, len(tasks), "unexpected result length")
 			for _, task := range tasks {
-				assert.Equal(t, tc.ClassId, task.ClassId, "unknown ClassId")
+				assert.Equal(t, id, task.ClassId, "unknown ClassId")
 			}
 		})
 	}
@@ -138,11 +156,12 @@ func (r *Repository) testGetTasksWithRange(t *testing.T) {
 		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Helper()
-			tasks, err := r.R.GetTasksWithRange(context.Background(), tc.ClassId, tc.From, tc.To)
+			id := r.getClass(tc.ClassId)
+			tasks, err := r.ClassTaskRepository.GetTasksWithRange(context.Background(), id, tc.From, tc.To)
 			assert.Equal(t, tc.Err, err, "missmatch error")
 			assert.Equal(t, tc.Len, len(tasks), "unexpected result length")
 			for _, task := range tasks {
-				assert.Equal(t, tc.ClassId, task.ClassId, "unknown ClassId")
+				assert.Equal(t, id, task.ClassId, "unknown ClassId")
 			}
 		})
 	}
@@ -154,7 +173,7 @@ func (r *Repository) testUpdateTasks(t *testing.T) {
 		Task domain.ClassTask
 		Err  error
 	}{
-		{"success", r.Tasks[0], nil},
+		{"success", r.tasks[0], nil},
 	}
 
 	for _, tc := range testCases {
@@ -166,11 +185,11 @@ func (r *Repository) testUpdateTasks(t *testing.T) {
 }
 
 func (r *Repository) testDeleteTask(t *testing.T) {
-	for _, task := range r.Tasks {
-		err := r.R.DeleteTask(context.Background(), task.TaskId)
+	for _, task := range r.tasks {
+		err := r.ClassTaskRepository.DeleteTask(context.Background(), task.TaskId)
 		assert.Equal(t, nil, err, "unexpected error")
 
-		_, err = r.R.GetTask(context.Background(), task.TaskId)
+		_, err = r.ClassTaskRepository.GetTask(context.Background(), task.TaskId)
 		assert.Equal(t, domain.ErrClassTaskNotExists, err, "failed deleting task")
 	}
 
@@ -183,7 +202,8 @@ func (r *Repository) testDeleteTask(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		tasks, err := r.R.GetTasks(context.Background(), tc.ClassId)
+		id := r.getClass(tc.ClassId)
+		tasks, err := r.ClassTaskRepository.GetTasks(context.Background(), id)
 		assert.Equal(t, nil, err)
 		assert.Equal(t, 0, len(tasks), "failed deleting task")
 	}
