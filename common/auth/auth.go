@@ -7,9 +7,9 @@ import (
 	"nory/common/response"
 )
 
-var ErrUserNotFound = response.NewUnathorized("can not found authenticated user")
+var ErrUserNotFound = response.NewUnathorized("authentication required")
 
-var userLocalKey = "authenticated user"
+const userLocalKey = "authenticated user locals key"
 
 type Auth struct {
 	SupabaseAuth *supabase.Auth

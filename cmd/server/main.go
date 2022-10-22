@@ -8,6 +8,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/jackc/pgx/v5/pgxpool"
 
+	"nory/common/response"
 	"nory/internal/class"
 	classtask "nory/internal/class_task"
 	"nory/internal/user"
@@ -35,7 +36,15 @@ func main() {
 		ClassTaskRepository: classTaskRepository,
 	})
 
-	app := fiber.New()
+	app := fiber.New(fiber.Config{
+		ErrorHandler: func(c *fiber.Ctx, err error) error {
+			err = response.ErrorHandler(c, err)
+			if err == nil {
+				return nil
+			}
+			return err
+		},
+	})
 	app.Route("/user", userRoute, "user")
 	app.Route("/class", classRoute, "class")
 
