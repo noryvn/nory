@@ -68,8 +68,8 @@ func (r *Repository) testCreateUser(t *testing.T) {
 		{"success create", domain.User{Username: "foo", Email: "foo@bel.ia", UserId: userFoo}, nil},
 		{"success create", domain.User{Username: "bar", Email: "bar@bel.ia", UserId: userBar}, nil},
 		{"success create", domain.User{Username: "baz", Email: "baz@bel.ia", UserId: userBaz}, nil},
-		{"duplicate username", domain.User{Username: "foo", UserId: "c3b3685f-796a-4a2f-a34a-2ca8fbcd44c4"}, domain.ErrUserExists},
-		{"duplicate id", domain.User{UserId: userFoo}, domain.ErrUserExists},
+		{"duplicate username", domain.User{Username: "foo", UserId: "c3b3685f-796a-4a2f-a34a-2ca8fbcd44c4"}, domain.ErrUserAlreadyExists},
+		{"duplicate id", domain.User{UserId: userFoo}, domain.ErrUserAlreadyExists},
 	}
 
 	for _, tc := range testCases {
@@ -89,7 +89,7 @@ func (r *Repository) testGetUser(t *testing.T) {
 		Err  error
 	}{
 		{"success", userFoo, nil},
-		{"failed", userQux, domain.ErrUserNotFound},
+		{"failed", userQux, domain.ErrUserNotExists},
 	}
 
 	for _, tc := range testCases {
@@ -112,7 +112,7 @@ func (r *Repository) testUpdateUser(t *testing.T) {
 		Err  error
 	}{
 		{"success", domain.User{UserId: userFoo, Username: "foo-bar"}, nil},
-		{"duplicate username", domain.User{UserId: userBar, Username: "foo-bar"}, domain.ErrUserExists},
+		{"duplicate username", domain.User{UserId: userBar, Username: "foo-bar"}, domain.ErrUserAlreadyExists},
 	}
 
 	for _, tc := range testCases {
@@ -155,7 +155,7 @@ func (r *Repository) testDeleteUser(t *testing.T) {
 			err := r.R.DeleteUser(context.Background(), tc.Id)
 			assert.Equal(t, tc.Err, err, "missmatch error")
 			_, err = r.R.GetUser(context.Background(), tc.Id)
-			assert.Equal(t, domain.ErrUserNotFound, err)
+			assert.Equal(t, domain.ErrUserNotExists, err)
 		})
 	}
 }

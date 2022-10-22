@@ -8,9 +8,9 @@ import (
 
 var (
 	// user not found
-	ErrUserNotFound = errors.New("user not found")
+	ErrUserNotExists = errors.New("user not found")
 	// used for duplicate UserId
-	ErrUserExists = errors.New("user already exists")
+	ErrUserAlreadyExists = errors.New("user already exists")
 )
 
 type User struct {

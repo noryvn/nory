@@ -82,7 +82,7 @@ func (r *Repository) testGetSchedule(t *testing.T) {
 		Err        error
 	}{
 		{"success", r.Schedules[0].ScheduleId, nil},
-		{"not found", xid.New().String(), domain.ErrClassScheduleNotFound},
+		{"not found", xid.New().String(), domain.ErrClassScheduleNotExists},
 	}
 
 	for _, tc := range testCases {
@@ -152,6 +152,6 @@ func (r *Repository) testDeleteSchedule(t *testing.T) {
 		err := r.R.DeleteSchedule(context.Background(), s.ScheduleId)
 		assert.Nil(t, err, "unknown error")
 		_, err = r.R.GetSchedule(context.Background(), s.ScheduleId)
-		assert.Equal(t, domain.ErrClassScheduleNotFound, err, "schedule not deleted properly")
+		assert.Equal(t, domain.ErrClassScheduleNotExists, err, "schedule not deleted properly")
 	}
 }

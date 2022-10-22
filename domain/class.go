@@ -8,9 +8,9 @@ import (
 
 var (
 	// class not found
-	ErrClassNotFound = errors.New("class not found")
+	ErrClassNotExists = errors.New("class not exists")
 	// conflicting data, unique constraint and etc.
-	ErrClassExists = errors.New("class already exists")
+	ErrClassAlreadyExists = errors.New("class already exists")
 )
 
 type Class struct {

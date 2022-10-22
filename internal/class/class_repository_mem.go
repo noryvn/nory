@@ -25,7 +25,7 @@ func (crm *ClassRepositoryMem) GetClass(ctx context.Context, classId string) (*d
 	defer crm.mx.Unlock()
 	c, ok := crm.m[classId]
 	if !ok {
-		return nil, domain.ErrClassNotFound
+		return nil, domain.ErrClassNotExists
 	}
 	return c, nil
 }

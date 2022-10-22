@@ -34,7 +34,7 @@ func (ctrm *ClassTaskRepositoryMem) GetTask(ctx context.Context, taskId string) 
 	defer ctrm.mx.Unlock()
 	task, ok := ctrm.m[taskId]
 	if !ok {
-		return nil, domain.ErrClassTaskNotFound
+		return nil, domain.ErrClassTaskNotExists
 	}
 	return task, nil
 }
@@ -74,7 +74,7 @@ func (ctrm *ClassTaskRepositoryMem) UpdateTask(ctx context.Context, task *domain
 	defer ctrm.mx.Unlock()
 	t, ok := ctrm.m[task.TaskId]
 	if !ok {
-		return domain.ErrClassTaskNotFound
+		return domain.ErrClassTaskNotExists
 	}
 	t.Update(task)
 	return nil

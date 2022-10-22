@@ -31,7 +31,7 @@ func (crp *ClassRepositoryPostgres) GetClass(ctx context.Context, classId string
 		&class.Description,
 	); err != nil {
 		if err == pgx.ErrNoRows {
-			err = domain.ErrClassNotFound
+			err = domain.ErrClassNotExists
 		}
 		return nil, err
 	}
@@ -70,7 +70,7 @@ func (crp *ClassRepositoryPostgres) CreateClass(ctx context.Context, class *doma
 		class.Description,
 	)
 	if pgerr, ok := err.(*pgconn.PgError); ok && pgerr.Code == "23505" {
-		return domain.ErrClassExists
+		return domain.ErrClassAlreadyExists
 	}
 	return err
 }

@@ -146,8 +146,8 @@ func (r *Repository) testGet(t *testing.T) {
 		{"existing class", r.classes[0].ClassId, nil},
 		{"existing class", r.classes[1].ClassId, nil},
 		{"existing class", r.classes[2].ClassId, nil},
-		{"unexisting class", "foo-bar", domain.ErrClassNotFound},
-		{"unexisting class", "foo-baz", domain.ErrClassNotFound},
+		{"unexisting class", "foo-bar", domain.ErrClassNotExists},
+		{"unexisting class", "foo-baz", domain.ErrClassNotExists},
 	}
 
 	for _, tc := range testCases {
@@ -201,7 +201,7 @@ func (r *Repository) testUpdate(t *testing.T) {
 		Err   error
 	}{
 		{"success", domain.Class{ClassId: r.classes[0].ClassId, Description: "foo"}, nil},
-		{"not found", domain.Class{ClassId: "anu", Description: "foo"}, domain.ErrClassNotFound},
+		{"not found", domain.Class{ClassId: "anu", Description: "foo"}, domain.ErrClassNotExists},
 	}
 
 	for _, tc := range testCases {

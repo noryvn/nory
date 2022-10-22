@@ -32,7 +32,7 @@ func (csrm *ClassScheduleRepositoryMem) GetSchedule(ctx context.Context, schedul
 	defer csrm.mx.Unlock()
 	schedule, ok := csrm.m[scheduleId]
 	if !ok {
-		return nil, domain.ErrClassScheduleNotFound
+		return nil, domain.ErrClassScheduleNotExists
 	}
 	return schedule, nil
 }

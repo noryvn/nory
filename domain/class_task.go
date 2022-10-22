@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	ErrClassTaskNotFound = errors.New("class not found")
+	ErrClassTaskNotExists = errors.New("class not found")
 )
 
 type ClassTask struct {

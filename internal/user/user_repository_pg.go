@@ -35,7 +35,7 @@ func (urp *UserRepositoryPostgres) GetUser(ctx context.Context, id string) (*dom
 		&u.CreatedAt,
 	); err != nil {
 		if err == pgx.ErrNoRows {
-			err = domain.ErrUserNotFound
+			err = domain.ErrUserNotExists
 		}
 		return nil, err
 	}
@@ -61,7 +61,7 @@ func (urp *UserRepositoryPostgres) CreateUser(ctx context.Context, user *domain.
 		user.Email,
 	)
 	if pgerr, ok := err.(*pgconn.PgError); ok && pgerr.Code == "23505" {
-		return domain.ErrUserExists
+		return domain.ErrUserAlreadyExists
 	}
 	return err
 }
@@ -80,7 +80,7 @@ func (urp *UserRepositoryPostgres) UpdateUser(ctx context.Context, user *domain.
 		u.UserId,
 	)
 	if pgerr, ok := err.(*pgconn.PgError); ok && pgerr.Code == "23505" {
-		return domain.ErrUserExists
+		return domain.ErrUserAlreadyExists
 	}
 	return err
 }

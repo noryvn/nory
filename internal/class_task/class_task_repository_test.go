@@ -8,6 +8,7 @@ import (
 	"nory/domain"
 	. "nory/internal/class_task"
 
+	"github.com/rs/xid"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -80,6 +81,9 @@ func (r *Repository) testGetTask(t *testing.T) {
 		task, err := r.R.GetTask(context.Background(), taskSc.TaskId)
 		assert.Equal(t, nil, err, "unexpected error")
 		assert.Equal(t, taskSc, *task, "unknown TaskId")
+
+		_, err = r.R.GetTask(context.Background(), xid.New().String())
+		assert.Equal(t, err, domain.ErrClassTaskNotExists)
 	}
 }
 
@@ -167,7 +171,7 @@ func (r *Repository) testDeleteTask(t *testing.T) {
 		assert.Equal(t, nil, err, "unexpected error")
 
 		_, err = r.R.GetTask(context.Background(), task.TaskId)
-		assert.Equal(t, domain.ErrClassTaskNotFound, err, "failed deleting task")
+		assert.Equal(t, domain.ErrClassTaskNotExists, err, "failed deleting task")
 	}
 
 	testCases := []struct {
