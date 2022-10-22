@@ -2,6 +2,8 @@ package class
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"time"
 
 	"nory/common/response"
@@ -15,6 +17,13 @@ type ClassService struct {
 
 func (cs *ClassService) GetClassInfo(ctx context.Context, classId string) (*response.Response[*domain.Class], error) {
 	class, err := cs.ClassRepository.GetClass(ctx, classId)
+	if errors.Is(err, domain.ErrClassNotFound) {
+		msg := fmt.Sprintf("can not find class with id %q", classId)
+		return nil, response.NewNotFound(msg)
+	}
+	if err != nil {
+		return nil, err
+	}
 	return response.New(200, class), err
 }
 

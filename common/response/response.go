@@ -9,6 +9,9 @@ type Response[T any] struct {
 }
 
 func (r *Response[T]) Respond(c *fiber.Ctx) error {
+	if r.Code == 204 {
+		return c.SendStatus(204)
+	}
 	return c.Status(r.Code).JSON(r)
 }
 
@@ -39,6 +42,13 @@ func NewBadRequest(msg string) *ResponseError {
 func NewUnathorized(msg string) *ResponseError {
 	return &ResponseError{
 		Code:    401,
+		Message: msg,
+	}
+}
+
+func NewNotFound(msg string) *ResponseError {
+	return &ResponseError{
+		Code:    404,
 		Message: msg,
 	}
 }

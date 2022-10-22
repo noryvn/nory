@@ -42,6 +42,7 @@ func main() {
 			if err == nil {
 				return nil
 			}
+			fmt.Println(err)
 			return err
 		},
 	})

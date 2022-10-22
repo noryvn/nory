@@ -14,16 +14,16 @@ type userRouter struct {
 	cs ClassService
 }
 
-func Route(classService ClassService) func (router fiber.Router) {
+func Route(classService ClassService) func(router fiber.Router) {
 	ur := userRouter{classService}
-	return func (router fiber.Router) {
-		router.Get("/:classId/info", ur.ClassInfo)
-		router.Get("/:classId/tasks", ur.ClassTasks)
-		router.Post("/create", ur.ClassCreate)
+	return func(router fiber.Router) {
+		router.Get("/:classId/info", ur.classInfo)
+		router.Get("/:classId/tasks", ur.classTasks)
+		router.Post("/create", ur.create)
 	}
 }
 
-func (ur userRouter) ClassInfo(c *fiber.Ctx) error {
+func (ur userRouter) classInfo(c *fiber.Ctx) error {
 	classId := c.Params("classId")
 	res, err := ur.cs.GetClassInfo(c.Context(), classId)
 	if err != nil {
@@ -32,7 +32,7 @@ func (ur userRouter) ClassInfo(c *fiber.Ctx) error {
 	return res.Respond(c)
 }
 
-func (ur userRouter) ClassTasks(c *fiber.Ctx) error {
+func (ur userRouter) classTasks(c *fiber.Ctx) error {
 	var q struct {
 		From time.Time
 		To   time.Time
@@ -48,7 +48,7 @@ func (ur userRouter) ClassTasks(c *fiber.Ctx) error {
 	return res.Respond(c)
 }
 
-func (ur userRouter) ClassCreate(c *fiber.Ctx) error {
+func (ur userRouter) create(c *fiber.Ctx) error {
 	user, err := auth.GetUser(c)
 	if err != nil {
 		return err
