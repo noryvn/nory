@@ -14,8 +14,8 @@ import (
 )
 
 func TestAuthMiddleware(t *testing.T) {
-	supabaseKey := os.Getenv("SUAPABASE_KEY")
-	supabaseUrl := os.Getenv("SUAPABASE_URL")
+	supabaseKey := os.Getenv("SUPABASE_KEY")
+	supabaseUrl := os.Getenv("SUPABASE_URL")
 	email := os.Getenv("AUTH_USER_EMAIL")
 	password := os.Getenv("AUTH_USER_PASSWORD")
 
