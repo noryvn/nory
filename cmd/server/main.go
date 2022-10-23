@@ -8,6 +8,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/jackc/pgx/v5/pgxpool"
 
+	"nory/common/auth"
 	"nory/common/response"
 	"nory/internal/class"
 	classtask "nory/internal/class_task"
@@ -35,6 +36,10 @@ func main() {
 		ClassRepository:     classRepository,
 		ClassTaskRepository: classTaskRepository,
 	})
+	authMiddleware := auth.Auth{
+		SupabaseAuth:   nil,
+		UserRepository: userRepository,
+	}
 
 	app := fiber.New(fiber.Config{
 		ErrorHandler: func(c *fiber.Ctx, err error) error {
@@ -46,6 +51,7 @@ func main() {
 			return err
 		},
 	})
+	app.Use(authMiddleware)
 	app.Route("/user", userRoute, "user")
 	app.Route("/class", classRoute, "class")
 

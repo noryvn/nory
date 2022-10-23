@@ -10,7 +10,7 @@ import (
 type UserProfile struct {
 	domain.User
 
-	OwnedClass  int `json:"ownedClass"`
+	OwnedClass int `json:"ownedClass"`
 }
 
 func (up *UserProfile) GetUser() *domain.User {
