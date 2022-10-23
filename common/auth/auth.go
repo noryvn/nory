@@ -56,10 +56,9 @@ func (a *Auth) UserFromBearer(ctx context.Context, bearer string) (*domain.User,
 		if err := a.UserRepository.CreateUser(ctx, u); err != nil {
 			return nil, err
 		}
-	}
-	if err != nil {
+	} else if err != nil {
 		return nil, err
 	}
 
-	return nil, nil
+	return u, nil
 }
