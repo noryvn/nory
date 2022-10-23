@@ -23,7 +23,7 @@ type Auth struct {
 
 func (a *Auth) Middleware(c *fiber.Ctx) error {
 	bearer := c.Get("authorization")
-	if len(bearer) < 7 {
+	if len(bearer) < 7 || bearer[:6] != "Bearer" {
 		return c.Next()
 	}
 

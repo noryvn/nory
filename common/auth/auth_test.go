@@ -31,7 +31,7 @@ func TestAuthMiddleware(t *testing.T) {
 	}
 
 	supaUser, err := a.SupabaseAuth.SignIn(context.Background(), supabase.UserCredentials{
-		Email: email,
+		Email:    email,
 		Password: password,
 	})
 	assert.Nil(t, err)
