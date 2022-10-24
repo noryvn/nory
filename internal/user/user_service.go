@@ -29,3 +29,8 @@ func (us UserService) GetUserProfile(ctx context.Context, user *domain.User) (*r
 	up.OwnedClass = len(classes)
 	return res, nil
 }
+
+func (us UserService) GetUserClasses(ctx context.Context, user *domain.User) (*response.Response[[]*domain.Class], error) {
+	classes, err := us.ClassRepository.GetClassesByOwnerId(ctx, user.UserId)
+	return response.New(200, classes), err
+}
