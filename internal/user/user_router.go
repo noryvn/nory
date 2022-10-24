@@ -6,25 +6,25 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-type router struct {
+type userRouter struct {
 	us UserService
 }
 
 func Route(userService UserService) func(router fiber.Router) {
-	r := router{userService}
+	ur := userRouter{userService}
 	return func(router fiber.Router) {
-		router.Get("/profile", r.GetUserProfile)
-		router.Get("/classes", r.GetUserClasses)
+		router.Get("/profile", ur.GetUserProfile)
+		router.Get("/classes", ur.GetUserClasses)
 	}
 }
 
-func (r router) GetUserProfile(c *fiber.Ctx) error {
+func (ur userRouter) GetUserProfile(c *fiber.Ctx) error {
 	user, err := auth.GetUser(c)
 	if err != nil {
 		return err
 	}
 
-	res, err := r.us.GetUserProfile(c.Context(), user)
+	res, err := ur.us.GetUserProfile(c.Context(), user)
 	if err != nil {
 		return err
 	}
@@ -32,13 +32,13 @@ func (r router) GetUserProfile(c *fiber.Ctx) error {
 	return res.Respond(c)
 }
 
-func (r router) GetUserClasses(c *fiber.Ctx) error {
+func (ur userRouter) GetUserClasses(c *fiber.Ctx) error {
 	user, err := auth.GetUser(c)
 	if err != nil {
 		return err
 	}
 
-	res, err := r.us.GetUserClasses(c.Context(), user)
+	res, err := ur.us.GetUserClasses(c.Context(), user)
 	if err != nil {
 		return err
 	}
