@@ -17,11 +17,16 @@ type classRouter struct {
 func Route(classService ClassService) func(router fiber.Router) {
 	cr := classRouter{classService}
 	return func(router fiber.Router) {
+		router.Delete("/:classId", cr.deleteClass)
 		router.Get("/:classId/info", cr.getClassInfo)
 		router.Get("/:classId/tasks", cr.getClassTasks)
 		router.Post("/:classId/task", cr.createClassTask)
 		router.Post("/create", cr.createClass)
 	}
+}
+
+func (cr classRouter) deleteClass(c *fiber.Ctx) error {
+	return nil
 }
 
 func (cr classRouter) getClassInfo(c *fiber.Ctx) error {
