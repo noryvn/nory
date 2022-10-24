@@ -55,7 +55,7 @@ func TestUserService(t *testing.T) {
 		for i := 0; i < 5; i++ {
 			class := &domain.Class{
 				OwnerId:     user.UserId,
-				Name:        "foo",
+				Name:        user.Name,
 			}
 			classes = append(classes, class)
 			err := us.ClassRepository.CreateClass(context.Background(), class)
@@ -66,7 +66,7 @@ func TestUserService(t *testing.T) {
 		assert.Nil(t, err)
 		assert.Equal(t, len(classes), len(res.Data))
 		for _, class := range res.Data {
-			assert.Equal(t, "foo", class.Name)
+			assert.Equal(t, user.Name, class.Name)
 			assert.Equal(t, user.UserId, class.OwnerId)
 		}
 
