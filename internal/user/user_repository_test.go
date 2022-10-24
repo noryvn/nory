@@ -68,7 +68,7 @@ func (r *Repository) testCreateUser(t *testing.T) {
 		{"success create", domain.User{Username: "foo", Email: "foo@bel.ia", UserId: userFoo}, nil},
 		{"success create", domain.User{Username: "bar", Email: "bar@bel.ia", UserId: userBar}, nil},
 		{"success create", domain.User{Username: "baz", Email: "baz@bel.ia", UserId: userBaz}, nil},
-		{"duplicate username", domain.User{Username: "foo", UserId: "c3b3685f-796a-4a2f-a34a-2ca8fbcd44c4"}, domain.ErrUserAlreadyExists},
+		{"duplicate username", domain.User{Username: "foo", UserId: userQux}, domain.ErrUserAlreadyExists},
 		{"duplicate id", domain.User{UserId: userFoo}, domain.ErrUserAlreadyExists},
 	}
 
