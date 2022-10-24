@@ -51,7 +51,7 @@ func main() {
 
 	app := fiber.New(fiber.Config{
 		EnablePrintRoutes: dev,
-		Immutable: dev,
+		Immutable:         dev,
 		ErrorHandler: func(c *fiber.Ctx, err error) error {
 			err = response.ErrorHandler(c, err)
 			if err == nil {

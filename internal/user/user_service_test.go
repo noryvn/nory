@@ -25,10 +25,10 @@ func TestUserService(t *testing.T) {
 	t.Run("GetUserProfile", func(t *testing.T) {
 		t.Parallel()
 		user := &domain.User{
-			UserId: uuid.NewString(),
-			Name: "Abelia",
+			UserId:   uuid.NewString(),
+			Name:     "Abelia",
 			Username: xid.New().String(),
-			Email: xid.New().String(),
+			Email:    xid.New().String(),
 		}
 		err := us.UserRepository.CreateUser(context.Background(), user)
 		assert.Nil(t, err)
@@ -43,10 +43,10 @@ func TestUserService(t *testing.T) {
 	t.Run("GetUserClasses", func(t *testing.T) {
 		t.Parallel()
 		user := &domain.User{
-			UserId: uuid.NewString(),
-			Name: "Abelia",
+			UserId:   uuid.NewString(),
+			Name:     "Abelia",
 			Username: xid.New().String(),
-			Email: xid.New().String(),
+			Email:    xid.New().String(),
 		}
 		err := us.UserRepository.CreateUser(context.Background(), user)
 		assert.Nil(t, err)
@@ -54,8 +54,8 @@ func TestUserService(t *testing.T) {
 		var classes []*domain.Class
 		for i := 0; i < 5; i++ {
 			class := &domain.Class{
-				OwnerId:     user.UserId,
-				Name:        user.Name,
+				OwnerId: user.UserId,
+				Name:    user.Name,
 			}
 			classes = append(classes, class)
 			err := us.ClassRepository.CreateClass(context.Background(), class)

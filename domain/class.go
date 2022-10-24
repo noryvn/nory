@@ -14,12 +14,12 @@ var (
 )
 
 type Class struct {
-	ClassId   string    `json:"classId"`
-	OwnerId   string    `json:"ownerId"`
-	CreatedAt time.Time `json:"createdAt"`
+	ClassId   string    `json:"classId"`   // immutable, unique
+	OwnerId   string    `json:"ownerId"`   // immutable
+	CreatedAt time.Time `json:"createdAt"` // immutable
 
-	Name        string `json:"name"`
-	Description string `json:"description"`
+	Name        string `json:"name"`        // mutable
+	Description string `json:"description"` // mutable
 }
 
 func (c *Class) Update(cc *Class) {

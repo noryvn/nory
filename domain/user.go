@@ -14,12 +14,12 @@ var (
 )
 
 type User struct {
-	UserId    string    `json:"userId"`
-	CreatedAt time.Time `json:"createdAt"`
+	UserId    string    `json:"userId"`    // immutable, unique
+	CreatedAt time.Time `json:"createdAt"` // immutable
 
-	Username string `json:"username"`
-	Name     string `json:"name"`
-	Email    string `json:"email"`
+	Username string `json:"username"` //  mutable, unique
+	Name     string `json:"name"`     // mutable
+	Email    string `json:"email"`    // immutable, unique
 }
 
 func (u *User) Update(uu *User) {
