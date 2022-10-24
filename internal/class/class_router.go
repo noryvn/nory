@@ -50,17 +50,20 @@ func (cr classRouter) getClassTasks(c *fiber.Ctx) error {
 }
 
 func (cr classRouter) createClassTask(c *fiber.Ctx) error {
-	// classId := c.Params("classId")
+	classId := c.Params("classId")
 
-	// var body domain.ClassTask
-	// if err := c.BodyParser(&body); err != nil {
-	// 	return err
-	// }
+	var task domain.ClassTask
+	if err := c.BodyParser(&task); err != nil {
+		return err
+	}
 
-	// res, err := cr.cs.ClassTaskRepository.CreateTask(c.Context(), )
+	task.ClassId = classId
+	res, err := cr.cs.CreateClassTask(c.Context(), &task)
+	if err != nil {
+		return err
+	}
 
-	// return res.Respond(c)
-	return nil
+	return res.Respond(c)
 }
 
 func (cr classRouter) createClass(c *fiber.Ctx) error {
