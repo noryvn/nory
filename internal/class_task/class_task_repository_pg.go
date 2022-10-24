@@ -60,7 +60,7 @@ func (ctrp *ClassTaskRepositoryPostgres) GetTasks(ctx context.Context, classId s
 }
 
 func (ctrp *ClassTaskRepositoryPostgres) GetTasksWithRange(ctx context.Context, classId string, from, to time.Time) ([]*domain.ClassTask, error) {
-	var tasks []*domain.ClassTask
+	tasks := make([]*domain.ClassTask, 0)
 	rows, err := ctrp.pool.Query(
 		ctx,
 		"SELECT task_id, name, description, due_date FROM class_task WHERE class_id = $1 AND due_date >= $2 AND due_date < $3",
