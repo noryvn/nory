@@ -22,6 +22,7 @@ func TestClassService(t *testing.T) {
 
 	t.Run("get class info", cst.classInfo)
 	t.Run("get class tasks", cst.classTasks)
+	t.Run("create class", cst.classCreate)
 }
 
 type classServiceTest struct {
@@ -51,4 +52,23 @@ func (cst classServiceTest) classInfo(t *testing.T) {
 
 func (cst classServiceTest) classTasks(t *testing.T) {
 	t.Parallel()
+}
+
+func (cst classServiceTest) classCreate(t *testing.T) {
+	t.Parallel()
+
+	class := &domain.Class{
+		Name: "foo",
+	}
+
+	res, err := cst.classService.CreateClass(context.Background(), class)
+	assert.Nil(t, err)
+	assert.Equal(t, 200, res.Code)
+
+
+	classRes, err := cst.classService.GetClassInfo(context.Background(), class.ClassId)
+	assert.Nil(t, err)
+	assert.Equal(t, 200, classRes.Code, "failed to create class")
+	assert.Equal(t, class.Name, classRes.Data.Name)
+	assert.Equal(t, class.ClassId, classRes.Data.ClassId)
 }
