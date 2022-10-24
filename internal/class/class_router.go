@@ -19,7 +19,7 @@ func Route(classService ClassService) func(router fiber.Router) {
 	return func(router fiber.Router) {
 		router.Get("/:classId/info", cr.getClassInfo)
 		router.Get("/:classId/tasks", cr.getClassTasks)
-		router.Post("/:classId/tasks", cr.createClassTask)
+		router.Post("/:classId/task", cr.createClassTask)
 		router.Post("/create", cr.createClass)
 	}
 }

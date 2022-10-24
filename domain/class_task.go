@@ -11,12 +11,12 @@ var (
 )
 
 type ClassTask struct {
-	TaskId  string `json:"taskId"` // immutable, unique
-	ClassId string `json:"-"`      // immutable
+	TaskId  string `json:"taskId"`              // immutable, unique
+	ClassId string `json:"-" validate:"len=20"` // immutable
 
-	Name        string    `json:"name"`        // mutable
-	Description string    `json:"description"` // mutable
-	DueDate     time.Time `json:"dueDate"`     // mutable
+	Name        string    `json:"name" validate:"max=20"`          // mutable
+	Description string    `json:"description" validate:"max=1024"` // mutable
+	DueDate     time.Time `json:"dueDate"`                         // mutable
 }
 
 func (ct *ClassTask) Update(task *ClassTask) {

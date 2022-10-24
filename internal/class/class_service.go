@@ -46,3 +46,11 @@ func (cs *ClassService) CreateClass(ctx context.Context, class *domain.Class) (*
 	err := cs.ClassRepository.CreateClass(ctx, class)
 	return response.New(200, class), err
 }
+
+func (cs *ClassService) CreateClassTask(ctx context.Context, task *domain.ClassTask) (*response.Response[*domain.ClassTask], error) {
+	if err := validator.ValidateStruct(task); err != nil {
+		return nil, err
+	}
+	err := cs.ClassTaskRepository.CreateTask(ctx, task)
+	return response.New(200, task), err
+}

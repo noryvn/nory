@@ -80,18 +80,17 @@ func TestUserService(t *testing.T) {
 	})
 }
 
+// testCases := []struct{
+// 	user domain.User
+// }{
+// 	{user: domain.User{Username: strings.Repeat("a", 21)}},
+// 	{user: domain.User{Name: strings.Repeat("a", 33)}},
+// 	{user: domain.User{Email: strings.Repeat("a", 254) + "@foo.bar"}},
+// 	{user: domain.User{Email: strings.Repeat("a", 25)}},
+// }
 
-		// testCases := []struct{
-		// 	user domain.User
-		// }{
-		// 	{user: domain.User{Username: strings.Repeat("a", 21)}},
-		// 	{user: domain.User{Name: strings.Repeat("a", 33)}},
-		// 	{user: domain.User{Email: strings.Repeat("a", 254) + "@foo.bar"}},
-		// 	{user: domain.User{Email: strings.Repeat("a", 25)}},
-		// }
-
-		// for _, tc := range testCases {
-		// 	_, err := us.GetUserProfile(context.Background(), &tc.user)
-		// 	t.Log(tc.user)
-		// 	assert.NotNil(t, err)
-		// }
+// for _, tc := range testCases {
+// 	_, err := us.GetUserProfile(context.Background(), &tc.user)
+// 	t.Log(tc.user)
+// 	assert.NotNil(t, err)
+// }
