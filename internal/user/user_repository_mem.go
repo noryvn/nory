@@ -35,7 +35,7 @@ func (urm *UserRepositoryMem) CreateUser(ctx context.Context, u *domain.User) er
 		return domain.ErrUserAlreadyExists
 	}
 	for _, user := range urm.m {
-		if user.Username == u.Username {
+		if user.Username == u.Username || user.Email == u.Email {
 			return domain.ErrUserAlreadyExists
 		}
 	}
@@ -55,7 +55,7 @@ func (urm *UserRepositoryMem) UpdateUser(ctx context.Context, u *domain.User) er
 		if uu.UserId == u.UserId {
 			continue
 		}
-		if uu.Username == u.Username {
+		if uu.Username == u.Username || uu.Email == u.Email {
 			return domain.ErrUserAlreadyExists
 		}
 	}
