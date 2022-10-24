@@ -13,7 +13,7 @@ import (
 	"nory/common/auth"
 	"nory/common/response"
 	"nory/internal/class"
-	classtask "nory/internal/class_task"
+	"nory/internal/class_task"
 	"nory/internal/user"
 )
 
