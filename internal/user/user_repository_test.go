@@ -70,6 +70,7 @@ func (r *Repository) testCreateUser(t *testing.T) {
 		{"success create", domain.User{Username: "baz", Email: "baz@bel.ia", UserId: userBaz}, nil},
 		{"duplicate username", domain.User{Username: "foo", UserId: userQux}, domain.ErrUserAlreadyExists},
 		{"duplicate id", domain.User{UserId: userFoo}, domain.ErrUserAlreadyExists},
+		{"duplicate email", domain.User{UserId: userQux, Email: "foo@bel.ia"}, domain.ErrUserAlreadyExists},
 	}
 
 	for _, tc := range testCases {
