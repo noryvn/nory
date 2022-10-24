@@ -8,15 +8,16 @@ import (
 	"nory/domain"
 	. "nory/internal/user"
 
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/stretchr/testify/assert"
 )
 
-const (
-	userFoo = "09229265-d53c-44fd-a791-cb686b3e61d6"
-	userBar = "eef59eb4-ef31-4491-bc7e-77026f4cb5e8"
-	userBaz = "f44a1fc5-b7bf-40e4-be55-0eb9dfb886c7"
-	userQux = "cde9b03c-311d-443d-901c-45473f453305"
+var (
+	userFoo = uuid.NewString()
+	userBar = uuid.NewString()
+	userBaz = uuid.NewString()
+	userQux = uuid.NewString()
 )
 
 func TestUserRepository(t *testing.T) {
