@@ -40,6 +40,10 @@ func NewUnathorized(msg string) *ResponseError {
 	return NewError(fiber.StatusUnauthorized, msg)
 }
 
+func NewForbidden(msg string) *ResponseError {
+	return NewError(fiber.StatusForbidden, msg)
+}
+
 func NewNotFound(msg string) *ResponseError {
 	return NewError(fiber.StatusNotFound, msg)
 }
