@@ -33,19 +33,19 @@ func (r *ResponseError) Respond(c *fiber.Ctx) error {
 }
 
 func NewBadRequest(msg string) *ResponseError {
-	return NewError(400, msg)
+	return NewError(fiber.StatusBadRequest, msg)
 }
 
 func NewUnathorized(msg string) *ResponseError {
-	return NewError(401, msg)
+	return NewError(fiber.StatusUnauthorized, msg)
 }
 
 func NewNotFound(msg string) *ResponseError {
-	return NewError(404, msg)
+	return NewError(fiber.StatusNotFound, msg)
 }
 
-func NewTooManyRequest(msg string) *ResponseError {
-	return NewError(429, msg)
+func NewTooManyRequests(msg string) *ResponseError {
+	return NewError(fiber.StatusTooManyRequests, msg)
 }
 
 func NewError(code int, msg string) *ResponseError {
