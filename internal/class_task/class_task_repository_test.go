@@ -24,6 +24,7 @@ var (
 )
 
 func TestClassTaskRepository(t *testing.T) {
+	t.Parallel()
 	pool, err := pgxpool.New(context.Background(), os.Getenv("DATABASE_URL"))
 	if err != nil {
 		t.Error(err)

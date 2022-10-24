@@ -14,6 +14,7 @@ import (
 )
 
 func TestUserService(t *testing.T) {
+	t.Parallel()
 	userRepository := NewUserRepositoryMem()
 	classRepository := class.NewClassRepositoryMem()
 

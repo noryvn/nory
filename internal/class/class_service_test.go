@@ -12,6 +12,7 @@ import (
 )
 
 func TestClassService(t *testing.T) {
+	t.Parallel()
 	classService := ClassService{
 		ClassRepository:     NewClassRepositoryMem(),
 		ClassTaskRepository: classtask.NewClassTaskRepositoryMem(),

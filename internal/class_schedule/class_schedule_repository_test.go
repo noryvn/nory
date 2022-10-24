@@ -18,6 +18,7 @@ var (
 )
 
 func TestClassScheduleRepository(t *testing.T) {
+	t.Parallel()
 	repos := []Repository{
 		{
 			Name: "memory",
