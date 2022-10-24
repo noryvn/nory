@@ -6,7 +6,9 @@ import (
 	"os"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/nedpals/supabase-go"
 
 	"nory/common/auth"
 	"nory/common/response"
@@ -17,12 +19,18 @@ import (
 
 func main() {
 	addr := getEnv("SERVER_ADDRESS", ":8080")
+	dev := getEnv("ENVIRONMENT", "development") == "development"
 	databaseUrl := mustGetEnv("DATABASE_URL")
 
 	pool, err := pgxpool.New(context.Background(), databaseUrl)
 	if err != nil {
 		panic(err)
 	}
+
+	supa := supabase.CreateClient(
+		mustGetEnv("SUPABASE_URL"),
+		mustGetEnv("SUPABASE_KEY"),
+	)
 
 	userRepository := user.NewUserRepositoryPostgres(pool)
 	classRepository := class.NewClassRepositoryPostgres(pool)
@@ -37,7 +45,7 @@ func main() {
 		ClassTaskRepository: classTaskRepository,
 	})
 	authMiddleware := auth.Auth{
-		SupabaseAuth:   nil,
+		SupabaseAuth:   supa.Auth,
 		UserRepository: userRepository,
 	}
 
@@ -51,7 +59,10 @@ func main() {
 			return err
 		},
 	})
-	app.Use(authMiddleware)
+	app.Use(recover.New(recover.Config{
+		EnableStackTrace: !dev,
+	}))
+	app.Use(authMiddleware.Middleware)
 	app.Route("/user", userRoute, "user")
 	app.Route("/class", classRoute, "class")
 
