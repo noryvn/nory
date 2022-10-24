@@ -114,6 +114,7 @@ func (r *Repository) testUpdateUser(t *testing.T) {
 	}{
 		{"success", domain.User{UserId: userFoo, Username: "foo-bar"}, nil},
 		{"duplicate username", domain.User{UserId: userBar, Username: "foo-bar"}, domain.ErrUserAlreadyExists},
+		{"duplicate email", domain.User{UserId: userBar, Email: "foo@bel.ia"}, domain.ErrUserAlreadyExists},
 	}
 
 	for _, tc := range testCases {
