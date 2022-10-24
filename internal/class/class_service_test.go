@@ -2,6 +2,7 @@ package class_test
 
 import (
 	"context"
+	"strings"
 	"testing"
 
 	"nory/domain"
@@ -71,4 +72,17 @@ func (cst classServiceTest) classCreate(t *testing.T) {
 	assert.Equal(t, 200, classRes.Code, "failed to create class")
 	assert.Equal(t, class.Name, classRes.Data.Name)
 	assert.Equal(t, class.ClassId, classRes.Data.ClassId)
+
+	testCases := []struct{
+		class domain.Class
+	}{
+		{domain.Class{Name: ""}},
+		{domain.Class{Name: "abelia narindi agsya - abel"}},
+		{domain.Class{Name: "abel", Description: strings.Repeat("abelia", 50)}},
+	}
+
+	for _, tc := range testCases {
+		_, err := cst.classService.CreateClass(context.Background(), &tc.class)
+		assert.NotNil(t, err)
+	}
 }

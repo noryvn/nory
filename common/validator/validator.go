@@ -1,6 +1,7 @@
 package validator
 
 import (
+	"fmt"
 	"reflect"
 	"regexp"
 	"strings"
@@ -45,7 +46,7 @@ func ValidateStruct(s any) error {
 	}
 	message := ""
 	for _, fe := range vErr {
-		message = fe.Error()
+		message = fmt.Sprintf("failed to validate %q, because %q rule", fe.Namespace(), fe.Tag())
 	}
 	return response.NewBadRequest(message)
 }

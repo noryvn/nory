@@ -17,13 +17,14 @@ type classRouter struct {
 func Route(classService ClassService) func(router fiber.Router) {
 	cr := classRouter{classService}
 	return func(router fiber.Router) {
-		router.Get("/:classId/info", cr.classInfo)
-		router.Get("/:classId/tasks", cr.classTasks)
-		router.Post("/create", cr.create)
+		router.Get("/:classId/info", cr.getClassInfo)
+		router.Get("/:classId/tasks", cr.getClassTasks)
+		router.Post("/:classId/tasks", cr.createClassTask)
+		router.Post("/create", cr.createClass)
 	}
 }
 
-func (cr classRouter) classInfo(c *fiber.Ctx) error {
+func (cr classRouter) getClassInfo(c *fiber.Ctx) error {
 	classId := c.Params("classId")
 	res, err := cr.cs.GetClassInfo(c.Context(), classId)
 	if err != nil {
@@ -32,7 +33,7 @@ func (cr classRouter) classInfo(c *fiber.Ctx) error {
 	return res.Respond(c)
 }
 
-func (cr classRouter) classTasks(c *fiber.Ctx) error {
+func (cr classRouter) getClassTasks(c *fiber.Ctx) error {
 	var q struct {
 		From time.Time
 		To   time.Time
@@ -48,15 +49,33 @@ func (cr classRouter) classTasks(c *fiber.Ctx) error {
 	return res.Respond(c)
 }
 
-func (cr classRouter) create(c *fiber.Ctx) error {
+func (cr classRouter) createClassTask(c *fiber.Ctx) error {
+	// classId := c.Params("classId")
+
+	// var body domain.ClassTask
+	// if err := c.BodyParser(&body); err != nil {
+	// 	return err
+	// }
+
+	// res, err := cr.cs.ClassTaskRepository.CreateTask(c.Context(), )
+
+	// return res.Respond(c)
+	return nil
+}
+
+func (cr classRouter) createClass(c *fiber.Ctx) error {
 	user, err := auth.GetUser(c)
 	if err != nil {
 		return err
 	}
-	class := &domain.Class{
-		OwnerId: user.UserId,
+
+	var class domain.Class
+	if err := c.BodyParser(&class); err != nil {
+		return err
 	}
-	res, err := cr.cs.CreateClass(c.Context(), class)
+
+	class.OwnerId = user.UserId
+	res, err := cr.cs.CreateClass(c.Context(), &class)
 	if err != nil {
 		return err
 	}

@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"nory/common/response"
+	"nory/common/validator"
 	"nory/domain"
 )
 
@@ -39,6 +40,9 @@ func (cs *ClassService) GetClassTasks(ctx context.Context, classId string, from,
 }
 
 func (cs *ClassService) CreateClass(ctx context.Context, class *domain.Class) (*response.Response[*domain.Class], error) {
+	if err := validator.ValidateStruct(class); err != nil {
+		return nil, err
+	}
 	err := cs.ClassRepository.CreateClass(ctx, class)
 	return response.New(200, class), err
 }
