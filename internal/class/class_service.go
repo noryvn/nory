@@ -64,16 +64,14 @@ func (cs *ClassService) DeleteClass(ctx context.Context, classId string) (*respo
 }
 
 func (cs *ClassService) AccessClass(ctx context.Context, user *domain.User, classId string) error {
-	msg := fmt.Sprintf("user with id %q does not has access to class with id %q", user.UserId, classId)
-	res := response.NewForbidden(msg)
-
 	class, err := cs.ClassRepository.GetClass(ctx, classId)
 	if err != nil {
 		return err
 	}
 
 	if class.OwnerId != user.UserId {
-		return res
+		msg := fmt.Sprintf("user with id %q does not has access to class with id %q", user.UserId, classId)
+		return response.NewForbidden(msg)
 	}
 
 	return nil
