@@ -237,6 +237,7 @@ func (r *Repository) testUpdateTasks(t *testing.T) {
 			after, err := r.ClassTaskRepository.GetTask(context.Background(), before.TaskId)
 			assert.Nil(t, err)
 			assert.Equal(t, before, *after)
+			assert.NotEqual(t, tc.Task, *after)
 		})
 	}
 }
