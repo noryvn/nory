@@ -28,14 +28,14 @@ func TestUserRepository(t *testing.T) {
 	}
 	repos := []Repository{
 		{
-			Name:           "memory",
-			UserRepository: NewUserRepositoryMem(),
-			Skip:           false,
-		},
-		{
 			Name:           "postgres",
 			UserRepository: NewUserRepositoryPostgres(pool),
 			Skip:           os.Getenv("DATABASE_URL") == "",
+		},
+		{
+			Name:           "memory",
+			UserRepository: NewUserRepositoryMem(),
+			Skip:           false,
 		},
 	}
 
