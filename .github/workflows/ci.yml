@@ -31,4 +31,4 @@ jobs:
       - name: run test
         run: go test -race -vet=off -covermode=atomic -coverprofile=coverage.out ./...
 
-      - uses: codecove/codecove-action@v3
+      - uses: codecov/codecov-action@v3
