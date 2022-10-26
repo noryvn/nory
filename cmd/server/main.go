@@ -53,10 +53,16 @@ func main() {
 		EnablePrintRoutes: dev,
 		Immutable:         dev,
 		ErrorHandler: func(c *fiber.Ctx, err error) error {
+			fiberErr, ok := err.(*fiber.Error)
+			if ok {
+				err = response.NewError(fiberErr.Code, fiberErr.Message)
+			}
+
 			err = response.ErrorHandler(c, err)
 			if err == nil {
 				return nil
 			}
+
 			fmt.Println(err)
 			return err
 		},
