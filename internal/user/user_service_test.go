@@ -41,6 +41,24 @@ func TestUserService(t *testing.T) {
 		assert.Equal(t, user.UserId, res.Data.User.UserId)
 	})
 
+	t.Run("GetUserProfileById", func(t *testing.T) {
+		t.Parallel()
+		user := &domain.User{
+			UserId:   uuid.NewString(),
+			Name:     "Abelia",
+			Username: xid.New().String(),
+			Email:    xid.New().String(),
+		}
+		err := us.UserRepository.CreateUser(context.Background(), user)
+		assert.Nil(t, err)
+
+		res, err := us.GetUserProfileById(context.Background(), user.UserId)
+		assert.Nil(t, err)
+		assert.Equal(t, 200, res.Code)
+		assert.Equal(t, user.Name, res.Data.User.Name)
+		assert.Equal(t, user.UserId, res.Data.User.UserId)
+	})
+
 	t.Run("GetUserClasses", func(t *testing.T) {
 		t.Parallel()
 		user := &domain.User{
