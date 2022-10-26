@@ -15,6 +15,7 @@ func Route(userService UserService) func(router fiber.Router) {
 	return func(router fiber.Router) {
 		router.Get("/profile", ur.GetUserProfile)
 		router.Get("/classes", ur.GetUserClasses)
+		router.Get("/:userId/profile", ur.GetOtherUserProfile)
 	}
 }
 
@@ -29,6 +30,18 @@ func (ur userRouter) GetUserProfile(c *fiber.Ctx) error {
 		return err
 	}
 
+	return res.Respond(c)
+}
+
+func (ur userRouter) GetOtherUserProfile(c *fiber.Ctx) error {
+	userId := c.Params("userId")
+
+	res, err := ur.us.GetUserProfileById(c.Context(), userId)
+	if err != nil {
+		return err
+	}
+
+	c.Set(fiber.HeaderCacheControl, "private, max-age=60")
 	return res.Respond(c)
 }
 
