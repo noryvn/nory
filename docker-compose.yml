@@ -7,8 +7,8 @@ services:
       - 26257:26257
     command: start-single-node --insecure
     healthcheck:
-      test: pg_isready -U root -d defaultdb
-      interval: 10s
+      test: ["CMD", "curl", "http://localhost:8080/"]
+      interval: 20s
       timeout: 3s
       retries: 10
   migrate:
