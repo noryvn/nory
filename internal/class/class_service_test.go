@@ -26,7 +26,7 @@ func TestClassService(t *testing.T) {
 	t.Run("get class info", cst.classInfo)
 	t.Run("get class tasks", cst.classTasks)
 	t.Run("create class tasks", cst.createClassTask)
-	t.Run("create and delete class", cst.classCreate)
+	t.Run("create, access and delete class", cst.classCreate)
 }
 
 type classServiceTest struct {
@@ -77,6 +77,12 @@ func (cst classServiceTest) classCreate(t *testing.T) {
 	assert.Equal(t, class.ClassId, classRes.Data.ClassId)
 
 	_, err = cst.classService.ClassRepository.GetClass(context.Background(), class.ClassId)
+	assert.Nil(t, err)
+
+	err = cst.classService.AccessClass(context.Background(), &domain.User{}, class.ClassId)
+	assert.NotNil(t, err)
+
+	err = cst.classService.AccessClass(context.Background(), &domain.User{UserId: class.OwnerId}, class.ClassId)
 	assert.Nil(t, err)
 
 	_, err = cst.classService.DeleteClass(context.Background(), class.ClassId)
