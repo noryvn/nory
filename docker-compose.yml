@@ -14,7 +14,8 @@ services:
   migrate:
     image: migrate/migrate
     depends_on:
-      - cockroach
+      cockroach:
+        condition: service_healthy
     links:
       - cockroach
     volumes:
