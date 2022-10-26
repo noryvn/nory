@@ -33,6 +33,6 @@ jobs:
       - name: run test
         run: go test -race -vet=off -covermode=atomic -coverprofile=coverage.out ./...
         env:
-          DATABASE_URL="postgres://root:@cockroach:26257/?sslmode=disable"
+          DATABASE_URL: "postgres://root:@cockroach:26257/?sslmode=disable"
 
       - uses: codecov/codecov-action@v3
