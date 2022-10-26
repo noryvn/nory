@@ -11,8 +11,10 @@ var (
 )
 
 type ClassSchedule struct {
-	ScheduleId string `json:"scheduleId"`          // unique
-	ClassId    string `json:"-" validate:"len=20"` //
+	ScheduleId string    `json:"scheduleId"` // unique
+	ClassId    string    `json:"classId"`    //
+	AuthorId   string    `json:"authorId"`
+	CreatedAt  time.Time `json:"createdAt"`
 
 	Name     string        `json:"name"`     //
 	StartAt  time.Duration `json:"startAt"`  //

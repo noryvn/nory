@@ -9,7 +9,7 @@ import (
 )
 
 type ClassTaskService struct {
-	ClassRepository domain.ClassRepository
+	ClassRepository     domain.ClassRepository
 	ClassTaskRepository domain.ClassTaskRepository
 }
 

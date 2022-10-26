@@ -2,6 +2,7 @@ package classtask
 
 import (
 	"context"
+	"errors"
 	"sync"
 	"time"
 
@@ -22,6 +23,9 @@ func NewClassTaskRepositoryMem() *ClassTaskRepositoryMem {
 }
 
 func (ctrm *ClassTaskRepositoryMem) CreateTask(ctx context.Context, task *domain.ClassTask) error {
+	if task.ClassId == "" || task.AuthorId == "" {
+		return errors.New("empty data")
+	}
 	ctrm.mx.Lock()
 	defer ctrm.mx.Unlock()
 	task.TaskId = xid.New().String()
