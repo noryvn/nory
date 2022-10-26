@@ -55,20 +55,26 @@ func (cs *ClassService) CreateClassTask(ctx context.Context, task *domain.ClassT
 	return response.New(200, task), err
 }
 
-func (cs *ClassService) DeleteClass(ctx context.Context, classId, userId string) (*response.Response[any], error) {
-	class, err := cs.ClassRepository.GetClass(ctx, classId)
-	if err != nil {
-		return nil, err
-	}
-
-	if class.OwnerId != userId {
-		msg := fmt.Sprintf("user with id %q does not has access to class with id %q", userId, classId)
-		return nil, response.NewForbidden(msg)
-	}
-
+func (cs *ClassService) DeleteClass(ctx context.Context, classId string) (*response.Response[any], error) {
 	if err := cs.ClassRepository.DeleteClass(ctx, classId); err != nil {
 		return nil, err
 	}
 
 	return response.New[any](204, nil), nil
+}
+
+func (cs *ClassService) AccessClass(ctx context.Context, user *domain.User, classId string) error {
+	msg := fmt.Sprintf("user with id %q does not has access to class with id %q", user.UserId, classId)
+	res := response.NewForbidden(msg)
+
+	class, err := cs.ClassRepository.GetClass(ctx, classId)
+	if err != nil {
+		return err
+	}
+
+	if class.OwnerId != user.UserId {
+		return res
+	}
+
+	return nil
 }

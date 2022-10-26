@@ -26,7 +26,7 @@ func TestClassService(t *testing.T) {
 	t.Run("get class info", cst.classInfo)
 	t.Run("get class tasks", cst.classTasks)
 	t.Run("create class tasks", cst.createClassTask)
-	t.Run("create class", cst.classCreate)
+	t.Run("create and delete class", cst.classCreate)
 }
 
 type classServiceTest struct {
@@ -76,6 +76,15 @@ func (cst classServiceTest) classCreate(t *testing.T) {
 	assert.Equal(t, class.Name, classRes.Data.Name)
 	assert.Equal(t, class.ClassId, classRes.Data.ClassId)
 
+	_, err = cst.classService.ClassRepository.GetClass(context.Background(), class.ClassId)
+	assert.Nil(t, err)
+
+	_, err = cst.classService.DeleteClass(context.Background(), class.ClassId)
+	assert.Nil(t, err)
+
+	_, err = cst.classService.ClassRepository.GetClass(context.Background(), class.ClassId)
+	assert.NotNil(t, err)
+
 	testCases := []struct {
 		class domain.Class
 	}{
@@ -88,13 +97,16 @@ func (cst classServiceTest) classCreate(t *testing.T) {
 		tc.class.OwnerId = uuid.NewString()
 		_, err := cst.classService.CreateClass(context.Background(), &tc.class)
 		assert.NotNilf(t, err, "unexpected at %#+v", tc.class)
+
+		_, err = cst.classService.DeleteClass(context.Background(), class.ClassId)
+		assert.Nil(t, err)
 	}
 }
 
 func (cst *classServiceTest) createClassTask(t *testing.T) {
 	t.Parallel()
 	task := &domain.ClassTask{
-		ClassId: xid.New().String(),
+		ClassId:  xid.New().String(),
 		AuthorId: uuid.NewString(),
 	}
 

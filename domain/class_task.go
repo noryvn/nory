@@ -11,9 +11,9 @@ var (
 )
 
 type ClassTask struct {
-	TaskId    string    `json:"taskId"`   // immutable, unique
-	ClassId   string    `json:"classId"`  // immutable
-	AuthorId  string    `json:"authorId"` // immutable
+	TaskId    string    `json:"taskId"`    // immutable, unique
+	ClassId   string    `json:"classId"`   // immutable
+	AuthorId  string    `json:"authorId"`  // immutable
 	CreatedAt time.Time `json:"createdAt"` // immutable
 
 	Name        string    `json:"name" validate:"max=20"`          // mutable

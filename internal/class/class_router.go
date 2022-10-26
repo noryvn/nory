@@ -1,6 +1,7 @@
 package class
 
 import (
+	"errors"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -26,7 +27,26 @@ func Route(classService ClassService) func(router fiber.Router) {
 }
 
 func (cr classRouter) deleteClass(c *fiber.Ctx) error {
-	return nil
+	classId := c.Params("classId")
+
+	user, err := auth.GetUser(c)
+	if err != nil {
+		return err
+	}
+
+	if err := cr.cs.AccessClass(c.Context(), user, classId); err != nil {
+		if errors.Is(err, domain.ErrClassNotExists) {
+			return nil
+		}
+		return err
+	}
+
+	res, err := cr.cs.DeleteClass(c.Context(), classId)
+	if err != nil {
+		return err
+	}
+
+	return res.Respond(c)
 }
 
 func (cr classRouter) getClassInfo(c *fiber.Ctx) error {
@@ -57,8 +77,17 @@ func (cr classRouter) getClassTasks(c *fiber.Ctx) error {
 func (cr classRouter) createClassTask(c *fiber.Ctx) error {
 	classId := c.Params("classId")
 
+	user, err := auth.GetUser(c)
+	if err != nil {
+		return err
+	}
+
 	var task domain.ClassTask
 	if err := c.BodyParser(&task); err != nil {
+		return err
+	}
+
+	if err := cr.cs.AccessClass(c.Context(), user, task.ClassId); err != nil {
 		return err
 	}
 
