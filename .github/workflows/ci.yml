@@ -5,9 +5,6 @@ on: [push, pull_request]
 jobs:
   ci:
     name: continous integration
-    if: |
-      github.event_name == 'push' ||
-      !startsWith(github.event.pull_request.head.label, 'noryvn:')
     runs-on: ubuntu-latest
     timeout-minutes: 5
 
