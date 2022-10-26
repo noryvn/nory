@@ -95,6 +95,7 @@ func (cst *classServiceTest) createClassTask(t *testing.T) {
 	t.Parallel()
 	task := &domain.ClassTask{
 		ClassId: xid.New().String(),
+		AuthorId: uuid.NewString(),
 	}
 
 	res, err := cst.classService.CreateClassTask(context.Background(), task)
