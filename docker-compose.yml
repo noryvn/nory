@@ -6,6 +6,11 @@ services:
       - 8081:8080
       - 26257:26257
     command: start-single-node --insecure
+    healthcheck:
+      test: pg_isready -U root -d defaultdb
+      interval: 10s
+      timeout: 3s
+      retries: 10
   migrate:
     image: migrate/migrate
     depends_on:
@@ -14,4 +19,4 @@ services:
       - cockroach
     volumes:
       - ./migrations:/migrations
-    command: -path /migrations -database cockroachdb://root:@cockroach:26257/ up 1
+    command: -path /migrations -database cockroachdb://root:@cockroach:26257/?sslmode=disable up 1

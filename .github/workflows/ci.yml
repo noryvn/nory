@@ -19,6 +19,8 @@ jobs:
         with:
           go-version: 1.19
 
+      - run: docker compose up -d
+
       - name: download dependency
         run: go mod download
 
