@@ -85,6 +85,11 @@ func (cst classServiceTest) classCreate(t *testing.T) {
 	err = cst.classService.AccessClass(context.Background(), &domain.User{UserId: class.OwnerId}, class.ClassId)
 	assert.Nil(t, err)
 
+	// delete existing class
+	_, err = cst.classService.DeleteClass(context.Background(), class.ClassId)
+	assert.Nil(t, err)
+
+	// delete unexisting class
 	_, err = cst.classService.DeleteClass(context.Background(), class.ClassId)
 	assert.Nil(t, err)
 
