@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS app_user (
 
 	username VARCHAR(20) NOT NULL,
 	name VARCHAR(32) NOT NULL,
-	email VARCHAR(254) UNIQUE NOT NULL,
+	email VARCHAR(254) NOT NULL,
 
 	PRIMARY KEY(user_id)
 );
@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS app_user (
 -- some times username will be used in WHERE clause
 CREATE INDEX IF NOT EXISTS user_id_index ON app_user(user_id, username);
 CREATE UNIQUE INDEX lower_username ON app_user(LOWER(username));
+CREATE UNIQUE INDEX lower_email ON app_user(LOWER(email));
 
 CREATE TABLE IF NOT EXISTS class (
 	class_id VARCHAR(20) UNIQUE NOT NULL,
@@ -63,5 +64,15 @@ CREATE TABLE IF NOT EXISTS class_task (
 );
 
 CREATE INDEX IF NOT EXISTS class_task_index ON class_task(class_id);
+
+CREATE TABLE IF NOT EXISTS class_member (
+	class_id VARCHAR(20) NOT NULL,
+	user_id UUID NOT NULL,
+	level VARCHAR(10) NOT NULL,
+
+	PRIMARY KEY(class_id, user_id),
+	CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES app_user(user_id) ON DELETE CASCADE,
+	CONSTRAINT fk_class FOREIGN KEY (class_id) REFERENCES class(class_id) ON DELETE CASCADE
+)
 
 COMMIT;
