@@ -33,7 +33,7 @@ func (cs *ClassService) GetClassTasks(ctx context.Context, classId string, from,
 		from = time.Now()
 	}
 	if to.IsZero() {
-		to = from.Add(24 * time.Hour)
+		to = from.Add(7 * 24 * time.Hour)
 	}
 	tasks, err := cs.ClassTaskRepository.GetTasksWithRange(ctx, classId, from, to)
 	return response.New(200, tasks), err
