@@ -9,13 +9,14 @@ import (
 )
 
 func TestValidator(t *testing.T) {
+	t.Parallel()
 	type foo struct {
 		Name string `validate:"required"`
 		Nick string `validate:"min=1,max=3" json:"n1ck"`
 	}
 
 	type nestedFoo struct {
-		Bar string `validate:"max=1"`
+		Bar string `json:"-" validate:"max=1"`
 		Foo foo
 	}
 
