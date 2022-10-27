@@ -57,6 +57,10 @@ func TestUserService(t *testing.T) {
 		assert.Equal(t, 200, res.Code)
 		assert.Equal(t, user.Name, res.Data.User.Name)
 		assert.Equal(t, user.UserId, res.Data.User.UserId)
+
+		res, err = us.GetUserProfileById(context.Background(), xid.New().String())
+		assert.NotNil(t, err)
+		assert.Equal(t, domain.ErrUserNotExists, err)
 	})
 
 	t.Run("GetUserClasses", func(t *testing.T) {
