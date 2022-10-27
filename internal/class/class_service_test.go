@@ -92,6 +92,7 @@ func (cst classServiceTest) classTasks(t *testing.T) {
 		To time.Time
 		Len int
 	}{
+		{time.Time{}, time.Time{}, 5},
 		{now, time.Time{}, 5},
 		{yesterday, time.Time{}, 7},
 		{yesterday, now, 2},
