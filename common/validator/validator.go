@@ -14,7 +14,7 @@ import (
 var (
 	validate = validator.New()
 
-	alphanumericSpaceRegex = regexp.MustCompile("^[a-zA-Z0-9\\s]*$")
+	usernameRegex = regexp.MustCompile("^[a-zA-Z0-9_.]*$")
 )
 
 func init() {
@@ -29,9 +29,12 @@ func init() {
 		return name
 	})
 
-	validate.RegisterValidation("alphanumeric_space", func(field validator.FieldLevel) bool {
+	validate.RegisterValidation("username", func(field validator.FieldLevel) bool {
 		str := field.Field().String()
-		return alphanumericSpaceRegex.MatchString(str)
+		if len(str) > 20 {
+			return false
+		}
+		return usernameRegex.MatchString(str)
 	})
 }
 

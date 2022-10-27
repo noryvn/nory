@@ -17,7 +17,7 @@ type User struct {
 	UserId    string    `json:"userId"`    // immutable, unique
 	CreatedAt time.Time `json:"createdAt"` // immutable
 
-	Username string `json:"username" validate:"max=20"` // mutable, unique
+	Username string `json:"username" validate:"username"` // mutable, unique
 	Name     string `json:"name" validate:"max=32"`     // mutable
 	Email    string `json:"email" validate:"max=254"`   // immutable, unique
 }

@@ -1,6 +1,7 @@
 package validator_test
 
 import (
+	"strings"
 	"testing"
 
 	. "nory/common/validator"
@@ -18,6 +19,10 @@ func TestValidator(t *testing.T) {
 	type nestedFoo struct {
 		Bar string `json:"-" validate:"max=1"`
 		Foo foo
+	}
+
+	type bar struct {
+		Userame string `validate:"username"`
 	}
 
 	testCase := []struct {
@@ -39,6 +44,21 @@ func TestValidator(t *testing.T) {
 			name: "failed nested validation",
 			data: nestedFoo{"bar", foo{"", "bazz"}},
 			err:  true,
+		},
+		{
+			name: "custom validator 'username'",
+			data: bar{"abelia_narindi.agsya"},
+			err: false,
+		},
+		{
+			name: "fail on forbidden character, validator 'username'",
+			data: bar{"abel?"},
+			err: true,
+		},
+		{
+			name: "fail on length, validator 'username'",
+			data: bar{strings.Repeat("u", 21)},
+			err: true,
 		},
 	}
 
