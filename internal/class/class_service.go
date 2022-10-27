@@ -25,7 +25,7 @@ func (cs *ClassService) GetClassInfo(ctx context.Context, classId string) (*resp
 	if err != nil {
 		return nil, err
 	}
-	return response.New(200, class), err
+	return response.New(200, class), nil
 }
 
 func (cs *ClassService) GetClassTasks(ctx context.Context, classId string, from, to time.Time) (*response.Response[[]*domain.ClassTask], error) {
