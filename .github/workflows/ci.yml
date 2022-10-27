@@ -30,6 +30,10 @@ jobs:
       - name: run test
         run: go test -race -vet=off -covermode=atomic -coverprofile=coverage.out ./...
         env:
+          SUPABASE_KEY: "${{ secrets.SUPABASE_KEY }}"
+          SUPABASE_URL: "${{ secrets.SUPABASE_URL }}"
+          AUTH_USER_EMAIL: "${{ secrets.AUTH_USER_EMAIL }}"
+          AUTH_USER_PASSWORD: "${{ secrets.AUTH_USER_PASSWORD }}"
           DATABASE_URL: "postgres://root:@127.0.0.1:26257/?sslmode=disable"
 
       - uses: codecov/codecov-action@v3
