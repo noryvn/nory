@@ -72,31 +72,31 @@ func (cst classServiceTest) classTasks(t *testing.T) {
 
 	for i := 0; i < 5; i++ {
 		err := cst.classService.ClassTaskRepository.CreateTask(context.Background(), &domain.ClassTask{
-			ClassId: class.ClassId,
+			ClassId:  class.ClassId,
 			AuthorId: class.OwnerId,
-			DueDate: tommorrow,
+			DueDate:  tommorrow,
 		})
 		assert.Nil(t, err)
 		if i > 2 {
 			err := cst.classService.ClassTaskRepository.CreateTask(context.Background(), &domain.ClassTask{
-				ClassId: class.ClassId,
+				ClassId:  class.ClassId,
 				AuthorId: class.OwnerId,
-				DueDate: yesterday,
+				DueDate:  yesterday,
 			})
 			assert.Nil(t, err)
 		}
 	}
 
-	for _, tc := range []struct{
+	for _, tc := range []struct {
 		From time.Time
-		To time.Time
-		Len int
+		To   time.Time
+		Len  int
 	}{
 		{time.Time{}, time.Time{}, 5},
 		{tommorrow, time.Time{}, 5},
 		{yesterday, time.Time{}, 7},
 		{yesterday, tommorrow, 2},
-	}{
+	} {
 		res, err := cst.classService.GetClassTasks(context.Background(), class.ClassId, tc.From, tc.To)
 		assert.Nil(t, err)
 		assert.Equal(t, tc.Len, len(res.Data))
