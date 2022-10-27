@@ -10,6 +10,6 @@ RUN CGO_ENABLED=0 go build -o nory ./cmd/server
 
 FROM gcr.io/distroless/static-debian11
 
-COPY --from=build /app/nory /
+COPY --from=builder /app/nory /
 
 CMD ["/nory"]
