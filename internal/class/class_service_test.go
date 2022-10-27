@@ -67,14 +67,14 @@ func (cst classServiceTest) classTasks(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, 200, r.Code)
 
-	now := time.Now().UTC()
-	yesterday := now.Add(-24 * time.Hour)
+	tommorrow := time.Now().UTC().Add(24 * time.Hour)
+	yesterday := tommorrow.Add(-2 * 24 * time.Hour)
 
 	for i := 0; i < 5; i++ {
 		err := cst.classService.ClassTaskRepository.CreateTask(context.Background(), &domain.ClassTask{
 			ClassId: class.ClassId,
 			AuthorId: class.OwnerId,
-			DueDate: now,
+			DueDate: tommorrow,
 		})
 		assert.Nil(t, err)
 		if i > 2 {
@@ -93,9 +93,9 @@ func (cst classServiceTest) classTasks(t *testing.T) {
 		Len int
 	}{
 		{time.Time{}, time.Time{}, 5},
-		{now, time.Time{}, 5},
+		{tommorrow, time.Time{}, 5},
 		{yesterday, time.Time{}, 7},
-		{yesterday, now, 2},
+		{yesterday, tommorrow, 2},
 	}{
 		res, err := cst.classService.GetClassTasks(context.Background(), class.ClassId, tc.From, tc.To)
 		assert.Nil(t, err)
