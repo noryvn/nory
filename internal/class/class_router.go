@@ -55,6 +55,7 @@ func (cr classRouter) getClassInfo(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
+
 	return res.Respond(c)
 }
 
@@ -71,6 +72,7 @@ func (cr classRouter) getClassTasks(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
+
 	return res.Respond(c)
 }
 

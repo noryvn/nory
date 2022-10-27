@@ -4,6 +4,7 @@ import (
 	"context"
 	"strings"
 	"testing"
+	"time"
 
 	"nory/domain"
 	. "nory/internal/class"
@@ -56,6 +57,50 @@ func (cst classServiceTest) classInfo(t *testing.T) {
 
 func (cst classServiceTest) classTasks(t *testing.T) {
 	t.Parallel()
+
+	class := &domain.Class{
+		OwnerId: uuid.NewString(),
+		Name:    "foo",
+	}
+
+	r, err := cst.classService.CreateClass(context.Background(), class)
+	assert.Nil(t, err)
+	assert.Equal(t, 200, r.Code)
+
+	tommorrow := time.Now().UTC().Add(24 * time.Hour)
+	yesterday := tommorrow.Add(-2 * 24 * time.Hour)
+
+	for i := 0; i < 5; i++ {
+		err := cst.classService.ClassTaskRepository.CreateTask(context.Background(), &domain.ClassTask{
+			ClassId:  class.ClassId,
+			AuthorId: class.OwnerId,
+			DueDate:  tommorrow,
+		})
+		assert.Nil(t, err)
+		if i > 2 {
+			err := cst.classService.ClassTaskRepository.CreateTask(context.Background(), &domain.ClassTask{
+				ClassId:  class.ClassId,
+				AuthorId: class.OwnerId,
+				DueDate:  yesterday,
+			})
+			assert.Nil(t, err)
+		}
+	}
+
+	for _, tc := range []struct {
+		From time.Time
+		To   time.Time
+		Len  int
+	}{
+		{time.Time{}, time.Time{}, 5},
+		{tommorrow, time.Time{}, 5},
+		{yesterday, time.Time{}, 7},
+		{yesterday, tommorrow, 2},
+	} {
+		res, err := cst.classService.GetClassTasks(context.Background(), class.ClassId, tc.From, tc.To)
+		assert.Nil(t, err)
+		assert.Equal(t, tc.Len, len(res.Data))
+	}
 }
 
 func (cst classServiceTest) classCreate(t *testing.T) {

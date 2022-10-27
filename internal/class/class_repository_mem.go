@@ -63,11 +63,6 @@ func (crm *ClassRepositoryMem) UpdateClass(ctx context.Context, class *domain.Cl
 	if err != nil {
 		return err
 	}
-	if class.Description != "" {
-		c.Description = class.Description
-	}
-	if class.Name != "" {
-		c.Name = class.Name
-	}
+	c.Update(class)
 	return nil
 }

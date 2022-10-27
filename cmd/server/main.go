@@ -80,16 +80,16 @@ func main() {
 }
 
 func getEnv(name, def string) string {
-	v := os.Getenv(name)
-	if v == "" {
+	v, exists := os.LookupEnv(name)
+	if !exists {
 		return def
 	}
 	return v
 }
 
 func mustGetEnv(name string) string {
-	v := os.Getenv(name)
-	if v == "" {
+	v, exists := os.LookupEnv(name)
+	if !exists {
 		msg := fmt.Sprintf("missing %q in environment variable", name)
 		panic(msg)
 	}

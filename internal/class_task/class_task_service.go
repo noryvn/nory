@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"nory/common/response"
+	"nory/common/validator"
 	"nory/domain"
 )
 
@@ -13,13 +14,23 @@ type ClassTaskService struct {
 	ClassTaskRepository domain.ClassTaskRepository
 }
 
+func (cts *ClassTaskService) CreateTask(ctx context.Context, task *domain.ClassTask) (*response.Response[*domain.ClassTask], error) {
+	if err := validator.ValidateStruct(task); err != nil {
+		return nil, err
+	}
+	if err := cts.ClassTaskRepository.CreateTask(ctx, task); err != nil {
+		return nil, err
+	}
+	return response.New(200, task), nil
+}
+
 func (cts *ClassTaskService) GetTask(ctx context.Context, taskId string) (*response.Response[*domain.ClassTask], error) {
 	task, err := cts.ClassTaskRepository.GetTask(ctx, taskId)
 	if err != nil {
 		return nil, err
 	}
 
-	return response.New(204, task), nil
+	return response.New(200, task), nil
 }
 
 func (cts *ClassTaskService) DeleteTask(ctx context.Context, taskId, userId string) (*response.Response[*struct{}], error) {

@@ -5,7 +5,6 @@ import (
 	"errors"
 
 	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/rs/xid"
 
@@ -68,9 +67,6 @@ func (crp *ClassRepositoryPostgres) CreateClass(ctx context.Context, class *doma
 		class.Name,
 		class.Description,
 	)
-	if pgerr, ok := err.(*pgconn.PgError); ok && pgerr.Code == "23505" {
-		return domain.ErrClassAlreadyExists
-	}
 	return err
 }
 

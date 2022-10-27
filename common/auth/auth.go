@@ -12,7 +12,7 @@ import (
 	"nory/domain"
 )
 
-var ErrUserNotFound = response.NewUnathorized("authentication required")
+var ErrUserNotFound error = response.NewUnathorized("authentication required")
 
 const userLocalKey = "authenticated user locals key"
 
