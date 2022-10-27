@@ -22,8 +22,15 @@ func TestAuthMock(t *testing.T) {
 			if !ok {
 				return fiber.DefaultErrorHandler(c, err)
 			}
-			return c.Status(res.Code).JSON(res)
+			return res.Respond(c)
 		},
+	})
+	app.Get("/not-set", func(c *fiber.Ctx) error {
+		u, err := GetUser(c)
+		if err != nil {
+			return err
+		}
+		return c.Status(200).JSON(u)
 	})
 	app.Use(MockMiddleware)
 	app.Get("/", func(c *fiber.Ctx) error {
@@ -32,6 +39,13 @@ func TestAuthMock(t *testing.T) {
 			return err
 		}
 		return c.Status(200).JSON(u)
+	})
+
+	t.Run("unset", func(t *testing.T) {
+		req := httptest.NewRequest("GET", "/", nil)
+		resp, err := app.Test(req, 10)
+		assert.Nil(t, err)
+		assert.Equal(t, 401, resp.StatusCode)
 	})
 
 	testCases := []struct {
