@@ -16,7 +16,7 @@ import (
 func TestClassTaskService(t *testing.T) {
 	t.Parallel()
 	cts := &ClassTaskService{
-		ClassRepository: class.NewClassRepositoryMem(),
+		ClassRepository:     class.NewClassRepositoryMem(),
 		ClassTaskRepository: NewClassTaskRepositoryMem(),
 	}
 
@@ -31,7 +31,7 @@ func TestClassTaskService(t *testing.T) {
 		assert.Nil(t, err)
 
 		task := &domain.ClassTask{
-			ClassId: class.ClassId,
+			ClassId:  class.ClassId,
 			AuthorId: class.OwnerId,
 		}
 
@@ -57,12 +57,12 @@ func TestClassTaskService(t *testing.T) {
 		get, err = cts.GetTask(context.Background(), create.Data.TaskId)
 		assert.NotNil(t, err)
 
-		for _, tc := range []struct{
+		for _, tc := range []struct {
 			Task domain.ClassTask
 		}{
 			{domain.ClassTask{Name: strings.Repeat("foo", 20)}},
 			{domain.ClassTask{Description: strings.Repeat("foo", 1024)}},
-		}{
+		} {
 			_, err := cts.CreateTask(context.Background(), &tc.Task)
 			assert.NotNil(t, err)
 		}

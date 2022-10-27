@@ -18,8 +18,8 @@ type User struct {
 	CreatedAt time.Time `json:"createdAt"` // immutable
 
 	Username string `json:"username" validate:"username"` // mutable, unique
-	Name     string `json:"name" validate:"max=32"`     // mutable
-	Email    string `json:"email" validate:"max=254"`   // immutable, unique
+	Name     string `json:"name" validate:"max=32"`       // mutable
+	Email    string `json:"email" validate:"max=254"`     // immutable, unique
 }
 
 func (u *User) Update(uu *User) {

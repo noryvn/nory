@@ -48,17 +48,17 @@ func TestValidator(t *testing.T) {
 		{
 			name: "custom validator 'username'",
 			data: bar{"abelia_narindi.agsya"},
-			err: false,
+			err:  false,
 		},
 		{
 			name: "fail on forbidden character, validator 'username'",
 			data: bar{"abel?"},
-			err: true,
+			err:  true,
 		},
 		{
 			name: "fail on length, validator 'username'",
 			data: bar{strings.Repeat("u", 21)},
-			err: true,
+			err:  true,
 		},
 	}
 
