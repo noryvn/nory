@@ -157,9 +157,13 @@ func (r *Repository) testDeleteUser(t *testing.T) {
 		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Helper()
-			err := r.UserRepository.DeleteUser(context.Background(), tc.Id)
+			user, err := r.UserRepository.GetUser(context.Background(), tc.Id)
+			assert.Nil(t, err)
+			err = r.UserRepository.DeleteUser(context.Background(), tc.Id)
 			assert.Equal(t, tc.Err, err, "missmatch error")
 			_, err = r.UserRepository.GetUser(context.Background(), tc.Id)
+			assert.Equal(t, domain.ErrUserNotExists, err)
+			_, err = r.UserRepository.GetUserWithUsername(context.Background(), user.Username)
 			assert.Equal(t, domain.ErrUserNotExists, err)
 		})
 	}
