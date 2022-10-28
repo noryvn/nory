@@ -105,5 +105,6 @@ func TestUserRouter(t *testing.T) {
 		var classes response.Response[[]*domain.Class]
 		err = json.NewDecoder(resp.Body).Decode(&classes)
 		assert.Nil(t, err)
+		assert.Equal(t, 1, len(classes.Data))
 	})
 }
