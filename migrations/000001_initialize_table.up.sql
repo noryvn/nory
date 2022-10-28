@@ -8,11 +8,11 @@ CREATE TABLE IF NOT EXISTS app_user (
 	name VARCHAR(32) NOT NULL,
 	email VARCHAR(254) NOT NULL,
 
-	PRIMARY KEY(user_id)
+	CONSTRAINT app_user_pk PRIMARY KEY(user_id)
 );
 
--- some times username will be used in WHERE clause
-CREATE INDEX IF NOT EXISTS user_id_index ON app_user(user_id, username);
+CREATE INDEX IF NOT EXISTS user_id_index ON app_user(user_id);
+CREATE INDEX IF NOT EXISTS username_index ON app_user(username);
 CREATE UNIQUE INDEX lower_username ON app_user(LOWER(username));
 CREATE UNIQUE INDEX lower_email ON app_user(LOWER(email));
 
@@ -24,11 +24,12 @@ CREATE TABLE IF NOT EXISTS class (
 	name VARCHAR(20) NOT NULL,
 	description VARCHAR(255) NOT NULL,
 
-	PRIMARY KEY(class_id),
+	CONSTRAINT class_pk PRIMARY KEY(class_id),
 	CONSTRAINT fk_user FOREIGN KEY (owner_id) REFERENCES app_user(user_id) ON DELETE CASCADE
 );
 
-CREATE INDEX IF NOT EXISTS class_index ON class(class_id);
+CREATE INDEX IF NOT EXISTS class_id_index ON class(class_id);
+CREATE INDEX IF NOT EXISTS owner_id_index ON class(owner_id);
 
 CREATE TABLE IF NOT EXISTS class_schedule (
 	schedule_id VARCHAR(20) UNIQUE NOT NULL,
@@ -41,12 +42,13 @@ CREATE TABLE IF NOT EXISTS class_schedule (
 	duration SMALLINT NOT NULL,
 	day SMALLINT NOT NULL,
 
-	PRIMARY KEY(schedule_id),
+	CONSTRAINT class_schedule_pk PRIMARY KEY(schedule_id),
 	CONSTRAINT fk_author FOREIGN KEY (author_id) REFERENCES app_user(user_id) ON DELETE CASCADE,
 	CONSTRAINT fk_class FOREIGN KEY (class_id) REFERENCES class(class_id) ON DELETE CASCADE
 );
 
-CREATE INDEX IF NOT EXISTS class_schedule_index ON class_schedule(class_id);
+CREATE INDEX IF NOT EXISTS class_schedule_index ON class_schedule(schedule_id);
+CREATE INDEX IF NOT EXISTS class_id_index ON class_schedule(class_id);
 
 CREATE TABLE IF NOT EXISTS class_task (
 	task_id VARCHAR(20) UNIQUE NOT NULL,
@@ -58,12 +60,13 @@ CREATE TABLE IF NOT EXISTS class_task (
 	due_date TIMESTAMP NOT NULL,
 	description VARCHAR(1024) NOT NULL,
 
-	PRIMARY KEY(task_id),
+	CONSTRAINT class_task_pk PRIMARY KEY(task_id),
 	CONSTRAINT fk_author FOREIGN KEY (author_id) REFERENCES app_user(user_id) ON DELETE CASCADE,
 	CONSTRAINT fk_class FOREIGN KEY (class_id) REFERENCES class(class_id) ON DELETE CASCADE
 );
 
-CREATE INDEX IF NOT EXISTS class_task_index ON class_task(class_id);
+CREATE INDEX IF NOT EXISTS class_task_index ON class_task(task_id);
+CREATE INDEX IF NOT EXISTS class_id_index ON class_task(class_id);
 
 CREATE TABLE IF NOT EXISTS class_member (
 	class_id VARCHAR(20) NOT NULL,
@@ -76,5 +79,10 @@ CREATE TABLE IF NOT EXISTS class_member (
 	CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES app_user(user_id) ON DELETE CASCADE,
 	CONSTRAINT fk_class FOREIGN KEY (class_id) REFERENCES class(class_id) ON DELETE CASCADE
 );
+
+CREATE INDEX IF NOT EXISTS class_id_index ON class_member(class_id);
+CREATE INDEX IF NOT EXISTS user_id_index ON class_member(user_id);
+CREATE INDEX IF NOT EXISTS user_and_class_index ON class_member(user_id, class_id);
+CREATE INDEX IF NOT EXISTS level ON class_member(level);
 
 COMMIT;
