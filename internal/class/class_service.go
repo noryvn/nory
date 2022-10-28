@@ -47,6 +47,13 @@ func (cs *ClassService) CreateClass(ctx context.Context, class *domain.Class) (*
 	if err := cs.ClassRepository.CreateClass(ctx, class); err != nil {
 		return nil, err
 	}
+	if err := cs.ClassMemberRepository.CreateMember(ctx, &domain.ClassMember{
+		UserId:  class.OwnerId,
+		ClassId: class.ClassId,
+		Level:   "admin",
+	}); err != nil {
+		return nil, err
+	}
 	return response.New(200, class), nil
 }
 

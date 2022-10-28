@@ -2,6 +2,8 @@ package user
 
 import (
 	"context"
+	"errors"
+	"fmt"
 
 	"nory/common/response"
 	"nory/domain"
@@ -21,22 +23,35 @@ type UserService struct {
 }
 
 func (us UserService) GetUserProfile(ctx context.Context, user *domain.User) (*response.Response[*UserProfile], error) {
-	up := &UserProfile{}
-	res := response.New(200, up)
+	user, err := us.UserRepository.GetUser(ctx, user.UserId)
+	if err != nil {
+		return nil, err
+	}
+
 	classes, err := us.ClassRepository.GetClassesByOwnerId(ctx, user.UserId)
 	if err != nil {
-		return res, err
+		return nil, err
 	}
 
 	members, err := us.ClassMemberRepository.ListJoined(ctx, user.UserId)
-	up.User = user
-	up.OwnedClass = len(classes)
-	up.JoinedClass = len(members)
-	return res, nil
+	if err != nil {
+		return nil, err
+	}
+
+	up := &UserProfile{
+		User:        user,
+		OwnedClass:  len(classes),
+		JoinedClass: len(members),
+	}
+	return response.New(200, up), nil
 }
 
 func (us UserService) GetUserProfileById(ctx context.Context, userId string) (*response.Response[*UserProfile], error) {
 	user, err := us.UserRepository.GetUser(ctx, userId)
+	if errors.Is(err, domain.ErrUserNotExists) {
+		msg := fmt.Sprintf("can not find user with id %q", userId)
+		return nil, response.NewNotFound(msg)
+	}
 	if err != nil {
 		return nil, err
 	}

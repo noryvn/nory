@@ -24,7 +24,7 @@ import (
 func TestClassRouter(t *testing.T) {
 	t.Parallel()
 
-	userRoute := Route(ClassService{
+	classRoute := Route(ClassService{
 		ClassRepository:       NewClassRepositoryMem(),
 		ClassTaskRepository:   classtask.NewClassTaskRepositoryMem(),
 		ClassMemberRepository: classmember.NewClassMemberRepositoryMem(),
@@ -42,10 +42,10 @@ func TestClassRouter(t *testing.T) {
 		},
 	})
 	app.Use(auth.MockMiddleware)
-	app.Route("/", userRoute)
+	app.Route("/", classRoute)
 
 	t.Run("create", func(t *testing.T) {
-		for _, tc := range []struct{
+		for _, tc := range []struct {
 			Name string
 			User domain.User
 			Body domain.Class
@@ -63,7 +63,7 @@ func TestClassRouter(t *testing.T) {
 				Body: domain.Class{Name: "foo"},
 				Code: 401,
 			},
-		}{
+		} {
 			tc := tc
 			t.Run(tc.Name, func(t *testing.T) {
 				buff := bytes.NewBuffer(nil)
@@ -101,9 +101,9 @@ func TestClassRouter(t *testing.T) {
 				p = fmt.Sprintf("/%s/task", body.Data.ClassId)
 				buff.Reset()
 				err = json.NewEncoder(buff).Encode(domain.ClassTask{
-					ClassId: xid.New().String(),
+					ClassId:  xid.New().String(),
 					AuthorId: uuid.NewString(),
-					DueDate: now.Add(24 * time.Hour),
+					DueDate:  now.Add(24 * time.Hour),
 				})
 				assert.Nil(t, err)
 				req = httptest.NewRequest("POST", p, buff)

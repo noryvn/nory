@@ -2,6 +2,7 @@ package user_test
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"nory/domain"
@@ -76,9 +77,11 @@ func TestUserService(t *testing.T) {
 		assert.Equal(t, user.Name, res.Data.User.Name)
 		assert.Equal(t, user.UserId, res.Data.User.UserId)
 
-		res, err = us.GetUserProfileById(context.Background(), xid.New().String())
+		userId := uuid.NewString()
+		res, err = us.GetUserProfileById(context.Background(), userId)
 		assert.NotNil(t, err)
-		assert.Equal(t, domain.ErrUserNotExists, err)
+		msg := fmt.Sprintf("can not find user with id %q", userId)
+		assert.Equal(t, msg, err.Error())
 	})
 
 	t.Run("GetUserClasses", func(t *testing.T) {
