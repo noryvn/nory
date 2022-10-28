@@ -12,11 +12,11 @@ var (
 )
 
 type ClassMember struct {
-	ClassId   string
-	UserId    string
-	CreatedAt time.Time
+	ClassId   string `json:"classId" validate:"len=20"`
+	UserId    string `json:"userId" validate:"uuid"`
+	CreatedAt time.Time `json:"createdAt"`
 
-	Level string
+	Level string `json:"level"`
 }
 
 func (member *ClassMember) Update(m *ClassMember) {

@@ -12,6 +12,7 @@ import (
 )
 
 type ClassService struct {
+	UserRepository domain.UserRepository
 	ClassRepository       domain.ClassRepository
 	ClassTaskRepository   domain.ClassTaskRepository
 	ClassMemberRepository domain.ClassMemberRepository
@@ -68,6 +69,30 @@ func (cs *ClassService) CreateClassTask(ctx context.Context, userId string, task
 		return nil, err
 	}
 	return response.New(200, task), nil
+}
+
+func (cs *ClassService) AddMember(ctx context.Context, userId string, member *domain.ClassMember) (*response.Response[any], error) {
+	if err := validator.ValidateStruct(member); err != nil {
+		return nil, err
+	}
+	if err := cs.AccessClass(ctx, userId, member.ClassId); err != nil {
+		return nil, err
+	}
+	if err := cs.ClassMemberRepository.CreateMember(ctx, member); err != nil {
+		return nil, err
+	}
+	return response.New[any](204, nil), nil
+}
+
+func (cs *ClassService) AddMemberWithUsername(ctx context.Context, userId, classId, username string) (*response.Response[any], error) {
+	user, err := cs.UserRepository.GetUserWithUsername(ctx, username)
+	if err != nil {
+		return nil, err
+	}
+	return cs.AddMember(ctx, userId, &domain.ClassMember{
+		UserId: user.UserId,
+		ClassId: classId,
+	})
 }
 
 func (cs *ClassService) DeleteClass(ctx context.Context, userId, classId string) (*response.Response[any], error) {

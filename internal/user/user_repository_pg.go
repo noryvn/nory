@@ -41,6 +41,27 @@ func (urp *UserRepositoryPostgres) GetUser(ctx context.Context, id string) (*dom
 	return u, err
 }
 
+func (urp *UserRepositoryPostgres) GetUserWithUsername(ctx context.Context, username string) (*domain.User, error) {
+	u := &domain.User{
+		UserId:    "",
+		CreatedAt: time.Time{},
+		Username:  username,
+		Name:      "",
+		Email:     "",
+	}
+	row := urp.pool.QueryRow(ctx, "SELECT user_id, name, email, created_at FROM app_user WHERE username = $1", username)
+	err := row.Scan(
+		&u.UserId,
+		&u.Name,
+		&u.Email,
+		&u.CreatedAt,
+	)
+	if errors.Is(err, pgx.ErrNoRows) {
+		err = domain.ErrUserNotExists
+	}
+	return u, err
+}
+
 func (urp *UserRepositoryPostgres) DeleteUser(ctx context.Context, id string) error {
 	_, err := urp.pool.Exec(
 		ctx,

@@ -28,6 +28,17 @@ func (urm *UserRepositoryMem) GetUser(ctx context.Context, id string) (*domain.U
 	return u, nil
 }
 
+func (urm *UserRepositoryMem) GetUserWithUsername(ctx context.Context, username string) (*domain.User, error) {
+	urm.mu.Lock()
+	defer urm.mu.Unlock()
+	for _, user := range urm.m {
+		if user.Username == username {
+			return user, nil
+		}
+	}
+	return nil, domain.ErrUserNotExists
+}
+
 func (urm *UserRepositoryMem) CreateUser(ctx context.Context, u *domain.User) error {
 	urm.mu.Lock()
 	defer urm.mu.Unlock()

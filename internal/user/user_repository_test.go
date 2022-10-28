@@ -102,6 +102,9 @@ func (r *Repository) testGetUser(t *testing.T) {
 			assert.Equal(t, tc.Err, err, "missmatch error")
 			if tc.Err == nil && err == nil {
 				assert.Equal(t, tc.Id, u.UserId, "missmatch user id")
+				uu, err := r.UserRepository.GetUserWithUsername(context.Background(), u.Username)
+				assert.Nil(t, err)
+				assert.Equal(t, u, uu)
 			}
 		})
 	}
