@@ -19,7 +19,7 @@ func Route(classService ClassService) func(router fiber.Router) {
 	return func(router fiber.Router) {
 		router.Delete("/:classId", cr.deleteClass)
 		router.Get("/:classId/info", cr.getClassInfo)
-		router.Get("/:classId/tasks", cr.getClassTasks)
+		router.Get("/:classId/task", cr.getClassTask)
 		router.Post("/:classId/task", cr.createClassTask)
 		router.Post("/create", cr.createClass)
 	}
@@ -51,7 +51,7 @@ func (cr classRouter) getClassInfo(c *fiber.Ctx) error {
 	return res.Respond(c)
 }
 
-func (cr classRouter) getClassTasks(c *fiber.Ctx) error {
+func (cr classRouter) getClassTask(c *fiber.Ctx) error {
 	var q struct {
 		From time.Time
 		To   time.Time

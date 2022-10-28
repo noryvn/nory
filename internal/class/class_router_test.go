@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
@@ -31,7 +32,14 @@ func TestClassRouter(t *testing.T) {
 
 	app := fiber.New(fiber.Config{
 		Immutable: true,
-		ErrorHandler: response.ErrorHandler,
+		ErrorHandler: func(c *fiber.Ctx, err error) error {
+			e := response.ErrorHandler(c, err)
+			if e != nil {
+				t.Logf("%#+v", e)
+				return e
+			}
+			return nil
+		},
 	})
 	app.Use(auth.MockMiddleware)
 	app.Route("/", userRoute)
@@ -88,6 +96,33 @@ func TestClassRouter(t *testing.T) {
 				assert.Nil(t, err)
 				assert.Equal(t, tc.Body.Name, body.Data.Name)
 				assert.NotEqual(t, "", body.Data.ClassId)
+
+				now := time.Now().UTC()
+				p = fmt.Sprintf("/%s/task", body.Data.ClassId)
+				buff.Reset()
+				err = json.NewEncoder(buff).Encode(domain.ClassTask{
+					ClassId: xid.New().String(),
+					AuthorId: uuid.NewString(),
+					DueDate: now.Add(24 * time.Hour),
+				})
+				assert.Nil(t, err)
+				req = httptest.NewRequest("POST", p, buff)
+				req.Header.Set("content-type", "application/json")
+				req.Header.Set("user-id", tc.User.UserId)
+				resp, err = app.Test(req)
+				assert.Equal(t, 200, resp.StatusCode)
+
+				req = httptest.NewRequest("GET", p, nil)
+				q := req.URL.Query()
+				q.Add("from", now.Format(time.RFC3339))
+				req.URL.RawQuery = q.Encode()
+				t.Log(req.URL.String())
+				resp, err = app.Test(req)
+				assert.Equal(t, 200, resp.StatusCode)
+				var b response.Response[[]*domain.ClassTask]
+				err = json.NewDecoder(resp.Body).Decode(&b)
+				assert.Nil(t, err)
+				assert.Equal(t, 1, len(b.Data))
 
 				p = fmt.Sprintf("/%s", body.Data.ClassId)
 				// unauthorized
