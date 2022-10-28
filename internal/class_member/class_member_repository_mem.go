@@ -46,6 +46,10 @@ func (repo *ClassMemberRepositoryMem) GetMember(ctx context.Context, member *dom
 }
 
 func (repo *ClassMemberRepositoryMem) CreateMember(ctx context.Context, member *domain.ClassMember) error {
+	_, err := repo.GetMember(ctx, member)
+	if err == nil {
+		return domain.ErrClassMemberAlreadyExists
+	}
 	repo.members = append(repo.members, member)
 	return nil
 }
@@ -63,7 +67,7 @@ func (repo *ClassMemberRepositoryMem) UpdateMember(ctx context.Context, member *
 func (repo *ClassMemberRepositoryMem) DeleteMember(ctx context.Context, member *domain.ClassMember) error {
 	for i, m := range repo.members {
 		if m.ClassId == member.ClassId && m.UserId == member.UserId {
-			repo.members = append(repo.members[:i], repo.members[i + 1:]...)
+			repo.members = append(repo.members[:i], repo.members[i+1:]...)
 			return nil
 		}
 	}

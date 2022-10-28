@@ -68,6 +68,8 @@ CREATE INDEX IF NOT EXISTS class_task_index ON class_task(class_id);
 CREATE TABLE IF NOT EXISTS class_member (
 	class_id VARCHAR(20) NOT NULL,
 	user_id UUID NOT NULL,
+	created_at TIMESTAMP DEFAULT NOW(),
+
 	level VARCHAR(10) NOT NULL,
 
 	PRIMARY KEY(class_id, user_id),

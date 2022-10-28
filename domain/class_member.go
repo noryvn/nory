@@ -3,15 +3,18 @@ package domain
 import (
 	"context"
 	"errors"
+	"time"
 )
 
 var (
-	ErrClassMemberNotExists = errors.New("ClassMember does not exists")
+	ErrClassMemberNotExists     = errors.New("ClassMember does not exists")
+	ErrClassMemberAlreadyExists = errors.New("ClassMember does not exists")
 )
 
 type ClassMember struct {
-	ClassId string
-	UserId string
+	ClassId   string
+	UserId    string
+	CreatedAt time.Time
 
 	Level string
 }
