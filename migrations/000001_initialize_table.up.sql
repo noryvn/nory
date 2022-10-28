@@ -75,7 +75,7 @@ CREATE TABLE IF NOT EXISTS class_member (
 
 	level VARCHAR(10) NOT NULL,
 
-	PRIMARY KEY(class_id, user_id),
+	CONSTRAINT class_member_pk PRIMARY KEY(class_id, user_id),
 	CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES app_user(user_id) ON DELETE CASCADE,
 	CONSTRAINT fk_class FOREIGN KEY (class_id) REFERENCES class(class_id) ON DELETE CASCADE
 );
