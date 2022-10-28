@@ -10,13 +10,13 @@ import (
 type UserProfile struct {
 	User *domain.User `json:"user"`
 
-	OwnedClass int `json:"ownedClass"`
+	OwnedClass  int `json:"ownedClass"`
 	JoinedClass int `json:"joinedClass"`
 }
 
 type UserService struct {
-	UserRepository  domain.UserRepository
-	ClassRepository domain.ClassRepository
+	UserRepository        domain.UserRepository
+	ClassRepository       domain.ClassRepository
 	ClassMemberRepository domain.ClassMemberRepository
 }
 

@@ -28,11 +28,11 @@ func TestClassMemberRepository(t *testing.T) {
 			Name: "memory",
 			Repo: NewClassMemberRepositoryMem(), Skip: false},
 		{
-			Name: "postgres",
-			Repo: NewClassMemberRepositoryPostgres(pool),
+			Name:      "postgres",
+			Repo:      NewClassMemberRepositoryPostgres(pool),
 			ClassRepo: class.NewClassRepositoryPostgres(pool),
-			UserRepo: user.NewUserRepositoryPostgres(pool),
-			Skip: os.Getenv("DATABASE_URL") == "",
+			UserRepo:  user.NewUserRepositoryPostgres(pool),
+			Skip:      os.Getenv("DATABASE_URL") == "",
 		},
 	} {
 		repo := repo
@@ -46,29 +46,29 @@ func TestClassMemberRepository(t *testing.T) {
 			if repo.ClassRepo != nil {
 				owner := uuid.NewString()
 				err := repo.UserRepo.CreateUser(context.Background(), &domain.User{
-					UserId:    userFoo,
-					Username:  xid.New().String(),
-					Email:     xid.New().String(),
+					UserId:   userFoo,
+					Username: xid.New().String(),
+					Email:    xid.New().String(),
 				})
 				assert.Nil(t, err)
 
 				err = repo.UserRepo.CreateUser(context.Background(), &domain.User{
-					UserId:    userBar,
-					Username:  xid.New().String(),
-					Email:     xid.New().String(),
+					UserId:   userBar,
+					Username: xid.New().String(),
+					Email:    xid.New().String(),
 				})
 				assert.Nil(t, err)
 
 				err = repo.UserRepo.CreateUser(context.Background(), &domain.User{
-					UserId:    owner,
-					Username:  xid.New().String(),
-					Email:     xid.New().String(),
+					UserId:   owner,
+					Username: xid.New().String(),
+					Email:    xid.New().String(),
 				})
 				assert.Nil(t, err)
 
 				c := &domain.Class{
-					ClassId:     "",
-					OwnerId:     owner,
+					ClassId: "",
+					OwnerId: owner,
 				}
 
 				err = repo.ClassRepo.CreateClass(context.Background(), c)
@@ -152,9 +152,9 @@ func TestClassMemberRepository(t *testing.T) {
 }
 
 type Repository struct {
-	Name string
-	Repo domain.ClassMemberRepository
+	Name      string
+	Repo      domain.ClassMemberRepository
 	ClassRepo domain.ClassRepository
-	UserRepo domain.UserRepository
-	Skip bool
+	UserRepo  domain.UserRepository
+	Skip      bool
 }

@@ -80,7 +80,7 @@ func (repo *ClassMemberRepositoryPostgres) ListJoined(ctx context.Context, userI
 
 func (repo *ClassMemberRepositoryPostgres) GetMember(ctx context.Context, member *domain.ClassMember) (*domain.ClassMember, error) {
 	m := &domain.ClassMember{
-		UserId: member.UserId,
+		UserId:  member.UserId,
 		ClassId: member.ClassId,
 	}
 	row := repo.pool.QueryRow(

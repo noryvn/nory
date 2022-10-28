@@ -19,8 +19,8 @@ import (
 func TestClassService(t *testing.T) {
 	t.Parallel()
 	classService := ClassService{
-		ClassRepository:     NewClassRepositoryMem(),
-		ClassTaskRepository: classtask.NewClassTaskRepositoryMem(),
+		ClassRepository:       NewClassRepositoryMem(),
+		ClassTaskRepository:   classtask.NewClassTaskRepositoryMem(),
 		ClassMemberRepository: classmember.NewClassMemberRepositoryMem(),
 	}
 
@@ -119,16 +119,16 @@ func (cst classServiceTest) classCreate(t *testing.T) {
 
 	member := uuid.NewString()
 	err = cst.classService.ClassMemberRepository.CreateMember(context.Background(), &domain.ClassMember{
-		Level: "member",
-		UserId: member,
+		Level:   "member",
+		UserId:  member,
 		ClassId: class.ClassId,
 	})
 	assert.Nil(t, err)
 
 	admin := uuid.NewString()
 	err = cst.classService.ClassMemberRepository.CreateMember(context.Background(), &domain.ClassMember{
-		Level: "admin",
-		UserId: admin,
+		Level:   "admin",
+		UserId:  admin,
 		ClassId: class.ClassId,
 	})
 	assert.Nil(t, err)
@@ -180,7 +180,6 @@ func (cst classServiceTest) classCreate(t *testing.T) {
 
 		_, err = cst.classService.DeleteClass(context.Background(), class.OwnerId, class.ClassId)
 		assert.NotNil(t, err)
-		assert.Equal(t, "class does not exists", err.Error())
 	}
 }
 
@@ -200,6 +199,9 @@ func (cst *classServiceTest) createClassTask(t *testing.T) {
 	res, err := cst.classService.CreateClassTask(context.Background(), class.OwnerId, task)
 	assert.Nil(t, err)
 	assert.Equal(t, 200, res.Code)
+
+	res, err = cst.classService.CreateClassTask(context.Background(), xid.New().String(), task)
+	assert.NotNil(t, err)
 
 	testCases := []struct{ task domain.ClassTask }{
 		{domain.ClassTask{Name: "abelia narindi agsya - abel"}},

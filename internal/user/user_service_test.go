@@ -21,8 +21,8 @@ func TestUserService(t *testing.T) {
 	classMemberRepository := classmember.NewClassMemberRepositoryMem()
 
 	us := UserService{
-		UserRepository:  userRepository,
-		ClassRepository: classRepository,
+		UserRepository:        userRepository,
+		ClassRepository:       classRepository,
 		ClassMemberRepository: classMemberRepository,
 	}
 
@@ -45,7 +45,7 @@ func TestUserService(t *testing.T) {
 			assert.Nil(t, err)
 
 			err = classMemberRepository.CreateMember(context.Background(), &domain.ClassMember{
-				UserId: user.UserId,
+				UserId:  user.UserId,
 				ClassId: c.ClassId,
 			})
 		}
