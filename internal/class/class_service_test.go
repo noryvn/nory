@@ -180,6 +180,7 @@ func (cst classServiceTest) classCreate(t *testing.T) {
 
 		_, err = cst.classService.DeleteClass(context.Background(), class.OwnerId, class.ClassId)
 		assert.NotNil(t, err)
+		assert.Equal(t, "class does not exists", err.Error())
 	}
 }
 

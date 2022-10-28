@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	ErrClassScheduleNotExists = errors.New("class schedule was not found")
+	ErrClassScheduleNotExists = errors.New("class schedule does not exists")
 )
 
 type ClassSchedule struct {

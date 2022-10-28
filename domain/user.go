@@ -8,7 +8,7 @@ import (
 
 var (
 	// user not found
-	ErrUserNotExists = errors.New("user not found")
+	ErrUserNotExists = errors.New("user does not exists")
 	// used for duplicate UserId
 	ErrUserAlreadyExists = errors.New("user already exists")
 )
