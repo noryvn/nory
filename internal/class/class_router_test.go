@@ -81,12 +81,33 @@ func TestClassRouter(t *testing.T) {
 
 				p := fmt.Sprintf("/%s/info", body.Data.ClassId)
 				req = httptest.NewRequest("GET", p, nil)
-
 				resp, err = app.Test(req)
 				assert.Nil(t, err)
 				assert.Equal(t, 200, resp.StatusCode)
+				err = json.NewDecoder(resp.Body).Decode(&body)
+				assert.Nil(t, err)
+				assert.Equal(t, tc.Body.Name, body.Data.Name)
+				assert.NotEqual(t, "", body.Data.ClassId)
 
-				p = fmt.Sprintf("/%s/info", xid.New().String())
+				p = fmt.Sprintf("/%s", body.Data.ClassId)
+				// unauthorized
+				req = httptest.NewRequest("DELETE", p, nil)
+				resp, err = app.Test(req)
+				assert.Nil(t, err)
+				assert.Equal(t, 401, resp.StatusCode)
+				// unauthenticated
+				req = httptest.NewRequest("DELETE", p, nil)
+				req.Header.Set("user-id", xid.New().String())
+				resp, err = app.Test(req)
+				assert.Nil(t, err)
+				assert.Equal(t, 403, resp.StatusCode)
+				// ok
+				req.Header.Set("user-id", tc.User.UserId)
+				resp, err = app.Test(req)
+				assert.Nil(t, err)
+				assert.Equal(t, 204, resp.StatusCode)
+
+				p = fmt.Sprintf("/%s/info", body.Data.ClassId)
 				req = httptest.NewRequest("GET", p, nil)
 
 				resp, err = app.Test(req)
