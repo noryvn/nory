@@ -80,6 +80,13 @@ func (r *Repository) testCreateUser(t *testing.T) {
 			t.Helper()
 			err := r.UserRepository.CreateUser(context.Background(), &tc.User)
 			assert.Equal(t, tc.Err, err, "missmatch error")
+			if err == nil {
+				u, err := r.UserRepository.GetUser(context.Background(), tc.User.UserId)
+				assert.Nil(t, err)
+				uu, err := r.UserRepository.GetUserWithUsername(context.Background(), tc.User.Username)
+				assert.Nil(t, err)
+				assert.Equal(t, u, uu)
+			}
 		})
 	}
 }
@@ -148,7 +155,6 @@ func (r *Repository) testDeleteUser(t *testing.T) {
 		Err  error
 	}{
 		{"delete existing user", userFoo, nil},
-		{"delete unexists", userQux, nil},
 		{"delete existing user", userBar, nil},
 		{"delete existing user", userBaz, nil},
 	}
@@ -160,11 +166,13 @@ func (r *Repository) testDeleteUser(t *testing.T) {
 			user, err := r.UserRepository.GetUser(context.Background(), tc.Id)
 			assert.Nil(t, err)
 			err = r.UserRepository.DeleteUser(context.Background(), tc.Id)
-			assert.Equal(t, tc.Err, err, "missmatch error")
+			assert.Equal(t, nil, err, "missmatch error")
 			_, err = r.UserRepository.GetUser(context.Background(), tc.Id)
 			assert.Equal(t, domain.ErrUserNotExists, err)
 			_, err = r.UserRepository.GetUserWithUsername(context.Background(), user.Username)
 			assert.Equal(t, domain.ErrUserNotExists, err)
+			err = r.UserRepository.DeleteUser(context.Background(), tc.Id)
+			assert.Equal(t, nil, err, "missmatch error")
 		})
 	}
 }
