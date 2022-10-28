@@ -11,11 +11,13 @@ type UserProfile struct {
 	User *domain.User `json:"user"`
 
 	OwnedClass int `json:"ownedClass"`
+	JoinedClass int `json:"joinedClass"`
 }
 
 type UserService struct {
 	UserRepository  domain.UserRepository
 	ClassRepository domain.ClassRepository
+	ClassMemberRepository domain.ClassMemberRepository
 }
 
 func (us UserService) GetUserProfile(ctx context.Context, user *domain.User) (*response.Response[*UserProfile], error) {
@@ -25,8 +27,11 @@ func (us UserService) GetUserProfile(ctx context.Context, user *domain.User) (*r
 	if err != nil {
 		return res, err
 	}
+
+	members, err := us.ClassMemberRepository.ListJoined(ctx, user.UserId)
 	up.User = user
 	up.OwnedClass = len(classes)
+	up.JoinedClass = len(members)
 	return res, nil
 }
 

@@ -14,6 +14,7 @@ import (
 type ClassService struct {
 	ClassRepository     domain.ClassRepository
 	ClassTaskRepository domain.ClassTaskRepository
+	ClassMemberRepository domain.ClassMemberRepository
 }
 
 func (cs *ClassService) GetClassInfo(ctx context.Context, classId string) (*response.Response[*domain.Class], error) {
@@ -49,7 +50,7 @@ func (cs *ClassService) CreateClass(ctx context.Context, class *domain.Class) (*
 	return response.New(200, class), nil
 }
 
-func (cs *ClassService) CreateClassTask(ctx context.Context, task *domain.ClassTask) (*response.Response[*domain.ClassTask], error) {
+func (cs *ClassService) CreateClassTask(ctx context.Context, userId string, task *domain.ClassTask) (*response.Response[*domain.ClassTask], error) {
 	if err := validator.ValidateStruct(task); err != nil {
 		return nil, err
 	}
@@ -57,7 +58,11 @@ func (cs *ClassService) CreateClassTask(ctx context.Context, task *domain.ClassT
 	return response.New(200, task), err
 }
 
-func (cs *ClassService) DeleteClass(ctx context.Context, classId string) (*response.Response[any], error) {
+func (cs *ClassService) DeleteClass(ctx context.Context, userId, classId string) (*response.Response[any], error) {
+	if err := cs.AccessClass(ctx, userId, classId); err != nil {
+		return nil, err
+	}
+
 	if err := cs.ClassRepository.DeleteClass(ctx, classId); err != nil {
 		return nil, err
 	}
@@ -65,16 +70,25 @@ func (cs *ClassService) DeleteClass(ctx context.Context, classId string) (*respo
 	return response.New[any](204, nil), nil
 }
 
-func (cs *ClassService) AccessClass(ctx context.Context, user *domain.User, classId string) error {
+func (cs *ClassService) AccessClass(ctx context.Context, userId, classId string) error {
 	class, err := cs.ClassRepository.GetClass(ctx, classId)
 	if err != nil {
 		return err
 	}
 
-	if class.OwnerId != user.UserId {
-		msg := fmt.Sprintf("user with id %q does not has access to class with id %q", user.UserId, classId)
-		return response.NewForbidden(msg)
+	if class.OwnerId == userId {
+		return nil
 	}
 
-	return nil
+	member, err := cs.ClassMemberRepository.GetMember(ctx, &domain.ClassMember{
+		ClassId: classId,
+		UserId: userId,
+	})
+
+	if err == nil && member.Level == "admin" {
+		return nil
+	}
+
+	msg := fmt.Sprintf("user with id %q does not has access to class with id %q", userId, classId)
+	return response.NewForbidden(msg)
 }

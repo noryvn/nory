@@ -8,6 +8,7 @@ import (
 
 	"nory/domain"
 	. "nory/internal/class"
+	classmember "nory/internal/class_member"
 	classtask "nory/internal/class_task"
 
 	"github.com/google/uuid"
@@ -20,6 +21,7 @@ func TestClassService(t *testing.T) {
 	classService := ClassService{
 		ClassRepository:     NewClassRepositoryMem(),
 		ClassTaskRepository: classtask.NewClassTaskRepositoryMem(),
+		ClassMemberRepository: classmember.NewClassMemberRepositoryMem(),
 	}
 
 	cst := classServiceTest{classService}
@@ -115,6 +117,22 @@ func (cst classServiceTest) classCreate(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, 200, res.Code)
 
+	member := uuid.NewString()
+	err = cst.classService.ClassMemberRepository.CreateMember(context.Background(), &domain.ClassMember{
+		Level: "member",
+		UserId: member,
+		ClassId: class.ClassId,
+	})
+	assert.Nil(t, err)
+
+	admin := uuid.NewString()
+	err = cst.classService.ClassMemberRepository.CreateMember(context.Background(), &domain.ClassMember{
+		Level: "admin",
+		UserId: admin,
+		ClassId: class.ClassId,
+	})
+	assert.Nil(t, err)
+
 	classRes, err := cst.classService.GetClassInfo(context.Background(), class.ClassId)
 	assert.Nil(t, err)
 	assert.Equal(t, 200, classRes.Code, "failed to create class")
@@ -124,19 +142,25 @@ func (cst classServiceTest) classCreate(t *testing.T) {
 	_, err = cst.classService.ClassRepository.GetClass(context.Background(), class.ClassId)
 	assert.Nil(t, err)
 
-	err = cst.classService.AccessClass(context.Background(), &domain.User{}, class.ClassId)
+	err = cst.classService.AccessClass(context.Background(), uuid.NewString(), class.ClassId)
 	assert.NotNil(t, err)
 
-	err = cst.classService.AccessClass(context.Background(), &domain.User{UserId: class.OwnerId}, class.ClassId)
+	err = cst.classService.AccessClass(context.Background(), class.OwnerId, class.ClassId)
+	assert.Nil(t, err)
+
+	err = cst.classService.AccessClass(context.Background(), member, class.ClassId)
+	assert.NotNil(t, err)
+
+	err = cst.classService.AccessClass(context.Background(), admin, class.ClassId)
 	assert.Nil(t, err)
 
 	// delete existing class
-	_, err = cst.classService.DeleteClass(context.Background(), class.ClassId)
+	_, err = cst.classService.DeleteClass(context.Background(), class.OwnerId, class.ClassId)
 	assert.Nil(t, err)
 
 	// delete unexisting class
-	_, err = cst.classService.DeleteClass(context.Background(), class.ClassId)
-	assert.Nil(t, err)
+	_, err = cst.classService.DeleteClass(context.Background(), class.OwnerId, xid.New().String())
+	assert.NotNil(t, err)
 
 	_, err = cst.classService.ClassRepository.GetClass(context.Background(), class.ClassId)
 	assert.NotNil(t, err)
@@ -154,19 +178,25 @@ func (cst classServiceTest) classCreate(t *testing.T) {
 		_, err := cst.classService.CreateClass(context.Background(), &tc.class)
 		assert.NotNilf(t, err, "unexpected at %#+v", tc.class)
 
-		_, err = cst.classService.DeleteClass(context.Background(), class.ClassId)
-		assert.Nil(t, err)
+		_, err = cst.classService.DeleteClass(context.Background(), class.OwnerId, class.ClassId)
+		assert.NotNil(t, err)
 	}
 }
 
 func (cst *classServiceTest) createClassTask(t *testing.T) {
 	t.Parallel()
+	class := &domain.Class{
+		OwnerId: uuid.NewString(),
+	}
+	err := cst.classService.ClassRepository.CreateClass(context.Background(), class)
+	assert.Nil(t, err)
+
 	task := &domain.ClassTask{
-		ClassId:  xid.New().String(),
+		ClassId:  class.ClassId,
 		AuthorId: uuid.NewString(),
 	}
 
-	res, err := cst.classService.CreateClassTask(context.Background(), task)
+	res, err := cst.classService.CreateClassTask(context.Background(), class.OwnerId, task)
 	assert.Nil(t, err)
 	assert.Equal(t, 200, res.Code)
 
@@ -176,7 +206,7 @@ func (cst *classServiceTest) createClassTask(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		_, err := cst.classService.CreateClassTask(context.Background(), &tc.task)
+		_, err := cst.classService.CreateClassTask(context.Background(), class.OwnerId, &tc.task)
 		assert.NotNilf(t, err, "unexpected at %#+v", tc.task)
 	}
 }

@@ -6,6 +6,7 @@ import (
 
 	"nory/domain"
 	"nory/internal/class"
+	classmember "nory/internal/class_member"
 	. "nory/internal/user"
 
 	"github.com/google/uuid"
@@ -17,10 +18,12 @@ func TestUserService(t *testing.T) {
 	t.Parallel()
 	userRepository := NewUserRepositoryMem()
 	classRepository := class.NewClassRepositoryMem()
+	classMemberRepository := classmember.NewClassMemberRepositoryMem()
 
 	us := UserService{
 		UserRepository:  userRepository,
 		ClassRepository: classRepository,
+		ClassMemberRepository: classMemberRepository,
 	}
 
 	t.Run("GetUserProfile", func(t *testing.T) {
@@ -34,11 +37,26 @@ func TestUserService(t *testing.T) {
 		err := us.UserRepository.CreateUser(context.Background(), user)
 		assert.Nil(t, err)
 
+		for i := 0; i < 5; i++ {
+			c := &domain.Class{
+				OwnerId: user.UserId,
+			}
+			err := classRepository.CreateClass(context.Background(), c)
+			assert.Nil(t, err)
+
+			err = classMemberRepository.CreateMember(context.Background(), &domain.ClassMember{
+				UserId: user.UserId,
+				ClassId: c.ClassId,
+			})
+		}
+
 		res, err := us.GetUserProfile(context.Background(), user)
 		assert.Nil(t, err)
 		assert.Equal(t, 200, res.Code)
 		assert.Equal(t, user.Name, res.Data.User.Name)
 		assert.Equal(t, user.UserId, res.Data.User.UserId)
+		assert.Equal(t, 5, res.Data.JoinedClass)
+		assert.Equal(t, 5, res.Data.OwnedClass)
 	})
 
 	t.Run("GetUserProfileById", func(t *testing.T) {
