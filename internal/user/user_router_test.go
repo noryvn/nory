@@ -3,6 +3,7 @@ package user_test
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http/httptest"
 	"testing"
 
@@ -83,7 +84,6 @@ func TestUserRouter(t *testing.T) {
 
 		req := httptest.NewRequest("GET", "/profile", nil)
 		req.Header.Set("user-id", user.UserId)
-		t.Log(user.UserId)
 
 		resp, err := app.Test(req)
 		assert.Nil(t, err)
@@ -106,5 +106,21 @@ func TestUserRouter(t *testing.T) {
 		err = json.NewDecoder(resp.Body).Decode(&classes)
 		assert.Nil(t, err)
 		assert.Equal(t, 1, len(classes.Data))
+
+		p := fmt.Sprintf("/%s/profile", user.UserId)
+		req = httptest.NewRequest("GET", p, nil)
+		req.Header.Set("user-id", user.UserId)
+
+		resp, err = app.Test(req)
+		assert.Nil(t, err)
+		assert.Equal(t, 200, resp.StatusCode)
+		var other response.Response[*UserProfile]
+		err = json.NewDecoder(resp.Body).Decode(&other)
+		assert.Nil(t, err)
+		assert.Equal(t, 1, other.Data.JoinedClass)
+		assert.Equal(t, 1, other.Data.OwnedClass)
+		assert.Equal(t, user.Username, other.Data.User.Username)
+		assert.Equal(t, user.Email, other.Data.User.Email)
+		assert.Equal(t, profile, other)
 	})
 }
