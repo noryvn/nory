@@ -51,6 +51,9 @@ func TestClassMemberRepository(t *testing.T) {
 						err := repo.Repo.DeleteMember(context.Background(), &m)
 						assert.Nil(t, err)
 
+						err = repo.Repo.DeleteMember(context.Background(), &m)
+						assert.Nil(t, err)
+
 						_, err = repo.Repo.GetMember(context.Background(), &m)
 						assert.Equal(t, domain.ErrClassMemberNotExists, err)
 					})
