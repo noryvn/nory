@@ -78,6 +78,11 @@ func TestUserRouter(t *testing.T) {
 		assert.Nil(t, err)
 		err = classMemberRepository.CreateMember(context.Background(), &domain.ClassMember{
 			UserId:  user.UserId,
+			ClassId: class.ClassId,
+		})
+		assert.Nil(t, err)
+		err = classMemberRepository.CreateMember(context.Background(), &domain.ClassMember{
+			UserId:  user.UserId,
 			ClassId: xid.New().String(),
 		})
 		assert.Nil(t, err)
@@ -91,7 +96,7 @@ func TestUserRouter(t *testing.T) {
 		var profile response.Response[*UserProfile]
 		err = json.NewDecoder(resp.Body).Decode(&profile)
 		assert.Nil(t, err)
-		assert.Equal(t, 1, profile.Data.JoinedClass)
+		assert.Equal(t, 2, profile.Data.JoinedClass)
 		assert.Equal(t, 1, profile.Data.OwnedClass)
 		assert.Equal(t, user.Username, profile.Data.User.Username)
 		assert.Equal(t, user.Email, profile.Data.User.Email)
@@ -117,7 +122,7 @@ func TestUserRouter(t *testing.T) {
 		var other response.Response[*UserProfile]
 		err = json.NewDecoder(resp.Body).Decode(&other)
 		assert.Nil(t, err)
-		assert.Equal(t, 1, other.Data.JoinedClass)
+		assert.Equal(t, 2, other.Data.JoinedClass)
 		assert.Equal(t, 1, other.Data.OwnedClass)
 		assert.Equal(t, user.Username, other.Data.User.Username)
 		assert.Equal(t, user.Email, other.Data.User.Email)
