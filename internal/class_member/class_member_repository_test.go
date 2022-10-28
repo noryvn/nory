@@ -94,7 +94,10 @@ func TestClassMemberRepository(t *testing.T) {
 				updated.Level = "admin"
 				err := repo.Repo.CreateMember(context.Background(), &m)
 				if assert.Nil(t, err) {
-					err := repo.Repo.UpdateMember(context.Background(), &updated)
+					err := repo.Repo.CreateMember(context.Background(), &m)
+					assert.Equal(t, domain.ErrClassMemberAlreadyExists, err)
+
+					err = repo.Repo.UpdateMember(context.Background(), &updated)
 					assert.Nil(t, err)
 
 					mem, err := repo.Repo.GetMember(context.Background(), &m)
