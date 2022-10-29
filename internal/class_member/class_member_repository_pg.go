@@ -22,7 +22,7 @@ func (repo *ClassMemberRepositoryPostgres) ListMembers(ctx context.Context, clas
 	members := make([]*domain.ClassMember, 0)
 	rows, err := repo.pool.Query(
 		ctx,
-		"SELECT user_id, created_at, level FROM class_member WHERE class_id = $1",
+		"SELECT user_id, created_at, level FROM class_member WHERE class_id = $1 ORDER BY created_at",
 		classId,
 	)
 	if err != nil {
@@ -52,7 +52,7 @@ func (repo *ClassMemberRepositoryPostgres) ListJoined(ctx context.Context, userI
 	members := make([]*domain.ClassMember, 0)
 	rows, err := repo.pool.Query(
 		ctx,
-		"SELECT class_id, created_at, level FROM class_member WHERE user_id = $1",
+		"SELECT class_id, created_at, level FROM class_member WHERE user_id = $1 ORDER BY created_at",
 		userId,
 	)
 	if err != nil {
