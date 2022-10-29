@@ -15,7 +15,7 @@ func Route(userService UserService) func(router fiber.Router) {
 	ur := userRouter{userService}
 	return func(router fiber.Router) {
 		router.Get("/profile", ur.GetUserProfile)
-		router.Get("/classes", ur.GetUserClasses)
+		router.Get("/class", ur.GetUserClasses)
 		router.Get("/id/:userId/profile", ur.GetOtherUserProfile)
 		router.Get("/username/:username/profile", ur.GetOtherUserProfileByUsername)
 		router.Patch("/user", ur.PatchUser)

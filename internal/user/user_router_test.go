@@ -106,7 +106,7 @@ func TestUserRouter(t *testing.T) {
 		assert.Equal(t, user.Username, profile.Data.User.Username)
 		assert.Equal(t, user.Email, profile.Data.User.Email)
 
-		req = httptest.NewRequest("GET", "/classes", nil)
+		req = httptest.NewRequest("GET", "/class", nil)
 		req.Header.Set("user-id", user.UserId)
 		req.Header.Set("username", user.Username)
 		req.Header.Set("name", user.Name)
