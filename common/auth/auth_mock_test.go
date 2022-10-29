@@ -77,7 +77,7 @@ func TestAuthMock(t *testing.T) {
 			req.Header.Set("name", tc.User.Name)
 			req.Header.Set("created-at", tc.User.CreatedAt.Format(time.RFC3339))
 
-			resp, err := app.Test(req, 10)
+			resp, err := app.Test(req)
 			assert.Equal(t, nil, err, "unexpected error")
 			assert.Equal(t, tc.Code, resp.StatusCode, "missmatch status code")
 
