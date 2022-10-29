@@ -13,6 +13,6 @@ FROM debian:bullseye as production
 COPY --from=builder /app/nory /
 
 ARG DATABASE_CERT_URL
-RUN curl --create-dirs -o $HOME/.postgresql/root.crt -O ${DATABASE_CERT_URL}
+RUN curl --create-dirs -o /.postgresql/root.crt -O ${DATABASE_CERT_URL}
 
 CMD ["/nory"]
