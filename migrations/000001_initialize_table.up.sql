@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS class_task (
 );
 
 CREATE INDEX IF NOT EXISTS class_task_index ON class_task(task_id);
-CREATE INDEX IF NOT EXISTS class_id_index ON class_task(class_id, schedule_id);
+CREATE INDEX IF NOT EXISTS class_id_index ON class_task(class_id, task_id);
 
 CREATE TABLE IF NOT EXISTS class_member (
 	class_id VARCHAR(20) NOT NULL,
