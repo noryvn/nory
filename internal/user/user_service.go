@@ -23,11 +23,6 @@ type UserService struct {
 }
 
 func (us UserService) GetUserProfile(ctx context.Context, user *domain.User) (*response.Response[*UserProfile], error) {
-	user, err := us.UserRepository.GetUser(ctx, user.UserId)
-	if err != nil {
-		return nil, err
-	}
-
 	classes, err := us.ClassRepository.GetClassesByOwnerId(ctx, user.UserId)
 	if err != nil {
 		return nil, err
@@ -47,9 +42,21 @@ func (us UserService) GetUserProfile(ctx context.Context, user *domain.User) (*r
 }
 
 func (us UserService) GetUserProfileById(ctx context.Context, userId string) (*response.Response[*UserProfile], error) {
-	user, err := us.UserRepository.GetUser(ctx, userId)
+	user, err := us.UserRepository.GetUserByUserId(ctx, userId)
 	if errors.Is(err, domain.ErrUserNotExists) {
 		msg := fmt.Sprintf("can not find user with id %q", userId)
+		return nil, response.NewNotFound(msg)
+	}
+	if err != nil {
+		return nil, err
+	}
+	return us.GetUserProfile(ctx, user)
+}
+
+func (us UserService) GetUserProfileByUsername(ctx context.Context, username string) (*response.Response[*UserProfile], error) {
+	user, err := us.UserRepository.GetUserByUsername(ctx, username)
+	if errors.Is(err, domain.ErrUserNotExists) {
+		msg := fmt.Sprintf("can not find user with id %q", username)
 		return nil, response.NewNotFound(msg)
 	}
 	if err != nil {

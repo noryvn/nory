@@ -112,7 +112,7 @@ func TestUserRouter(t *testing.T) {
 		assert.Nil(t, err)
 		assert.Equal(t, 1, len(classes.Data))
 
-		p := fmt.Sprintf("/%s/profile", user.UserId)
+		p := fmt.Sprintf("/id/%s/profile", user.UserId)
 		req = httptest.NewRequest("GET", p, nil)
 		req.Header.Set("user-id", user.UserId)
 

@@ -44,7 +44,7 @@ func (a *Auth) UserFromBearer(ctx context.Context, bearer string) (*domain.User,
 		return nil, err
 	}
 
-	u, err := a.UserRepository.GetUser(ctx, user.ID)
+	u, err := a.UserRepository.GetUserByUserId(ctx, user.ID)
 	if errors.Is(err, domain.ErrUserNotExists) {
 		id := xid.New().String()
 		u = &domain.User{

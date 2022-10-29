@@ -84,8 +84,8 @@ func (cs *ClassService) AddMember(ctx context.Context, userId string, member *do
 	return response.New[any](204, nil), nil
 }
 
-func (cs *ClassService) AddMemberWithUsername(ctx context.Context, userId, classId, username string) (*response.Response[any], error) {
-	user, err := cs.UserRepository.GetUserWithUsername(ctx, username)
+func (cs *ClassService) AddMemberByUsername(ctx context.Context, userId, classId, username string) (*response.Response[any], error) {
+	user, err := cs.UserRepository.GetUserByUsername(ctx, username)
 	if err != nil {
 		return nil, err
 	}
