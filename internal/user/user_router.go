@@ -49,7 +49,7 @@ func (ur userRouter) GetOtherUserProfile(c *fiber.Ctx) error {
 func (ur userRouter) GetOtherUserProfileByUsername(c *fiber.Ctx) error {
 	username := c.Params("username")
 
-	res, err := ur.us.GetUserProfileById(c.Context(), username)
+	res, err := ur.us.GetUserProfileByUsername(c.Context(), username)
 	if err != nil {
 		return err
 	}

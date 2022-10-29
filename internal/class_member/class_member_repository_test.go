@@ -38,6 +38,9 @@ func TestClassMemberRepository(t *testing.T) {
 		repo := repo
 		t.Run(repo.Name, func(t *testing.T) {
 			t.Parallel()
+			if repo.Skip {
+				t.Skip()
+			}
 			classFoo := xid.New().String()
 			classBar := xid.New().String()
 			userFoo := uuid.NewString()

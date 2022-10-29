@@ -89,6 +89,9 @@ func TestUserRouter(t *testing.T) {
 
 		req := httptest.NewRequest("GET", "/profile", nil)
 		req.Header.Set("user-id", user.UserId)
+		req.Header.Set("username", user.Username)
+		req.Header.Set("name", user.Name)
+		req.Header.Set("email", user.Email)
 
 		resp, err := app.Test(req)
 		assert.Nil(t, err)
@@ -103,6 +106,9 @@ func TestUserRouter(t *testing.T) {
 
 		req = httptest.NewRequest("GET", "/classes", nil)
 		req.Header.Set("user-id", user.UserId)
+		req.Header.Set("username", user.Username)
+		req.Header.Set("name", user.Name)
+		req.Header.Set("email", user.Email)
 
 		resp, err = app.Test(req)
 		assert.Nil(t, err)
