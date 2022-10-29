@@ -70,7 +70,7 @@ func TestUserService(t *testing.T) {
 		assert.Nil(t, err)
 		assert.Equal(t, 200, res.Code)
 		assert.Equal(t, "Abelia Narindi Agsya", res.Data.User.Name)
-		assert.Equal(t, "Abelia", res.Data.User.Username)
+		assert.Equal(t, "abelia", res.Data.User.Username)
 		assert.Equal(t, user.UserId, res.Data.User.UserId)
 		assert.Equal(t, 5, res.Data.JoinedClass)
 		assert.Equal(t, 5, res.Data.OwnedClass)
