@@ -60,6 +60,6 @@ jobs:
         env:
           FLY_API_TOKEN: "${{ secrets.FLY_API_TOKEN }}"
         with:
-          args: deploy --local-only --build-arg "DATABASE_CERT_URL=${{ secrets.DATABASE_CERT_URL }}"
+          args: deploy --local-only --build-arg "DATABASE_CERT_URL=${{ secrets.DATABASE_CERT_URL }} -a nory"
 
 
