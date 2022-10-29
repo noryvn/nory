@@ -11,8 +11,8 @@ CREATE TABLE IF NOT EXISTS app_user (
 	CONSTRAINT app_user_pk PRIMARY KEY(user_id)
 );
 
-CREATE INDEX IF NOT EXISTS user_id_index ON app_user(user_id);
-CREATE INDEX IF NOT EXISTS username_index ON app_user(username);
+CREATE INDEX IF NOT EXISTS user_id_index ON app_user(user_id, created_at);
+CREATE INDEX IF NOT EXISTS username_index ON app_user(username, created_at);
 CREATE UNIQUE INDEX lower_username ON app_user(LOWER(username));
 CREATE UNIQUE INDEX lower_email ON app_user(LOWER(email));
 
@@ -28,8 +28,8 @@ CREATE TABLE IF NOT EXISTS class (
 	CONSTRAINT fk_user FOREIGN KEY (owner_id) REFERENCES app_user(user_id) ON DELETE CASCADE
 );
 
-CREATE INDEX IF NOT EXISTS class_id_index ON class(class_id, created_at);
-CREATE INDEX IF NOT EXISTS owner_id_index ON class(owner_id, created_at);
+CREATE INDEX IF NOT EXISTS class_id_index ON class(class_id);
+CREATE INDEX IF NOT EXISTS owner_id_index ON class(owner_id, class_id);
 
 CREATE TABLE IF NOT EXISTS class_schedule (
 	schedule_id VARCHAR(20) UNIQUE NOT NULL,
@@ -47,8 +47,8 @@ CREATE TABLE IF NOT EXISTS class_schedule (
 	CONSTRAINT fk_class FOREIGN KEY (class_id) REFERENCES class(class_id) ON DELETE CASCADE
 );
 
-CREATE INDEX IF NOT EXISTS class_schedule_index ON class_schedule(schedule_id, created_at);
-CREATE INDEX IF NOT EXISTS class_id_index ON class_schedule(class_id, created_at);
+CREATE INDEX IF NOT EXISTS class_schedule_index ON class_schedule(schedule_id);
+CREATE INDEX IF NOT EXISTS class_id_index ON class_schedule(class_id, schedule_id);
 
 CREATE TABLE IF NOT EXISTS class_task (
 	task_id VARCHAR(20) UNIQUE NOT NULL,
@@ -65,8 +65,8 @@ CREATE TABLE IF NOT EXISTS class_task (
 	CONSTRAINT fk_class FOREIGN KEY (class_id) REFERENCES class(class_id) ON DELETE CASCADE
 );
 
-CREATE INDEX IF NOT EXISTS class_task_index ON class_task(task_id, created_at);
-CREATE INDEX IF NOT EXISTS class_id_index ON class_task(class_id, created_at);
+CREATE INDEX IF NOT EXISTS class_task_index ON class_task(task_id);
+CREATE INDEX IF NOT EXISTS class_id_index ON class_task(class_id, schedule_id);
 
 CREATE TABLE IF NOT EXISTS class_member (
 	class_id VARCHAR(20) NOT NULL,
