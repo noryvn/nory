@@ -53,6 +53,7 @@ func TestUserRouter(t *testing.T) {
 		}{
 			{"GET", "/profile"},
 			{"GET", "/classes"},
+			{"PATCH", "/user"},
 		} {
 			req := httptest.NewRequest(tc.Method, tc.Path, nil)
 			resp, err := app.Test(req)
