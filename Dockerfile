@@ -8,11 +8,12 @@ RUN go mod download
 COPY . /app
 RUN CGO_ENABLED=0 go build -o nory ./cmd/server
 
+ARG DATABASE_CERT_URL
+RUN curl --create-dirs -o /root.crt -O ${DATABASE_CERT_URL}
+
 FROM debian:bullseye as production
 
 COPY --from=builder /app/nory /
-
-ARG DATABASE_CERT_URL
-RUN curl --create-dirs -o /.postgresql/root.crt -O ${DATABASE_CERT_URL}
+COPY --from=builder /root.crt /.postgresql/root.crt
 
 CMD ["/nory"]
