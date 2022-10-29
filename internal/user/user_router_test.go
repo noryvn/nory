@@ -156,6 +156,7 @@ func TestUserRouter(t *testing.T) {
 		})
 
 		req = httptest.NewRequest("PATCH", "/user", buff)
+		req.Header.Set("content-type", "application/json")
 		req.Header.Set("user-id", user.UserId)
 		req.Header.Set("username", user.Username)
 		req.Header.Set("name", user.Name)
@@ -177,7 +178,5 @@ func TestUserRouter(t *testing.T) {
 		assert.Equal(t, 1, other.Data.OwnedClass)
 		assert.Equal(t, "hai", other.Data.User.Username)
 		assert.Equal(t, user.Email, other.Data.User.Email)
-		assert.Equal(t, profile, other)
-
 	})
 }

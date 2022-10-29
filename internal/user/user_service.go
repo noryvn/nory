@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"nory/common/response"
+	"nory/common/validator"
 	"nory/domain"
 )
 
@@ -71,6 +72,11 @@ func (us UserService) GetUserClasses(ctx context.Context, user *domain.User) (*r
 }
 
 func (us UserService) UpdateUser(ctx context.Context, user *domain.User) (*response.Response[any], error) {
-	err := us.UserRepository.UpdateUser(ctx, user)
-	return response.New[any](204, nil), err
+	if err := validator.ValidateStruct(user); err != nil {
+		return nil, err
+	}
+	if err := us.UserRepository.UpdateUser(ctx, user); err != nil {
+		return nil, err
+	}
+	return response.New[any](204, nil), nil
 }
