@@ -69,3 +69,8 @@ func (us UserService) GetUserClasses(ctx context.Context, user *domain.User) (*r
 	classes, err := us.ClassRepository.GetClassesByOwnerId(ctx, user.UserId)
 	return response.New(200, classes), err
 }
+
+func (us UserService) UpdateUser(ctx context.Context, user *domain.User) (*response.Response[any], error) {
+	err := us.UserRepository.UpdateUser(ctx, user)
+	return response.New[any](204, nil), err
+}

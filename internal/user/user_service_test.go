@@ -58,6 +58,22 @@ func TestUserService(t *testing.T) {
 		assert.Equal(t, user.UserId, res.Data.User.UserId)
 		assert.Equal(t, 5, res.Data.JoinedClass)
 		assert.Equal(t, 5, res.Data.OwnedClass)
+
+		_, err = us.UpdateUser(context.Background(), &domain.User{
+			UserId: user.UserId,
+			Name: "Abelia Narindi Agsya",
+			Username: "Abelia",
+		})
+		assert.Nil(t, err)
+
+		res, err = us.GetUserProfile(context.Background(), user)
+		assert.Nil(t, err)
+		assert.Equal(t, 200, res.Code)
+		assert.Equal(t, "Abelia Narindi Agsya", res.Data.User.Name)
+		assert.Equal(t, "Abelia", res.Data.User.Username)
+		assert.Equal(t, user.UserId, res.Data.User.UserId)
+		assert.Equal(t, 5, res.Data.JoinedClass)
+		assert.Equal(t, 5, res.Data.OwnedClass)
 	})
 
 	t.Run("GetUserProfileById", func(t *testing.T) {
