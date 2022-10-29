@@ -11,8 +11,8 @@ CREATE TABLE IF NOT EXISTS app_user (
 	CONSTRAINT app_user_pk PRIMARY KEY(user_id)
 );
 
-CREATE INDEX IF NOT EXISTS user_id_index ON app_user(user_id, created_at);
-CREATE INDEX IF NOT EXISTS username_index ON app_user(username, created_at);
+CREATE INDEX IF NOT EXISTS user_id_index ON app_user(user_id);
+CREATE INDEX IF NOT EXISTS username_index ON app_user(username);
 CREATE UNIQUE INDEX lower_username ON app_user(LOWER(username));
 CREATE UNIQUE INDEX lower_email ON app_user(LOWER(email));
 
@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS class_task (
 	CONSTRAINT fk_class FOREIGN KEY (class_id) REFERENCES class(class_id) ON DELETE CASCADE
 );
 
-CREATE INDEX IF NOT EXISTS class_task_index ON class_task(task_id);
+CREATE INDEX IF NOT EXISTS class_task_index ON class_task(task_id, due_date);
 CREATE INDEX IF NOT EXISTS class_id_index ON class_task(class_id, task_id);
 
 CREATE TABLE IF NOT EXISTS class_member (
