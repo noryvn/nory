@@ -26,6 +26,9 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	if err := pool.Ping(context.Background()); err != nil {
+		panic(err)
+	}
 
 	supa := supabase.CreateClient(
 		mustGetEnv("SUPABASE_URL"),
