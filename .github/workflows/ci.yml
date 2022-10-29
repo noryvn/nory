@@ -85,7 +85,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
   fly:
     name: Deploy to fly.io
-    if: github.event_name == 'push' && github.ref = 'refs/head/main'
+    if: github.event_name == 'push' && github.ref == 'refs/head/main'
     needs: ci
     runs-on: ubuntu-latest
     timeout-minutes: 5
