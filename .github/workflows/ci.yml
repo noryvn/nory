@@ -93,7 +93,7 @@ jobs:
       - name: Clone repository
         uses: actions/checkout@v2
       - name: deploy
-        uses: suprefly/flyctl-actions@master
+        uses: superfly/flyctl-actions@master
         env:
           FLY_API_TOKEN: "${{ secrets.FLY_API_TOKEN }}"
         with:
