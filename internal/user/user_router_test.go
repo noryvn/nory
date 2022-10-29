@@ -1,6 +1,7 @@
 package user_test
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -148,5 +149,35 @@ func TestUserRouter(t *testing.T) {
 		assert.Equal(t, user.Username, other.Data.User.Username)
 		assert.Equal(t, user.Email, other.Data.User.Email)
 		assert.Equal(t, profile, other)
+
+		buff := bytes.NewBuffer(nil)
+		err = json.NewEncoder(buff).Encode(domain.User{
+			Username: "hai",
+		})
+
+		req = httptest.NewRequest("PATCH", "/user", buff)
+		req.Header.Set("user-id", user.UserId)
+		req.Header.Set("username", user.Username)
+		req.Header.Set("name", user.Name)
+		req.Header.Set("email", user.Email)
+
+		resp, err = app.Test(req)
+		assert.Nil(t, err)
+
+		p = fmt.Sprintf("/id/%s/profile", user.UserId)
+		req = httptest.NewRequest("GET", p, nil)
+
+		resp, err = app.Test(req)
+		assert.Nil(t, err)
+		assert.Equal(t, 200, resp.StatusCode)
+		other = response.Response[*UserProfile]{}
+		err = json.NewDecoder(resp.Body).Decode(&other)
+		assert.Nil(t, err)
+		assert.Equal(t, 2, other.Data.JoinedClass)
+		assert.Equal(t, 1, other.Data.OwnedClass)
+		assert.Equal(t, "hai", other.Data.User.Username)
+		assert.Equal(t, user.Email, other.Data.User.Email)
+		assert.Equal(t, profile, other)
+
 	})
 }
