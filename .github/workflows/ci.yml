@@ -46,43 +46,6 @@ jobs:
           DATABASE_URL: "postgres://root:@127.0.0.1:26257/?sslmode=disable"
 
       - uses: codecov/codecov-action@v3
-  cd:
-    name: build docker image
-    needs: ci
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - name: Clone repository
-        uses: actions/checkout@v2
-
-      - name: Setup Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
-      - name: Login to GHCR
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Docker metadata
-        id: meta
-        uses: docker/metadata-action@v4
-        with:
-          images: |
-            ghcr.io/noryvn/nory
-          tags: |
-            type=ref,event=branch
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}},enable=${{ !startsWith(github.ref, 'refs/tags/v0.0.') }}
-            type=semver,pattern={{major}},enable=${{ !startsWith(github.ref, 'refs/tags/v0.') }}
-
-      - uses: docker/build-push-action@v3
-        with:
-          context: .
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
   fly:
     name: Deploy to fly.io
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -97,6 +60,6 @@ jobs:
         env:
           FLY_API_TOKEN: "${{ secrets.FLY_API_TOKEN }}"
         with:
-          args: deploy --local-only
+          args: deploy --local-only --build-arg "DATABASE_CERT_URL=${{ secrets.DATABASE_CERT_URL }}"
 
 

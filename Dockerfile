@@ -11,7 +11,7 @@ RUN CGO_ENABLED=0 go build -o nory ./cmd/server
 ARG DATABASE_CERT_URL
 RUN curl --create-dirs -o /root.crt -O ${DATABASE_CERT_URL}
 
-FROM debian:bullseye as production
+FROM gcr.io/distroless/static-debian11 as production
 
 COPY --from=builder /app/nory /
 COPY --from=builder /root.crt /.postgresql/root.crt
