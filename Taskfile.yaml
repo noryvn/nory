@@ -18,15 +18,15 @@ tasks:
     cmds:
       - go test -run {{default "''" .GO_TEST_FILTER}} {{.GO_TEST_FLAGS}} {{default "./..." .CLI_ARGS}}
 
-  migration:create:
+  migrate:create:
     cmds:
       - migrate create -dir migrations -seq -ext sql {{.CLI_ARGS}}
 
-  migration:up:
+  migrate:up:
     cmds:
       - migrate -path ./migrations -database {{.DATABASE_URL}} up
 
-  migration:down:
+  migrate:down:
     cmds:
       - migrate -path ./migrations -database {{.DATABASE_URL}} down
 
