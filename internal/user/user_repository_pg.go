@@ -20,7 +20,7 @@ func NewUserRepositoryPostgres(pool *pgxpool.Pool) *UserRepositoryPostgres {
 	return &UserRepositoryPostgres{pool}
 }
 
-func (urp *UserRepositoryPostgres) GetUser(ctx context.Context, id string) (*domain.User, error) {
+func (urp *UserRepositoryPostgres) GetUserByUserId(ctx context.Context, id string) (*domain.User, error) {
 	u := &domain.User{
 		UserId:    id,
 		CreatedAt: time.Time{},
@@ -31,6 +31,27 @@ func (urp *UserRepositoryPostgres) GetUser(ctx context.Context, id string) (*dom
 	row := urp.pool.QueryRow(ctx, "SELECT username, name, email, created_at FROM app_user WHERE user_id = $1", id)
 	err := row.Scan(
 		&u.Username,
+		&u.Name,
+		&u.Email,
+		&u.CreatedAt,
+	)
+	if errors.Is(err, pgx.ErrNoRows) {
+		err = domain.ErrUserNotExists
+	}
+	return u, err
+}
+
+func (urp *UserRepositoryPostgres) GetUserByUsername(ctx context.Context, username string) (*domain.User, error) {
+	u := &domain.User{
+		UserId:    "",
+		CreatedAt: time.Time{},
+		Username:  username,
+		Name:      "",
+		Email:     "",
+	}
+	row := urp.pool.QueryRow(ctx, "SELECT user_id, name, email, created_at FROM app_user WHERE username = $1", username)
+	err := row.Scan(
+		&u.UserId,
 		&u.Name,
 		&u.Email,
 		&u.CreatedAt,
@@ -66,7 +87,7 @@ func (urp *UserRepositoryPostgres) CreateUser(ctx context.Context, user *domain.
 }
 
 func (urp *UserRepositoryPostgres) UpdateUser(ctx context.Context, user *domain.User) error {
-	u, err := urp.GetUser(ctx, user.UserId)
+	u, err := urp.GetUserByUserId(ctx, user.UserId)
 	if err != nil {
 		return err
 	}

@@ -2,10 +2,12 @@ package user_test
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"nory/domain"
 	"nory/internal/class"
+	classmember "nory/internal/class_member"
 	. "nory/internal/user"
 
 	"github.com/google/uuid"
@@ -17,10 +19,12 @@ func TestUserService(t *testing.T) {
 	t.Parallel()
 	userRepository := NewUserRepositoryMem()
 	classRepository := class.NewClassRepositoryMem()
+	classMemberRepository := classmember.NewClassMemberRepositoryMem()
 
 	us := UserService{
-		UserRepository:  userRepository,
-		ClassRepository: classRepository,
+		UserRepository:        userRepository,
+		ClassRepository:       classRepository,
+		ClassMemberRepository: classMemberRepository,
 	}
 
 	t.Run("GetUserProfile", func(t *testing.T) {
@@ -34,11 +38,42 @@ func TestUserService(t *testing.T) {
 		err := us.UserRepository.CreateUser(context.Background(), user)
 		assert.Nil(t, err)
 
+		for i := 0; i < 5; i++ {
+			c := &domain.Class{
+				OwnerId: user.UserId,
+			}
+			err := classRepository.CreateClass(context.Background(), c)
+			assert.Nil(t, err)
+
+			err = classMemberRepository.CreateMember(context.Background(), &domain.ClassMember{
+				UserId:  user.UserId,
+				ClassId: c.ClassId,
+			})
+		}
+
 		res, err := us.GetUserProfile(context.Background(), user)
 		assert.Nil(t, err)
 		assert.Equal(t, 200, res.Code)
 		assert.Equal(t, user.Name, res.Data.User.Name)
 		assert.Equal(t, user.UserId, res.Data.User.UserId)
+		assert.Equal(t, 5, res.Data.JoinedClass)
+		assert.Equal(t, 5, res.Data.OwnedClass)
+
+		_, err = us.UpdateUser(context.Background(), &domain.User{
+			UserId:   user.UserId,
+			Name:     "Abelia Narindi Agsya",
+			Username: "Abelia",
+		})
+		assert.Nil(t, err)
+
+		res, err = us.GetUserProfile(context.Background(), user)
+		assert.Nil(t, err)
+		assert.Equal(t, 200, res.Code)
+		assert.Equal(t, "Abelia Narindi Agsya", res.Data.User.Name)
+		assert.Equal(t, "Abelia", res.Data.User.Username)
+		assert.Equal(t, user.UserId, res.Data.User.UserId)
+		assert.Equal(t, 5, res.Data.JoinedClass)
+		assert.Equal(t, 5, res.Data.OwnedClass)
 	})
 
 	t.Run("GetUserProfileById", func(t *testing.T) {
@@ -58,9 +93,11 @@ func TestUserService(t *testing.T) {
 		assert.Equal(t, user.Name, res.Data.User.Name)
 		assert.Equal(t, user.UserId, res.Data.User.UserId)
 
-		res, err = us.GetUserProfileById(context.Background(), xid.New().String())
+		userId := uuid.NewString()
+		res, err = us.GetUserProfileById(context.Background(), userId)
 		assert.NotNil(t, err)
-		assert.Equal(t, domain.ErrUserNotExists, err)
+		msg := fmt.Sprintf("can not find user with id %q", userId)
+		assert.Equal(t, msg, err.Error())
 	})
 
 	t.Run("GetUserClasses", func(t *testing.T) {

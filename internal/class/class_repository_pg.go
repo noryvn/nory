@@ -38,7 +38,7 @@ func (crp *ClassRepositoryPostgres) GetClass(ctx context.Context, classId string
 
 func (crp *ClassRepositoryPostgres) GetClassesByOwnerId(ctx context.Context, ownerId string) ([]*domain.Class, error) {
 	classes := make([]*domain.Class, 0)
-	rows, err := crp.pool.Query(ctx, "SELECT class_id, created_at, name, description FROM class WHERE owner_id = $1", ownerId)
+	rows, err := crp.pool.Query(ctx, "SELECT class_id, created_at, name, description FROM class WHERE owner_id = $1 ORDER BY class_id", ownerId)
 	if err != nil {
 		return nil, err
 	}

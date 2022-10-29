@@ -18,7 +18,7 @@ func NewUserRepositoryMem() *UserRepositoryMem {
 	}
 }
 
-func (urm *UserRepositoryMem) GetUser(ctx context.Context, id string) (*domain.User, error) {
+func (urm *UserRepositoryMem) GetUserByUserId(ctx context.Context, id string) (*domain.User, error) {
 	urm.mu.Lock()
 	defer urm.mu.Unlock()
 	u, ok := urm.m[id]
@@ -26,6 +26,17 @@ func (urm *UserRepositoryMem) GetUser(ctx context.Context, id string) (*domain.U
 		return u, domain.ErrUserNotExists
 	}
 	return u, nil
+}
+
+func (urm *UserRepositoryMem) GetUserByUsername(ctx context.Context, username string) (*domain.User, error) {
+	urm.mu.Lock()
+	defer urm.mu.Unlock()
+	for _, user := range urm.m {
+		if user.Username == username {
+			return user, nil
+		}
+	}
+	return nil, domain.ErrUserNotExists
 }
 
 func (urm *UserRepositoryMem) CreateUser(ctx context.Context, u *domain.User) error {
@@ -59,7 +70,7 @@ func (urm *UserRepositoryMem) UpdateUser(ctx context.Context, u *domain.User) er
 			return domain.ErrUserAlreadyExists
 		}
 	}
-	uu, err := urm.GetUser(ctx, u.UserId)
+	uu, err := urm.GetUserByUserId(ctx, u.UserId)
 	if err != nil {
 		return err
 	}

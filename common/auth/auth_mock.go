@@ -11,7 +11,7 @@ import (
 func MockMiddleware(c *fiber.Ctx) error {
 	userId := c.Get("user-id")
 	if userId == "" {
-		return ErrUserNotFound
+		return c.Next()
 	}
 	createdAt, _ := time.Parse(time.RFC3339, c.Get("created-at"))
 	c.Locals(userLocalKey, &domain.User{

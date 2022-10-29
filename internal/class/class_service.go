@@ -12,8 +12,10 @@ import (
 )
 
 type ClassService struct {
-	ClassRepository     domain.ClassRepository
-	ClassTaskRepository domain.ClassTaskRepository
+	UserRepository        domain.UserRepository
+	ClassRepository       domain.ClassRepository
+	ClassTaskRepository   domain.ClassTaskRepository
+	ClassMemberRepository domain.ClassMemberRepository
 }
 
 func (cs *ClassService) GetClassInfo(ctx context.Context, classId string) (*response.Response[*domain.Class], error) {
@@ -46,18 +48,58 @@ func (cs *ClassService) CreateClass(ctx context.Context, class *domain.Class) (*
 	if err := cs.ClassRepository.CreateClass(ctx, class); err != nil {
 		return nil, err
 	}
+	if err := cs.ClassMemberRepository.CreateMember(ctx, &domain.ClassMember{
+		UserId:  class.OwnerId,
+		ClassId: class.ClassId,
+		Level:   "admin",
+	}); err != nil {
+		return nil, err
+	}
 	return response.New(200, class), nil
 }
 
-func (cs *ClassService) CreateClassTask(ctx context.Context, task *domain.ClassTask) (*response.Response[*domain.ClassTask], error) {
+func (cs *ClassService) CreateClassTask(ctx context.Context, userId string, task *domain.ClassTask) (*response.Response[*domain.ClassTask], error) {
 	if err := validator.ValidateStruct(task); err != nil {
 		return nil, err
 	}
-	err := cs.ClassTaskRepository.CreateTask(ctx, task)
-	return response.New(200, task), err
+	if err := cs.AccessClass(ctx, userId, task.ClassId); err != nil {
+		return nil, err
+	}
+	if err := cs.ClassTaskRepository.CreateTask(ctx, task); err != nil {
+		return nil, err
+	}
+	return response.New(200, task), nil
 }
 
-func (cs *ClassService) DeleteClass(ctx context.Context, classId string) (*response.Response[any], error) {
+func (cs *ClassService) AddMember(ctx context.Context, userId string, member *domain.ClassMember) (*response.Response[any], error) {
+	if err := validator.ValidateStruct(member); err != nil {
+		return nil, err
+	}
+	if err := cs.AccessClass(ctx, userId, member.ClassId); err != nil {
+		return nil, err
+	}
+	if err := cs.ClassMemberRepository.CreateMember(ctx, member); err != nil {
+		return nil, err
+	}
+	return response.New[any](204, nil), nil
+}
+
+func (cs *ClassService) AddMemberByUsername(ctx context.Context, userId, classId, username string) (*response.Response[any], error) {
+	user, err := cs.UserRepository.GetUserByUsername(ctx, username)
+	if err != nil {
+		return nil, err
+	}
+	return cs.AddMember(ctx, userId, &domain.ClassMember{
+		UserId:  user.UserId,
+		ClassId: classId,
+	})
+}
+
+func (cs *ClassService) DeleteClass(ctx context.Context, userId, classId string) (*response.Response[any], error) {
+	if err := cs.AccessClass(ctx, userId, classId); err != nil {
+		return nil, err
+	}
+
 	if err := cs.ClassRepository.DeleteClass(ctx, classId); err != nil {
 		return nil, err
 	}
@@ -65,16 +107,29 @@ func (cs *ClassService) DeleteClass(ctx context.Context, classId string) (*respo
 	return response.New[any](204, nil), nil
 }
 
-func (cs *ClassService) AccessClass(ctx context.Context, user *domain.User, classId string) error {
+func (cs *ClassService) AccessClass(ctx context.Context, userId, classId string) error {
 	class, err := cs.ClassRepository.GetClass(ctx, classId)
+	if errors.Is(err, domain.ErrClassNotExists) {
+		msg := fmt.Sprintf("can not find class with id %q", classId)
+		return response.NewNotFound(msg)
+	}
 	if err != nil {
 		return err
 	}
 
-	if class.OwnerId != user.UserId {
-		msg := fmt.Sprintf("user with id %q does not has access to class with id %q", user.UserId, classId)
-		return response.NewForbidden(msg)
+	if class.OwnerId == userId {
+		return nil
 	}
 
-	return nil
+	member, err := cs.ClassMemberRepository.GetMember(ctx, &domain.ClassMember{
+		ClassId: classId,
+		UserId:  userId,
+	})
+
+	if err == nil && member.Level == "admin" {
+		return nil
+	}
+
+	msg := fmt.Sprintf("user with id %q does not has access to class with id %q", userId, classId)
+	return response.NewForbidden(msg)
 }

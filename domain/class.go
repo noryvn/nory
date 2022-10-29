@@ -8,7 +8,7 @@ import (
 
 var (
 	// class not found
-	ErrClassNotExists = errors.New("class not exists")
+	ErrClassNotExists = errors.New("class does not exists")
 	// conflicting data, unique constraint and etc.
 	ErrClassAlreadyExists = errors.New("class already exists")
 )

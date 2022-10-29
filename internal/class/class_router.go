@@ -1,7 +1,6 @@
 package class
 
 import (
-	"errors"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -20,7 +19,7 @@ func Route(classService ClassService) func(router fiber.Router) {
 	return func(router fiber.Router) {
 		router.Delete("/:classId", cr.deleteClass)
 		router.Get("/:classId/info", cr.getClassInfo)
-		router.Get("/:classId/tasks", cr.getClassTasks)
+		router.Get("/:classId/task", cr.getClassTask)
 		router.Post("/:classId/task", cr.createClassTask)
 		router.Post("/create", cr.createClass)
 	}
@@ -34,14 +33,7 @@ func (cr classRouter) deleteClass(c *fiber.Ctx) error {
 		return err
 	}
 
-	if err := cr.cs.AccessClass(c.Context(), user, classId); err != nil {
-		if errors.Is(err, domain.ErrClassNotExists) {
-			return nil
-		}
-		return err
-	}
-
-	res, err := cr.cs.DeleteClass(c.Context(), classId)
+	res, err := cr.cs.DeleteClass(c.Context(), user.UserId, classId)
 	if err != nil {
 		return err
 	}
@@ -59,7 +51,7 @@ func (cr classRouter) getClassInfo(c *fiber.Ctx) error {
 	return res.Respond(c)
 }
 
-func (cr classRouter) getClassTasks(c *fiber.Ctx) error {
+func (cr classRouter) getClassTask(c *fiber.Ctx) error {
 	var q struct {
 		From time.Time
 		To   time.Time
@@ -89,12 +81,8 @@ func (cr classRouter) createClassTask(c *fiber.Ctx) error {
 		return err
 	}
 
-	if err := cr.cs.AccessClass(c.Context(), user, task.ClassId); err != nil {
-		return err
-	}
-
 	task.ClassId = classId
-	res, err := cr.cs.CreateClassTask(c.Context(), &task)
+	res, err := cr.cs.CreateClassTask(c.Context(), user.UserId, &task)
 	if err != nil {
 		return err
 	}

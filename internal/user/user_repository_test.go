@@ -80,6 +80,13 @@ func (r *Repository) testCreateUser(t *testing.T) {
 			t.Helper()
 			err := r.UserRepository.CreateUser(context.Background(), &tc.User)
 			assert.Equal(t, tc.Err, err, "missmatch error")
+			if err == nil {
+				u, err := r.UserRepository.GetUserByUserId(context.Background(), tc.User.UserId)
+				assert.Nil(t, err)
+				uu, err := r.UserRepository.GetUserByUsername(context.Background(), tc.User.Username)
+				assert.Nil(t, err)
+				assert.Equal(t, u, uu)
+			}
 		})
 	}
 }
@@ -98,10 +105,13 @@ func (r *Repository) testGetUser(t *testing.T) {
 		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Helper()
-			u, err := r.UserRepository.GetUser(context.Background(), tc.Id)
+			u, err := r.UserRepository.GetUserByUserId(context.Background(), tc.Id)
 			assert.Equal(t, tc.Err, err, "missmatch error")
 			if tc.Err == nil && err == nil {
 				assert.Equal(t, tc.Id, u.UserId, "missmatch user id")
+				uu, err := r.UserRepository.GetUserByUsername(context.Background(), u.Username)
+				assert.Nil(t, err)
+				assert.Equal(t, u, uu)
 			}
 		})
 	}
@@ -120,13 +130,13 @@ func (r *Repository) testUpdateUser(t *testing.T) {
 	for _, tc := range testCases {
 		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
-			prev, err := r.UserRepository.GetUser(context.Background(), tc.User.UserId)
+			prev, err := r.UserRepository.GetUserByUserId(context.Background(), tc.User.UserId)
 			assert.Equal(t, nil, err, "unexpected error received")
 
 			err = r.UserRepository.UpdateUser(context.Background(), &tc.User)
 			assert.Equal(t, tc.Err, err, "missmatch error")
 
-			curr, err := r.UserRepository.GetUser(context.Background(), tc.User.UserId)
+			curr, err := r.UserRepository.GetUserByUserId(context.Background(), tc.User.UserId)
 			assert.Equal(t, nil, err, "unexpected error received")
 
 			if tc.Err == nil && err == nil {
@@ -145,7 +155,6 @@ func (r *Repository) testDeleteUser(t *testing.T) {
 		Err  error
 	}{
 		{"delete existing user", userFoo, nil},
-		{"delete unexists", userQux, nil},
 		{"delete existing user", userBar, nil},
 		{"delete existing user", userBaz, nil},
 	}
@@ -154,10 +163,16 @@ func (r *Repository) testDeleteUser(t *testing.T) {
 		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Helper()
-			err := r.UserRepository.DeleteUser(context.Background(), tc.Id)
-			assert.Equal(t, tc.Err, err, "missmatch error")
-			_, err = r.UserRepository.GetUser(context.Background(), tc.Id)
+			user, err := r.UserRepository.GetUserByUserId(context.Background(), tc.Id)
+			assert.Nil(t, err)
+			err = r.UserRepository.DeleteUser(context.Background(), tc.Id)
+			assert.Equal(t, nil, err, "missmatch error")
+			_, err = r.UserRepository.GetUserByUserId(context.Background(), tc.Id)
 			assert.Equal(t, domain.ErrUserNotExists, err)
+			_, err = r.UserRepository.GetUserByUsername(context.Background(), user.Username)
+			assert.Equal(t, domain.ErrUserNotExists, err)
+			err = r.UserRepository.DeleteUser(context.Background(), tc.Id)
+			assert.Equal(t, nil, err, "missmatch error")
 		})
 	}
 }
