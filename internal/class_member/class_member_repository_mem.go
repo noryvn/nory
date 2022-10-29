@@ -8,7 +8,7 @@ import (
 )
 
 type ClassMemberRepositoryMem struct {
-	mx sync.Mutex
+	mx      sync.Mutex
 	members []*domain.ClassMember
 }
 

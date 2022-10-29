@@ -57,7 +57,6 @@ func NewError(code int, msg string) *ResponseError {
 		Code:    code,
 		Message: msg,
 	}
-
 }
 
 func ErrorHandler(c *fiber.Ctx, err error) error {

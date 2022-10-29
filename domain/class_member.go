@@ -12,8 +12,8 @@ var (
 )
 
 type ClassMember struct {
-	ClassId   string `json:"classId" validate:"len=20"`
-	UserId    string `json:"userId" validate:"uuid"`
+	ClassId   string    `json:"classId" validate:"len=20"`
+	UserId    string    `json:"userId" validate:"uuid"`
 	CreatedAt time.Time `json:"createdAt"`
 
 	Level string `json:"level"`

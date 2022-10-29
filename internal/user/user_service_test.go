@@ -60,8 +60,8 @@ func TestUserService(t *testing.T) {
 		assert.Equal(t, 5, res.Data.OwnedClass)
 
 		_, err = us.UpdateUser(context.Background(), &domain.User{
-			UserId: user.UserId,
-			Name: "Abelia Narindi Agsya",
+			UserId:   user.UserId,
+			Name:     "Abelia Narindi Agsya",
 			Username: "Abelia",
 		})
 		assert.Nil(t, err)

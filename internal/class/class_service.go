@@ -12,7 +12,7 @@ import (
 )
 
 type ClassService struct {
-	UserRepository domain.UserRepository
+	UserRepository        domain.UserRepository
 	ClassRepository       domain.ClassRepository
 	ClassTaskRepository   domain.ClassTaskRepository
 	ClassMemberRepository domain.ClassMemberRepository
@@ -90,7 +90,7 @@ func (cs *ClassService) AddMemberByUsername(ctx context.Context, userId, classId
 		return nil, err
 	}
 	return cs.AddMember(ctx, userId, &domain.ClassMember{
-		UserId: user.UserId,
+		UserId:  user.UserId,
 		ClassId: classId,
 	})
 }
