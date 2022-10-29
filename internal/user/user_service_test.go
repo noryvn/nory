@@ -62,7 +62,7 @@ func TestUserService(t *testing.T) {
 		_, err = us.UpdateUser(context.Background(), &domain.User{
 			UserId:   user.UserId,
 			Name:     "Abelia Narindi Agsya",
-			Username: "Abelia",
+			Username: "abelia",
 		})
 		assert.Nil(t, err)
 
