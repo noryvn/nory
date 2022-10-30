@@ -19,12 +19,14 @@ import (
 	. "nory/internal/class"
 	classmember "nory/internal/class_member"
 	classtask "nory/internal/class_task"
+	"nory/internal/user"
 )
 
 func TestClassRouter(t *testing.T) {
 	t.Parallel()
 
 	classRoute := Route(ClassService{
+		UserRepository:        user.NewUserRepositoryMem(),
 		ClassRepository:       NewClassRepositoryMem(),
 		ClassTaskRepository:   classtask.NewClassTaskRepositoryMem(),
 		ClassMemberRepository: classmember.NewClassMemberRepositoryMem(),

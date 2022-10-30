@@ -54,10 +54,10 @@ func TestUserService(t *testing.T) {
 		res, err := us.GetUserProfile(context.Background(), user)
 		assert.Nil(t, err)
 		assert.Equal(t, 200, res.Code)
-		assert.Equal(t, user.Name, res.Data.User.Name)
-		assert.Equal(t, user.UserId, res.Data.User.UserId)
-		assert.Equal(t, 5, res.Data.JoinedClass)
-		assert.Equal(t, 5, res.Data.OwnedClass)
+		assert.Equal(t, user.Name, res.Data.Name)
+		assert.Equal(t, user.UserId, res.Data.UserId)
+		assert.Equal(t, 5, res.Data.UserStatistics.JoinedClass)
+		assert.Equal(t, 5, res.Data.UserStatistics.OwnedClass)
 
 		_, err = us.UpdateUser(context.Background(), &domain.User{
 			UserId:   user.UserId,
@@ -69,11 +69,11 @@ func TestUserService(t *testing.T) {
 		res, err = us.GetUserProfile(context.Background(), user)
 		assert.Nil(t, err)
 		assert.Equal(t, 200, res.Code)
-		assert.Equal(t, "Abelia Narindi Agsya", res.Data.User.Name)
-		assert.Equal(t, "abelia", res.Data.User.Username)
-		assert.Equal(t, user.UserId, res.Data.User.UserId)
-		assert.Equal(t, 5, res.Data.JoinedClass)
-		assert.Equal(t, 5, res.Data.OwnedClass)
+		assert.Equal(t, "Abelia Narindi Agsya", res.Data.Name)
+		assert.Equal(t, "abelia", res.Data.Username)
+		assert.Equal(t, user.UserId, res.Data.UserId)
+		assert.Equal(t, 5, res.Data.UserStatistics.JoinedClass)
+		assert.Equal(t, 5, res.Data.UserStatistics.OwnedClass)
 	})
 
 	t.Run("GetUserProfileById", func(t *testing.T) {
@@ -90,8 +90,8 @@ func TestUserService(t *testing.T) {
 		res, err := us.GetUserProfileById(context.Background(), user.UserId)
 		assert.Nil(t, err)
 		assert.Equal(t, 200, res.Code)
-		assert.Equal(t, user.Name, res.Data.User.Name)
-		assert.Equal(t, user.UserId, res.Data.User.UserId)
+		assert.Equal(t, user.Name, res.Data.Name)
+		assert.Equal(t, user.UserId, res.Data.UserId)
 
 		userId := uuid.NewString()
 		res, err = us.GetUserProfileById(context.Background(), userId)
@@ -133,9 +133,9 @@ func TestUserService(t *testing.T) {
 		upRes, err := us.GetUserProfile(context.Background(), user)
 		assert.Nil(t, err)
 		assert.Equal(t, 200, upRes.Code)
-		assert.Equal(t, user.Name, upRes.Data.User.Name)
-		assert.Equal(t, user.UserId, upRes.Data.User.UserId)
-		assert.Equal(t, len(classes), upRes.Data.OwnedClass)
+		assert.Equal(t, user.Name, upRes.Data.Name)
+		assert.Equal(t, user.UserId, upRes.Data.UserId)
+		assert.Equal(t, len(classes), upRes.Data.UserStatistics.OwnedClass)
 	})
 }
 

@@ -98,13 +98,13 @@ func TestUserRouter(t *testing.T) {
 		resp, err := app.Test(req)
 		assert.Nil(t, err)
 		assert.Equal(t, 200, resp.StatusCode)
-		var profile response.Response[*UserProfile]
+		var profile response.Response[*domain.User]
 		err = json.NewDecoder(resp.Body).Decode(&profile)
 		assert.Nil(t, err)
-		assert.Equal(t, 2, profile.Data.JoinedClass)
-		assert.Equal(t, 1, profile.Data.OwnedClass)
-		assert.Equal(t, user.Username, profile.Data.User.Username)
-		assert.Equal(t, user.Email, profile.Data.User.Email)
+		assert.Equal(t, 2, profile.Data.UserStatistics.JoinedClass)
+		assert.Equal(t, 1, profile.Data.UserStatistics.OwnedClass)
+		assert.Equal(t, user.Username, profile.Data.Username)
+		assert.Equal(t, user.Email, profile.Data.Email)
 
 		req = httptest.NewRequest("GET", "/class", nil)
 		req.Header.Set("user-id", user.UserId)
@@ -126,13 +126,13 @@ func TestUserRouter(t *testing.T) {
 		resp, err = app.Test(req)
 		assert.Nil(t, err)
 		assert.Equal(t, 200, resp.StatusCode)
-		var other response.Response[*UserProfile]
+		var other response.Response[*domain.User]
 		err = json.NewDecoder(resp.Body).Decode(&other)
 		assert.Nil(t, err)
-		assert.Equal(t, 2, other.Data.JoinedClass)
-		assert.Equal(t, 1, other.Data.OwnedClass)
-		assert.Equal(t, user.Username, other.Data.User.Username)
-		assert.Equal(t, user.Email, other.Data.User.Email)
+		assert.Equal(t, 2, other.Data.UserStatistics.JoinedClass)
+		assert.Equal(t, 1, other.Data.UserStatistics.OwnedClass)
+		assert.Equal(t, user.Username, other.Data.Username)
+		assert.Equal(t, user.Email, other.Data.Email)
 		assert.Equal(t, profile, other)
 
 		p = fmt.Sprintf("/username/%s/profile", user.Username)
@@ -141,13 +141,13 @@ func TestUserRouter(t *testing.T) {
 		resp, err = app.Test(req)
 		assert.Nil(t, err)
 		assert.Equal(t, 200, resp.StatusCode)
-		other = response.Response[*UserProfile]{}
+		other = response.Response[*domain.User]{}
 		err = json.NewDecoder(resp.Body).Decode(&other)
 		assert.Nil(t, err)
-		assert.Equal(t, 2, other.Data.JoinedClass)
-		assert.Equal(t, 1, other.Data.OwnedClass)
-		assert.Equal(t, user.Username, other.Data.User.Username)
-		assert.Equal(t, user.Email, other.Data.User.Email)
+		assert.Equal(t, 2, other.Data.UserStatistics.JoinedClass)
+		assert.Equal(t, 1, other.Data.UserStatistics.OwnedClass)
+		assert.Equal(t, user.Username, other.Data.Username)
+		assert.Equal(t, user.Email, other.Data.Email)
 		assert.Equal(t, profile, other)
 
 		buff := bytes.NewBuffer(nil)
@@ -171,12 +171,12 @@ func TestUserRouter(t *testing.T) {
 		resp, err = app.Test(req)
 		assert.Nil(t, err)
 		assert.Equal(t, 200, resp.StatusCode)
-		other = response.Response[*UserProfile]{}
+		other = response.Response[*domain.User]{}
 		err = json.NewDecoder(resp.Body).Decode(&other)
 		assert.Nil(t, err)
-		assert.Equal(t, 2, other.Data.JoinedClass)
-		assert.Equal(t, 1, other.Data.OwnedClass)
-		assert.Equal(t, "hai", other.Data.User.Username)
-		assert.Equal(t, user.Email, other.Data.User.Email)
+		assert.Equal(t, 2, other.Data.UserStatistics.JoinedClass)
+		assert.Equal(t, 1, other.Data.UserStatistics.OwnedClass)
+		assert.Equal(t, "hai", other.Data.Username)
+		assert.Equal(t, user.Email, other.Data.Email)
 	})
 }

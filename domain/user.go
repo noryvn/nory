@@ -13,6 +13,11 @@ var (
 	ErrUserAlreadyExists = errors.New("user already exists")
 )
 
+type UserStatistics struct {
+	JoinedClass int `json:"joinedCLass"`
+	OwnedClass  int `json:"ownedCLass"`
+}
+
 type User struct {
 	UserId    string    `json:"userId"`    // immutable, unique
 	CreatedAt time.Time `json:"createdAt"` // immutable
@@ -20,6 +25,8 @@ type User struct {
 	Username string `json:"username" validate:"username"` // mutable, unique
 	Name     string `json:"name" validate:"max=32"`       // mutable
 	Email    string `json:"email" validate:"max=254"`     // immutable, unique
+
+	UserStatistics *UserStatistics `json:"userStatistics,omitempty"`
 }
 
 func (u *User) Update(uu *User) {

@@ -42,14 +42,14 @@ func main() {
 	classMemberRepository := classmember.NewClassMemberRepositoryPostgres(pool)
 
 	userRoute := user.Route(user.UserService{
-		UserRepository:  userRepository,
-		ClassRepository: classRepository,
+		UserRepository:        userRepository,
+		ClassRepository:       classRepository,
 		ClassMemberRepository: classMemberRepository,
 	})
 	classRoute := class.Route(class.ClassService{
-		UserRepository: userRepository,
-		ClassRepository:     classRepository,
-		ClassTaskRepository: classTaskRepository,
+		UserRepository:        userRepository,
+		ClassRepository:       classRepository,
+		ClassTaskRepository:   classTaskRepository,
 		ClassMemberRepository: classMemberRepository,
 	})
 	authMiddleware := auth.Auth{
