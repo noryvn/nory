@@ -13,6 +13,7 @@ import (
 	"nory/common/auth"
 	"nory/common/response"
 	"nory/internal/class"
+	classmember "nory/internal/class_member"
 	"nory/internal/class_task"
 	"nory/internal/user"
 )
@@ -38,14 +39,18 @@ func main() {
 	userRepository := user.NewUserRepositoryPostgres(pool)
 	classRepository := class.NewClassRepositoryPostgres(pool)
 	classTaskRepository := classtask.NewClassTaskRepositoryPostgres(pool)
+	classMemberRepository := classmember.NewClassMemberRepositoryPostgres(pool)
 
 	userRoute := user.Route(user.UserService{
 		UserRepository:  userRepository,
 		ClassRepository: classRepository,
+		ClassMemberRepository: classMemberRepository,
 	})
 	classRoute := class.Route(class.ClassService{
+		UserRepository: userRepository,
 		ClassRepository:     classRepository,
 		ClassTaskRepository: classTaskRepository,
+		ClassMemberRepository: classMemberRepository,
 	})
 	authMiddleware := auth.Auth{
 		SupabaseAuth:   supa.Auth,
@@ -71,7 +76,7 @@ func main() {
 		},
 	})
 	app.Use(recover.New(recover.Config{
-		EnableStackTrace: !dev,
+		EnableStackTrace: true,
 	}))
 	app.Use(authMiddleware.Middleware)
 	app.Route("/user", userRoute, "user")

@@ -11,6 +11,13 @@ type classTaskRouter struct {
 }
 
 func Route(classTaskService ClassTaskService) func(router fiber.Router) {
+	if classTaskService.ClassRepository == nil {
+		panic("classTaskRoute: nil classTaskService.ClassRepository")
+	}
+	if classTaskService.ClassTaskRepository == nil {
+		panic("classTaskRoute: nil classTaskService.ClassTaskRepository")
+	}
+
 	ctr := classTaskRouter{classTaskService}
 	return func(router fiber.Router) {
 		router.Delete("/:taskId", ctr.DeleteTask)

@@ -15,6 +15,19 @@ type classRouter struct {
 }
 
 func Route(classService ClassService) func(router fiber.Router) {
+	if classService.UserRepository == nil {
+		panic("classRoute: nil ClassService.UserRepository")
+	}
+	if classService.ClassRepository == nil {
+		panic("classRoute: nil ClassService.ClassRepository")
+	}
+	if classService.ClassTaskRepository == nil {
+		panic("classRoute: nil ClassService.ClassTaskRepository")
+	}
+	if classService.ClassMemberRepository == nil {
+		panic("classRoute: nil ClassService.ClassMemberRepository")
+	}
+
 	cr := classRouter{classService}
 	return func(router fiber.Router) {
 		router.Delete("/:classId", cr.deleteClass)
