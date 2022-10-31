@@ -54,7 +54,7 @@ func TestUserRouter(t *testing.T) {
 		}{
 			{"GET", "/profile"},
 			{"GET", "/class"},
-			{"PATCH", "/user"},
+			{"PATCH", "/profile"},
 		} {
 			req := httptest.NewRequest(tc.Method, tc.Path, nil)
 			resp, err := app.Test(req)
@@ -155,7 +155,7 @@ func TestUserRouter(t *testing.T) {
 			Username: "hai",
 		})
 
-		req = httptest.NewRequest("PATCH", "/user", buff)
+		req = httptest.NewRequest("PATCH", "/profile", buff)
 		req.Header.Set("content-type", "application/json")
 		req.Header.Set("user-id", user.UserId)
 		req.Header.Set("username", user.Username)
