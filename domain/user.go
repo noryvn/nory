@@ -14,8 +14,8 @@ var (
 )
 
 type UserStatistics struct {
-	JoinedClass int `json:"joinedCLass"`
-	OwnedClass  int `json:"ownedCLass"`
+	JoinedClass int `json:"joinedClass"`
+	OwnedClass  int `json:"ownedClass"`
 }
 
 type User struct {
