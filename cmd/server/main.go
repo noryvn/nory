@@ -73,7 +73,6 @@ func main() {
 				return nil
 			}
 
-			fmt.Println(err)
 			return err
 		},
 	})
