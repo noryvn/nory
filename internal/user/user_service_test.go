@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"testing"
 
+	"nory/common/response"
 	"nory/domain"
 	"nory/internal/class"
 	classmember "nory/internal/class_member"
@@ -32,10 +33,17 @@ func TestUserService(t *testing.T) {
 		user := &domain.User{
 			UserId:   uuid.NewString(),
 			Name:     "Abelia",
-			Username: xid.New().String(),
+			Username: "11x0a",
 			Email:    xid.New().String(),
 		}
 		err := us.UserRepository.CreateUser(context.Background(), user)
+		user = &domain.User{
+			UserId:   uuid.NewString(),
+			Name:     "Abelia",
+			Username: xid.New().String(),
+			Email:    xid.New().String(),
+		}
+		err = us.UserRepository.CreateUser(context.Background(), user)
 		assert.Nil(t, err)
 
 		for i := 0; i < 5; i++ {
@@ -74,6 +82,15 @@ func TestUserService(t *testing.T) {
 		assert.Equal(t, user.UserId, res.Data.UserId)
 		assert.Equal(t, 5, res.Data.UserStatistics.JoinedClass)
 		assert.Equal(t, 5, res.Data.UserStatistics.OwnedClass)
+
+		_, err = us.UpdateUser(context.Background(), &domain.User{
+			UserId:   user.UserId,
+			Username: "11x0a",
+		})
+		assert.NotNil(t, err)
+		resErr := &response.ResponseError{}
+		assert.ErrorAs(t, err, &resErr)
+		assert.Equal(t, 409, resErr.Code)
 	})
 
 	t.Run("GetUserProfileById", func(t *testing.T) {

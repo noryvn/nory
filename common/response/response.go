@@ -48,6 +48,10 @@ func NewNotFound(msg string) *ResponseError {
 	return NewError(fiber.StatusNotFound, msg)
 }
 
+func NewConflict(msg string) *ResponseError {
+	return NewError(fiber.StatusConflict, msg)
+}
+
 func NewTooManyRequests(msg string) *ResponseError {
 	return NewError(fiber.StatusTooManyRequests, msg)
 }

@@ -7,6 +7,8 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/recover"
+	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/nedpals/supabase-go"
 
@@ -78,6 +80,11 @@ func main() {
 	app.Use(recover.New(recover.Config{
 		EnableStackTrace: true,
 	}))
+	app.Use(cors.New(cors.Config{
+		AllowHeaders: "*",
+		MaxAge: 86400,
+	}))
+	app.Use(logger.New())
 	app.Use(authMiddleware.Middleware)
 	app.Route("/user", userRoute, "user")
 	app.Route("/class", classRoute, "class")

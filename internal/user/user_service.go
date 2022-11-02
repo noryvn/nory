@@ -74,6 +74,9 @@ func (us UserService) UpdateUser(ctx context.Context, user *domain.User) (*respo
 		return nil, err
 	}
 	if err := us.UserRepository.UpdateUser(ctx, user); err != nil {
+		if errors.Is(err, domain.ErrUserAlreadyExists) {
+			return nil, response.NewConflict("user already exists")
+		}
 		return nil, err
 	}
 	return response.New[any](204, nil), nil
