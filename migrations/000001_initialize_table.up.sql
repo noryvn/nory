@@ -30,6 +30,7 @@ CREATE TABLE IF NOT EXISTS class (
 
 CREATE INDEX IF NOT EXISTS class_id_index ON class(class_id);
 CREATE INDEX IF NOT EXISTS owner_id_index ON class(owner_id, class_id);
+CREATE UNIQUE INDEX user_class_name ON class (owner_id, name);
 
 CREATE TABLE IF NOT EXISTS class_schedule (
 	schedule_id VARCHAR(20) UNIQUE NOT NULL,

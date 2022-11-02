@@ -89,6 +89,8 @@ func TestValidatorRegex(t *testing.T) {
 		{true, "abelia_narindi_agsya"},
 		{true, "a0x11"},
 		{true, "11x0a"},
+		{true, "abe"},
+		{false, "ab"},
 		{false, "a__"},
 		{false, "_b_"},
 		{false, "__e"},
