@@ -69,10 +69,33 @@ func TestValidator(t *testing.T) {
 			t.Parallel()
 			err := ValidateStruct(tc.data)
 			if tc.err {
-				assert.NotNil(t, err, "validate struct not return erro while error expected")
+				assert.NotNil(t, err, "validate struct not return error while error expected")
 			} else {
 				assert.Nil(t, err, "validate struct return error while not expected")
 			}
 		})
+	}
+}
+
+func TestValidatorRegex(t *testing.T) {
+	t.Parallel()
+	for _, tc := range []struct {
+		Match bool
+		Str   string
+	}{
+		{true, "cimi"},
+		{true, "CIMI"},
+		{true, "CimI"},
+		{true, "abelia_narindi_agsya"},
+		{true, "a0x11"},
+		{true, "11x0a"},
+		{false, "a__"},
+		{false, "_b_"},
+		{false, "__e"},
+		{false, "___1"},
+		{false, "_"},
+	} {
+		match := UsernameRegex.MatchString(tc.Str)
+		assert.Equalf(t, tc.Match, match, "UsernameRegex should return %v at %q", tc.Match, tc.Str)
 	}
 }

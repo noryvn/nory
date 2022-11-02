@@ -6,9 +6,9 @@ import (
 	"os"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/nedpals/supabase-go"
 
@@ -81,7 +81,7 @@ func main() {
 	}))
 	app.Use(cors.New(cors.Config{
 		AllowHeaders: "*",
-		MaxAge: 86400,
+		MaxAge:       86400,
 	}))
 	app.Use(logger.New())
 	app.Use(authMiddleware.Middleware)

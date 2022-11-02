@@ -14,7 +14,7 @@ import (
 var (
 	validate = validator.New()
 
-	usernameRegex = regexp.MustCompile("^[a-z0-9_.]*$")
+	UsernameRegex = regexp.MustCompile("(?i)^[a-z0-9][a-z0-9.]?.*[a-z0-9]$")
 )
 
 func init() {
@@ -34,7 +34,7 @@ func init() {
 		if len(str) > 20 {
 			return false
 		}
-		return usernameRegex.MatchString(str)
+		return UsernameRegex.MatchString(str)
 	})
 }
 
