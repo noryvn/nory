@@ -18,9 +18,9 @@ import (
 )
 
 var (
-	AbelBirthday = time.Date(2005, time.August, 11, 0, 0, 0, 0, time.UTC)
-	Now          = time.Now().UTC().Round(time.Hour)
-	Tomorrow     = Now.Add(24 * time.Hour)
+	SpecialDate = time.Date(2005, time.August, 11, 0, 0, 0, 0, time.UTC)
+	Now         = time.Now().UTC().Round(time.Hour)
+	Tomorrow    = Now.Add(24 * time.Hour)
 )
 
 func TestClassTaskRepository(t *testing.T) {
@@ -92,7 +92,10 @@ func (r *Repository) getClass(name string) string {
 	err := r.UserRepository.CreateUser(context.Background(), u)
 	assert.Nil(r.t, err)
 
-	class := &domain.Class{OwnerId: u.UserId}
+	class := &domain.Class{
+		Name:    xid.New().String(),
+		OwnerId: u.UserId,
+	}
 	err = r.ClassRepository.CreateClass(context.Background(), class)
 	assert.Nil(r.t, err)
 
@@ -111,12 +114,12 @@ func (r *Repository) testCreateTask(t *testing.T) {
 		Task domain.ClassTask
 		Err  bool
 	}{
-		{"success", domain.ClassTask{ClassId: r.getClass("foo"), AuthorId: r.getUser("foo"), DueDate: AbelBirthday, TaskId: "abelia narindi agsya"}, false},
+		{"success", domain.ClassTask{ClassId: r.getClass("foo"), AuthorId: r.getUser("foo"), DueDate: SpecialDate, TaskId: "abelia narindi agsya"}, false},
 		{"success", domain.ClassTask{ClassId: r.getClass("foo"), AuthorId: r.getUser("foo"), DueDate: Now, Name: "abelia narindi agsya"}, false},
-		{"success", domain.ClassTask{ClassId: r.getClass("bar"), AuthorId: r.getUser("bar"), DueDate: AbelBirthday, Description: "abelia narindi agsya"}, false},
+		{"success", domain.ClassTask{ClassId: r.getClass("bar"), AuthorId: r.getUser("bar"), DueDate: SpecialDate, Description: "abelia narindi agsya"}, false},
 		{"success", domain.ClassTask{ClassId: r.getClass("baz"), AuthorId: r.getUser("baz"), DueDate: Now}, false},
-		{"failed empty ClassId", domain.ClassTask{AuthorId: "", DueDate: AbelBirthday, Name: "Err"}, true},
-		{"failed empty AuthorId", domain.ClassTask{ClassId: r.getClass("foo"), DueDate: AbelBirthday, Name: "Err"}, true},
+		{"failed empty ClassId", domain.ClassTask{AuthorId: "", DueDate: SpecialDate, Name: "Err"}, true},
+		{"failed empty AuthorId", domain.ClassTask{ClassId: r.getClass("foo"), DueDate: SpecialDate, Name: "Err"}, true},
 	}
 
 	for _, tc := range testCases {
@@ -181,11 +184,11 @@ func (r *Repository) testGetTasksWithRange(t *testing.T) {
 		Len     int
 		Err     error
 	}{
-		{"success", "foo", AbelBirthday, Tomorrow, 2, nil},
-		{"success", "bar", AbelBirthday, Tomorrow, 1, nil},
-		{"success", "baz", AbelBirthday, Tomorrow, 1, nil},
-		{"success", "qux", AbelBirthday, Tomorrow, 0, nil},
-		{"success", "foo", AbelBirthday, AbelBirthday.Add(24 * time.Hour), 1, nil},
+		{"success", "foo", SpecialDate, Tomorrow, 2, nil},
+		{"success", "bar", SpecialDate, Tomorrow, 1, nil},
+		{"success", "baz", SpecialDate, Tomorrow, 1, nil},
+		{"success", "qux", SpecialDate, Tomorrow, 0, nil},
+		{"success", "foo", SpecialDate, SpecialDate.Add(24 * time.Hour), 1, nil},
 		{"success", "foo", Now, Tomorrow, 1, nil},
 		{"bar has 0 with due date now", "bar", Now, Tomorrow, 0, nil},
 		{"baz has 1 with due date Now", "baz", Now, Tomorrow, 1, nil},

@@ -70,6 +70,7 @@ func TestClassMemberRepository(t *testing.T) {
 				assert.Nil(t, err)
 
 				c := &domain.Class{
+					Name:    xid.New().String(),
 					ClassId: "",
 					OwnerId: owner,
 				}
@@ -78,6 +79,7 @@ func TestClassMemberRepository(t *testing.T) {
 				assert.Nil(t, err)
 				classFoo = c.ClassId
 
+				c.Name = xid.New().String()
 				err = repo.ClassRepo.CreateClass(context.Background(), c)
 				assert.Nil(t, err)
 				classBar = c.ClassId
