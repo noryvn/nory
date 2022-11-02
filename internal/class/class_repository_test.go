@@ -94,10 +94,10 @@ func (r *Repository) testCreate(t *testing.T) {
 		Class domain.Class
 		Err   error
 	}{
-		{"success", domain.Class{ClassName: "1", ClassId: "foo", OwnerId: foo}, nil},
-		{"success", domain.Class{ClassName: "2", ClassId: "bar", OwnerId: foo}, nil},
-		{"success", domain.Class{ClassName: "1", ClassId: "baz", OwnerId: bar}, nil},
-		{"success", domain.Class{ClassName: "1", ClassId: "baz", OwnerId: baz}, nil},
+		{"success", domain.Class{Name: "1", ClassId: "foo", OwnerId: foo}, nil},
+		{"success", domain.Class{Name: "2", ClassId: "bar", OwnerId: foo}, nil},
+		{"success", domain.Class{Name: "1", ClassId: "baz", OwnerId: bar}, nil},
+		{"success", domain.Class{Name: "1", ClassId: "baz", OwnerId: baz}, nil},
 	}
 
 	for _, tc := range testCases {
