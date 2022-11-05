@@ -42,12 +42,13 @@ func (ctrp *ClassTaskRepositoryPostgres) GetTask(ctx context.Context, taskId str
 	}
 	row := ctrp.pool.QueryRow(
 		ctx,
-		"SELECT class_id, author_id, name, description, due_date FROM class_task WHERE task_id = $1 ORDER BY task_id",
+		"SELECT class_id, author_id, created_at, name, description, due_date FROM class_task WHERE task_id = $1 ORDER BY due_date",
 		taskId,
 	)
 	err := row.Scan(
 		&ct.ClassId,
 		&ct.AuthorId,
+			&ct.CreatedAt,
 		&ct.Name,
 		&ct.Description,
 		&ct.DueDate,
@@ -66,7 +67,7 @@ func (ctrp *ClassTaskRepositoryPostgres) GetTasksWithRange(ctx context.Context, 
 	tasks := make([]*domain.ClassTask, 0)
 	rows, err := ctrp.pool.Query(
 		ctx,
-		"SELECT task_id, author_id, name, description, due_date FROM class_task WHERE class_id = $1 AND due_date >= $2 AND due_date < $3 ORDER BY task_id",
+		"SELECT task_id, author_id, created_at, name, description, due_date FROM class_task WHERE class_id = $1 AND due_date >= $2 AND due_date < $3 ORDER BY task_id",
 		classId,
 		from,
 		to,
@@ -81,6 +82,7 @@ func (ctrp *ClassTaskRepositoryPostgres) GetTasksWithRange(ctx context.Context, 
 		err := rows.Scan(
 			&ct.TaskId,
 			&ct.AuthorId,
+			&ct.CreatedAt,
 			&ct.Name,
 			&ct.Description,
 			&ct.DueDate,

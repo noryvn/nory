@@ -95,6 +95,7 @@ func (cr classRouter) createClassTask(c *fiber.Ctx) error {
 	}
 
 	task.ClassId = classId
+	task.AuthorId = user.UserId
 	res, err := cr.cs.CreateClassTask(c.Context(), user.UserId, &task)
 	if err != nil {
 		return err
