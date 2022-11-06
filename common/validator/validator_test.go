@@ -47,7 +47,7 @@ func TestValidator(t *testing.T) {
 		},
 		{
 			name: "custom validator 'username'",
-			data: bar{"abelia_narindi.agsya"},
+			data: bar{"abelia_narindi_agsya"},
 			err:  false,
 		},
 		{
