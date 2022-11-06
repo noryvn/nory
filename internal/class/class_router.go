@@ -31,9 +31,10 @@ func Route(classService ClassService) func(router fiber.Router) {
 	cr := classRouter{classService}
 	return func(router fiber.Router) {
 		router.Delete("/:classId", cr.deleteClass)
+		router.Delete("/:classId/member/:memberId", cr.deleteMember)
 		router.Get("/:classId/info", cr.getClassInfo)
 		router.Get("/:classId/task", cr.getClassTask)
-		router.Get("/:classId/member", cr.getClassTask)
+		router.Get("/:classId/member", cr.listMember)
 		router.Post("/:classId/task", cr.createClassTask)
 		router.Post("/:classId/member", cr.addMember)
 		router.Post("/create", cr.createClass)
@@ -135,11 +136,18 @@ func (cr classRouter) addMember(c *fiber.Ctx) error {
 	var body struct {
 		Username string `json:"username"`
 	}
-	if err := c.BodyParser(body); err != nil {
+	if err := c.BodyParser(&body); err != nil {
 		return err
 	}
 
-	res, err := cr.cs.AddMemberByUsername(c.Context(), user.UserId, classId, body.Username)
+	res, err := cr.cs.AddMemberByUsername(c.Context(), user.UserId, body.Username, &domain.ClassMember{
+		ClassId: classId,
+		Level: "member",
+	})
+	if err != nil {
+		return err
+	}
+
 	return res.Respond(c)
 }
 
@@ -153,3 +161,20 @@ func (cr classRouter) listMember(c *fiber.Ctx) error {
 
 	return res.Respond(c)
 }
+
+func (cr classRouter) deleteMember(c *fiber.Ctx) error {
+	user, err := auth.GetUser(c)
+	if err != nil {
+		return err
+	}
+	classId := c.Params("classId")
+	memberId := c.Params("memberId")
+
+	res, err := cr.cs.DeleteMember(c.Context(), user.UserId, classId, memberId)
+	if err != nil {
+		return err
+	}
+
+	return res.Respond(c)
+}
+

@@ -229,7 +229,7 @@ func (cst classServiceTest) listMemberTask(t *testing.T) {
 	foo := &domain.User{UserId: uuid.NewString(), Username: "foo", Email: "foo"}
 	err = cst.classService.UserRepository.CreateUser(context.Background(), foo)
 	assert.Nil(t, err)
-	res, err := cst.classService.AddMemberByUsername(context.Background(), class.OwnerId, class.ClassId, "foo")
+	res, err := cst.classService.AddMemberByUsername(context.Background(), class.OwnerId, "foo", &domain.ClassMember{ ClassId: class.ClassId })
 	if assert.Nil(t, err) {
 		assert.Equal(t, 204, res.Code)
 	}
@@ -237,7 +237,7 @@ func (cst classServiceTest) listMemberTask(t *testing.T) {
 	bar := &domain.User{UserId: uuid.NewString(), Username: "bar", Email: "bar"}
 	err = cst.classService.UserRepository.CreateUser(context.Background(), bar)
 	assert.Nil(t, err)
-	res, err = cst.classService.AddMemberByUsername(context.Background(), class.OwnerId, class.ClassId, "bar")
+	res, err = cst.classService.AddMemberByUsername(context.Background(), class.OwnerId, "bar", &domain.ClassMember{ ClassId: class.ClassId })
 	if assert.Nil(t, err) {
 		assert.Equal(t, 204, res.Code)
 	}
@@ -257,4 +257,12 @@ func (cst classServiceTest) listMemberTask(t *testing.T) {
 	assert.Nil(t ,err)
 	assert.Equal(t, 200, resMember.Code)
 	assert.Equal(t, 12, len(resMember.Data))
+
+	_, err = cst.classService.DeleteMember(context.Background(), class.OwnerId, class.ClassId, foo.UserId)
+
+	resMember, err = cst.classService.ListMember(context.Background(), class.ClassId)
+	assert.Nil(t ,err)
+	assert.Equal(t, 200, resMember.Code)
+	assert.Equal(t, 11, len(resMember.Data))
+	assert.Nil(t, err)
 }

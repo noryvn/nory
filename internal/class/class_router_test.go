@@ -2,6 +2,7 @@ package class_test
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http/httptest"
@@ -25,12 +26,13 @@ import (
 func TestClassRouter(t *testing.T) {
 	t.Parallel()
 
-	classRoute := Route(ClassService{
+	classService := ClassService{
 		UserRepository:        user.NewUserRepositoryMem(),
 		ClassRepository:       NewClassRepositoryMem(),
 		ClassTaskRepository:   classtask.NewClassTaskRepositoryMem(),
 		ClassMemberRepository: classmember.NewClassMemberRepositoryMem(),
-	})
+	}
+	classRoute := Route(classService)
 
 	app := fiber.New(fiber.Config{
 		Immutable: true,
@@ -118,13 +120,61 @@ func TestClassRouter(t *testing.T) {
 				q := req.URL.Query()
 				q.Add("from", now.Format(time.RFC3339))
 				req.URL.RawQuery = q.Encode()
-				t.Log(req.URL.String())
 				resp, err = app.Test(req)
 				assert.Equal(t, 200, resp.StatusCode)
 				var b response.Response[[]*domain.ClassTask]
 				err = json.NewDecoder(resp.Body).Decode(&b)
 				assert.Nil(t, err)
 				assert.Equal(t, 1, len(b.Data))
+
+				user := &domain.User{
+					UserId: uuid.NewString(),
+					Username: xid.New().String(),
+					Email: xid.New().String(),
+				}
+				err = classService.UserRepository.CreateUser(context.Background(), user)
+
+				buff = bytes.NewBuffer(nil)
+				err = json.NewEncoder(buff).Encode(&domain.User{
+					Username: user.Username,
+				})
+				assert.Nil(t, err)
+				p = fmt.Sprintf("/%s/member", body.Data.ClassId)
+				req = httptest.NewRequest("POST", p, buff)
+				req.Header.Set("user-id", tc.User.UserId)
+				req.Header.Set("content-type", "application/json")
+				resp, err = app.Test(req)
+				assert.Nil(t, err)
+				assert.Equal(t, 204, resp.StatusCode)
+
+				req = httptest.NewRequest("GET", p, nil)
+				resp, err = app.Test(req)
+				assert.Nil(t, err)
+				assert.Equal(t, 200, resp.StatusCode)
+
+				memBody := response.Response[[]*domain.ClassMember]{}
+				err = json.NewDecoder(resp.Body).Decode(&memBody)
+				assert.Nil(t,err)
+				assert.Equal(t, 2, len(memBody.Data))
+
+				p = fmt.Sprintf("/%s/member/%s", body.Data.ClassId, user.UserId)
+
+				req = httptest.NewRequest("DELETE", p, nil)
+				req.Header.Set("user-id", tc.User.UserId)
+				resp, err = app.Test(req)
+				assert.Nil(t, err)
+				assert.Equal(t, 204, resp.StatusCode)
+
+				p = fmt.Sprintf("/%s/member", body.Data.ClassId)
+				req = httptest.NewRequest("GET", p, nil)
+				resp, err = app.Test(req)
+				assert.Nil(t, err)
+				assert.Equal(t, 200, resp.StatusCode)
+
+				memBody = response.Response[[]*domain.ClassMember]{}
+				err = json.NewDecoder(resp.Body).Decode(&memBody)
+				assert.Nil(t,err)
+				assert.Equal(t, 1, len(memBody.Data))
 
 				p = fmt.Sprintf("/%s", body.Data.ClassId)
 				// unauthorized

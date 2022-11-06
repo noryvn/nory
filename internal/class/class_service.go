@@ -51,7 +51,7 @@ func (cs *ClassService) CreateClass(ctx context.Context, class *domain.Class) (*
 	if err := cs.ClassMemberRepository.CreateMember(ctx, &domain.ClassMember{
 		UserId:  class.OwnerId,
 		ClassId: class.ClassId,
-		Level:   "admin",
+		Level:   "owner",
 	}); err != nil {
 		return nil, err
 	}
@@ -84,15 +84,23 @@ func (cs *ClassService) AddMember(ctx context.Context, userId string, member *do
 	return response.New[any](204, nil), nil
 }
 
-func (cs *ClassService) AddMemberByUsername(ctx context.Context, userId, classId, username string) (*response.Response[any], error) {
+func (cs *ClassService) AddMemberByUsername(ctx context.Context, userId, username string, member *domain.ClassMember) (*response.Response[any], error) {
 	user, err := cs.UserRepository.GetUserByUsername(ctx, username)
 	if err != nil {
 		return nil, err
 	}
-	return cs.AddMember(ctx, userId, &domain.ClassMember{
-		UserId:  user.UserId,
-		ClassId: classId,
-	})
+	member.UserId = user.UserId
+	return cs.AddMember(ctx, userId, member)
+}
+
+func (cs *ClassService) DeleteMember(ctx context.Context, userId, classId, memberId string) (*response.Response[any], error) {
+	if err := cs.AccessClass(ctx, userId, classId); err != nil {
+		return nil, err
+	}
+	if err := cs.ClassMemberRepository.DeleteMember(ctx, &domain.ClassMember{ ClassId: classId, UserId: memberId }); err != nil {
+		return nil, err
+	}
+	return response.New[any](204, nil), nil
 }
 
 func (cs *ClassService) ListMember(ctx context.Context, classId string) (*response.Response[[]*domain.ClassMember], error) {
