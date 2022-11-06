@@ -16,6 +16,7 @@ type ClassTask struct {
 	AuthorId  string    `json:"authorId"`  // immutable
 	CreatedAt time.Time `json:"createdAt"` // immutable
 
+	AuthorDisplayName string `json:"authorDisplayName" validate:"max=20"` // mutable
 	Name        string    `json:"name" validate:"max=20"`          // mutable
 	Description string    `json:"description" validate:"max=1024"` // mutable
 	DueDate     time.Time `json:"dueDate"`                         // mutable

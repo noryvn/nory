@@ -57,6 +57,7 @@ CREATE TABLE IF NOT EXISTS class_task (
 	author_id UUID NOT NULL,
 	created_at TIMESTAMP DEFAULT NOW(),
 
+	author_display_name VARCHAR(20) NOT NULL,
 	name VARCHAR(20) NOT NULL,
 	due_date TIMESTAMP NOT NULL,
 	description VARCHAR(1024) NOT NULL,
