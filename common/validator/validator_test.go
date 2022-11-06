@@ -91,12 +91,14 @@ func TestValidatorRegex(t *testing.T) {
 		{true, "11x0a"},
 		{true, "abe"},
 		{false, "ab"},
+		{false, "ab."},
 		{false, "a__"},
 		{false, "_b_"},
 		{false, "__e"},
 		{false, "___1"},
 		{false, "_"},
 	} {
+		tc := tc
 		match := UsernameRegex.MatchString(tc.Str)
 		assert.Equalf(t, tc.Match, match, "UsernameRegex should return %v at %q", tc.Match, tc.Str)
 	}
