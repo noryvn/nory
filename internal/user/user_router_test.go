@@ -120,6 +120,20 @@ func TestUserRouter(t *testing.T) {
 		assert.Nil(t, err)
 		assert.Equal(t, 1, len(classes.Data))
 
+		req = httptest.NewRequest("GET", "/joined", nil)
+		req.Header.Set("user-id", user.UserId)
+		req.Header.Set("username", user.Username)
+		req.Header.Set("name", user.Name)
+		req.Header.Set("email", user.Email)
+
+		resp, err = app.Test(req)
+		assert.Nil(t, err)
+		assert.Equal(t, 200, resp.StatusCode)
+		var joined response.Response[[]*domain.ClassMember]
+		err = json.NewDecoder(resp.Body).Decode(&joined)
+		assert.Nil(t, err)
+		assert.Equal(t, 2, len(joined.Data))
+
 		p := fmt.Sprintf("/id/%s/profile", user.UserId)
 		req = httptest.NewRequest("GET", p, nil)
 

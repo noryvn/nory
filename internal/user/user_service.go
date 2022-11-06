@@ -69,6 +69,14 @@ func (us UserService) GetUserClasses(ctx context.Context, user *domain.User) (*r
 	return response.New(200, classes), err
 }
 
+func (us UserService) GetUserJoinedClasses(ctx context.Context, user *domain.User) (*response.Response[[]*domain.ClassMember], error) {
+	classes, err := us.ClassMemberRepository.ListJoined(ctx, user.UserId)
+	if err != nil {
+		return nil, err
+	}
+	return response.New(200, classes), nil
+}
+
 func (us UserService) UpdateUser(ctx context.Context, user *domain.User) (*response.Response[any], error) {
 	if err := validator.ValidateStruct(user); err != nil {
 		return nil, err

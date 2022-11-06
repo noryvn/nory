@@ -147,6 +147,10 @@ func TestUserService(t *testing.T) {
 			assert.Equal(t, user.UserId, class.OwnerId)
 		}
 
+		resJoined, err := us.GetUserClasses(context.Background(), user)
+		assert.Nil(t, err)
+		assert.Equal(t, len(classes), len(resJoined.Data))
+
 		upRes, err := us.GetUserProfile(context.Background(), user)
 		assert.Nil(t, err)
 		assert.Equal(t, 200, upRes.Code)

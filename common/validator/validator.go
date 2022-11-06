@@ -14,7 +14,7 @@ import (
 var (
 	validate = validator.New()
 
-	UsernameRegex = regexp.MustCompile("(?i)^[a-z0-9][a-z0-9.].*[a-z0-9]$")
+	UsernameRegex = regexp.MustCompile("(?i)^[a-z0-9][a-z0-9_]{1,18}[a-z0-9]$")
 )
 
 func init() {
