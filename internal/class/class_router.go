@@ -142,7 +142,7 @@ func (cr classRouter) addMember(c *fiber.Ctx) error {
 
 	res, err := cr.cs.AddMemberByUsername(c.Context(), user.UserId, body.Username, &domain.ClassMember{
 		ClassId: classId,
-		Level: "member",
+		Level:   "member",
 	})
 	if err != nil {
 		return err
@@ -177,4 +177,3 @@ func (cr classRouter) deleteMember(c *fiber.Ctx) error {
 
 	return res.Respond(c)
 }
-

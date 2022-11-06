@@ -128,9 +128,9 @@ func TestClassRouter(t *testing.T) {
 				assert.Equal(t, 1, len(b.Data))
 
 				user := &domain.User{
-					UserId: uuid.NewString(),
+					UserId:   uuid.NewString(),
 					Username: xid.New().String(),
-					Email: xid.New().String(),
+					Email:    xid.New().String(),
 				}
 				err = classService.UserRepository.CreateUser(context.Background(), user)
 
@@ -154,7 +154,7 @@ func TestClassRouter(t *testing.T) {
 
 				memBody := response.Response[[]*domain.ClassMember]{}
 				err = json.NewDecoder(resp.Body).Decode(&memBody)
-				assert.Nil(t,err)
+				assert.Nil(t, err)
 				assert.Equal(t, 2, len(memBody.Data))
 
 				p = fmt.Sprintf("/%s/member/%s", body.Data.ClassId, user.UserId)
@@ -173,7 +173,7 @@ func TestClassRouter(t *testing.T) {
 
 				memBody = response.Response[[]*domain.ClassMember]{}
 				err = json.NewDecoder(resp.Body).Decode(&memBody)
-				assert.Nil(t,err)
+				assert.Nil(t, err)
 				assert.Equal(t, 1, len(memBody.Data))
 
 				p = fmt.Sprintf("/%s", body.Data.ClassId)

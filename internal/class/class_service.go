@@ -97,7 +97,7 @@ func (cs *ClassService) DeleteMember(ctx context.Context, userId, classId, membe
 	if err := cs.AccessClass(ctx, userId, classId); err != nil {
 		return nil, err
 	}
-	if err := cs.ClassMemberRepository.DeleteMember(ctx, &domain.ClassMember{ ClassId: classId, UserId: memberId }); err != nil {
+	if err := cs.ClassMemberRepository.DeleteMember(ctx, &domain.ClassMember{ClassId: classId, UserId: memberId}); err != nil {
 		return nil, err
 	}
 	return response.New[any](204, nil), nil
