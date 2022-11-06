@@ -167,6 +167,12 @@ func TestClassRouter(t *testing.T) {
 				req.Header.Set("content-type", "application/json")
 				resp, err = app.Test(req)
 				assert.Nil(t, err)
+				assert.Equal(t, 204, resp.StatusCode)
+
+				p = fmt.Sprintf("/%s/member", body.Data.ClassId)
+				req = httptest.NewRequest("GET", p, nil)
+				resp, err = app.Test(req)
+				assert.Nil(t, err)
 				assert.Equal(t, 200, resp.StatusCode)
 
 				memBody = response.Response[[]*domain.ClassMember]{}
@@ -180,6 +186,7 @@ func TestClassRouter(t *testing.T) {
 					}
 				}
 
+				p = fmt.Sprintf("/%s/member/%s", body.Data.ClassId, user.UserId)
 				req = httptest.NewRequest("DELETE", p, nil)
 				req.Header.Set("user-id", tc.User.UserId)
 				resp, err = app.Test(req)
