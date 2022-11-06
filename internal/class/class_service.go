@@ -95,6 +95,15 @@ func (cs *ClassService) AddMemberByUsername(ctx context.Context, userId, classId
 	})
 }
 
+func (cs *ClassService) ListMember(ctx context.Context, classId string) (*response.Response[[]*domain.ClassMember], error) {
+	members, err := cs.ClassMemberRepository.ListMembers(ctx, classId)
+	if err != nil {
+		return nil, err
+	}
+
+	return response.New(200, members), nil
+}
+
 func (cs *ClassService) DeleteClass(ctx context.Context, userId, classId string) (*response.Response[any], error) {
 	if err := cs.AccessClass(ctx, userId, classId); err != nil {
 		return nil, err

@@ -10,6 +10,7 @@ import (
 	. "nory/internal/class"
 	classmember "nory/internal/class_member"
 	classtask "nory/internal/class_task"
+	"nory/internal/user"
 
 	"github.com/google/uuid"
 	"github.com/rs/xid"
@@ -19,6 +20,7 @@ import (
 func TestClassService(t *testing.T) {
 	t.Parallel()
 	classService := ClassService{
+		UserRepository: user.NewUserRepositoryMem(),
 		ClassRepository:       NewClassRepositoryMem(),
 		ClassTaskRepository:   classtask.NewClassTaskRepositoryMem(),
 		ClassMemberRepository: classmember.NewClassMemberRepositoryMem(),
@@ -30,6 +32,7 @@ func TestClassService(t *testing.T) {
 	t.Run("get class tasks", cst.classTasks)
 	t.Run("create class tasks", cst.createClassTask)
 	t.Run("create, access and delete class", cst.classCreate)
+	t.Run("list member", cst.listMemberTask)
 }
 
 type classServiceTest struct {
@@ -212,4 +215,46 @@ func (cst *classServiceTest) createClassTask(t *testing.T) {
 		_, err := cst.classService.CreateClassTask(context.Background(), class.OwnerId, &tc.task)
 		assert.NotNilf(t, err, "unexpected at %#+v", tc.task)
 	}
+}
+
+func (cst classServiceTest) listMemberTask(t *testing.T) {
+	t.Parallel()
+
+	class := &domain.Class{
+		OwnerId: uuid.NewString(),
+	}
+	err := cst.classService.ClassRepository.CreateClass(context.Background(), class)
+	assert.Nil(t, err)
+
+	foo := &domain.User{UserId: uuid.NewString(), Username: "foo", Email: "foo"}
+	err = cst.classService.UserRepository.CreateUser(context.Background(), foo)
+	assert.Nil(t, err)
+	res, err := cst.classService.AddMemberByUsername(context.Background(), class.OwnerId, class.ClassId, "foo")
+	if assert.Nil(t, err) {
+		assert.Equal(t, 204, res.Code)
+	}
+
+	bar := &domain.User{UserId: uuid.NewString(), Username: "bar", Email: "bar"}
+	err = cst.classService.UserRepository.CreateUser(context.Background(), bar)
+	assert.Nil(t, err)
+	res, err = cst.classService.AddMemberByUsername(context.Background(), class.OwnerId, class.ClassId, "bar")
+	if assert.Nil(t, err) {
+		assert.Equal(t, 204, res.Code)
+	}
+
+
+	for i := 0; i < 10; i++ {
+		res, err := cst.classService.AddMember(context.Background(), class.OwnerId, &domain.ClassMember{
+			UserId: uuid.NewString(),
+			ClassId: class.ClassId,
+		})
+		assert.Nil(t, err)
+		assert.Equal(t, 204, res.Code)
+	}
+
+
+	resMember, err := cst.classService.ListMember(context.Background(), class.ClassId)
+	assert.Nil(t ,err)
+	assert.Equal(t, 200, resMember.Code)
+	assert.Equal(t, 12, len(resMember.Data))
 }
