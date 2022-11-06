@@ -48,6 +48,44 @@ func TestClassRouter(t *testing.T) {
 	app.Use(auth.MockMiddleware)
 	app.Route("/", classRoute)
 
+	t.Run("auth", func(t *testing.T) {
+		buff := bytes.NewBuffer(nil)
+		err := json.NewEncoder(buff).Encode(&domain.Class{
+			Name: "foo-f",
+		})
+		assert.Nil(t, err)
+		userId := uuid.NewString()
+
+		req := httptest.NewRequest("POST", "/create", buff)
+		req.Header.Set("content-type", "application/json")
+		req.Header.Set("user-id", userId)
+		resp, err := app.Test(req)
+		assert.Equal(t, 200, resp.StatusCode)
+		var body response.Response[*domain.Class]
+		err = json.NewDecoder(resp.Body).Decode(&body)
+		assert.Nil(t, err)
+
+		class := body.Data
+
+		t.Run("unauthenticated", func(t *testing.T) {
+			for _, tc := range []struct {
+				Method string
+				Path string
+			}{
+				{"DELETE", fmt.Sprintf("/%s", class.ClassId)},
+				{"DELETE", fmt.Sprintf("/%s/member/%s", class.ClassId, userId)},
+				{"POST", fmt.Sprintf("/%s/member", class.ClassId)},
+				{"POST", fmt.Sprintf("/%s/task", class.ClassId)},
+				{"POST", "/create"},
+			}{
+				req := httptest.NewRequest(tc.Method, tc.Path, nil)
+				resp, err := app.Test(req)
+				assert.Nil(t, err)
+				assert.Equal(t, 401, resp.StatusCode)
+			}
+		})
+	})
+
 	t.Run("create", func(t *testing.T) {
 		for _, tc := range []struct {
 			Name string
