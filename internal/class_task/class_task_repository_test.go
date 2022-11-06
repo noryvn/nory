@@ -143,6 +143,7 @@ func (r *Repository) testGetTask(t *testing.T) {
 	for _, taskSc := range r.tasks {
 		task, err := r.ClassTaskRepository.GetTask(context.Background(), taskSc.TaskId)
 		assert.Nil(t, err, "unexpected error")
+		task.CreatedAt = time.Time{}
 		assert.Equal(t, taskSc, *task, "unknown task")
 	}
 }
@@ -238,6 +239,7 @@ func (r *Repository) testUpdateTasks(t *testing.T) {
 			}
 
 			after, err := r.ClassTaskRepository.GetTask(context.Background(), before.TaskId)
+			after.CreatedAt = time.Time{}
 			assert.Nil(t, err)
 			assert.Equal(t, before, *after)
 			assert.NotEqual(t, tc.Task, *after)

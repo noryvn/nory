@@ -48,7 +48,7 @@ func (ctrp *ClassTaskRepositoryPostgres) GetTask(ctx context.Context, taskId str
 	err := row.Scan(
 		&ct.ClassId,
 		&ct.AuthorId,
-			&ct.CreatedAt,
+		&ct.CreatedAt,
 		&ct.Name,
 		&ct.Description,
 		&ct.DueDate,
