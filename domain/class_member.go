@@ -13,8 +13,8 @@ var (
 
 type ClassMember struct {
 	ClassId   string    `json:"classId" validate:"len=20"` // immutable
-	UserId    string    `json:"userId" validate:"uuid"` // immutable
-	CreatedAt time.Time `json:"createdAt"` // immutable
+	UserId    string    `json:"userId" validate:"uuid"`    // immutable
+	CreatedAt time.Time `json:"createdAt"`                 // immutable
 
 	Level string `json:"level"` // mutable
 }

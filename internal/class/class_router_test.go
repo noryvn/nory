@@ -180,7 +180,6 @@ func TestClassRouter(t *testing.T) {
 					}
 				}
 
-
 				req = httptest.NewRequest("DELETE", p, nil)
 				req.Header.Set("user-id", tc.User.UserId)
 				resp, err = app.Test(req)

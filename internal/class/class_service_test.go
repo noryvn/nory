@@ -266,8 +266,8 @@ func (cst classServiceTest) listMember(t *testing.T) {
 
 	_, err = cst.classService.UpdateMember(context.Background(), class.OwnerId, &domain.ClassMember{
 		ClassId: class.ClassId,
-		UserId: bar.UserId,
-		Level: "admin",
+		UserId:  bar.UserId,
+		Level:   "admin",
 	})
 	assert.Nil(t, err)
 

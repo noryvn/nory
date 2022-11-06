@@ -11,10 +11,10 @@ var (
 )
 
 type ClassSchedule struct {
-	ScheduleId string    `json:"scheduleId"`  // immutable, unique
-	ClassId    string    `json:"classId"`     // immutable
-	AuthorId   string    `json:"authorId"` // immutable
-	CreatedAt  time.Time `json:"createdAt"` // immutable
+	ScheduleId string    `json:"scheduleId"` // immutable, unique
+	ClassId    string    `json:"classId"`    // immutable
+	AuthorId   string    `json:"authorId"`   // immutable
+	CreatedAt  time.Time `json:"createdAt"`  // immutable
 
 	Name     string        `json:"name"`     // immutable
 	StartAt  time.Duration `json:"startAt"`  // immutable
