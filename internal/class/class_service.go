@@ -86,6 +86,10 @@ func (cs *ClassService) AddMember(ctx context.Context, userId string, member *do
 
 func (cs *ClassService) AddMemberByUsername(ctx context.Context, userId, username string, member *domain.ClassMember) (*response.Response[any], error) {
 	user, err := cs.UserRepository.GetUserByUsername(ctx, username)
+	if errors.Is(err, domain.ErrUserNotExists) {
+		msg := fmt.Sprintf("can not find user with username %q", username)
+		return nil, response.NewUnprocessableEntity(msg)
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -110,6 +114,19 @@ func (cs *ClassService) ListMember(ctx context.Context, classId string) (*respon
 	}
 
 	return response.New(200, members), nil
+}
+
+func (cs *ClassService) UpdateMember(ctx context.Context, userId string, member *domain.ClassMember) (*response.Response[any], error) {
+	if err := cs.AccessClass(ctx, userId, member.ClassId); err != nil {
+		return nil, err
+	}
+	if err := validator.ValidateStruct(member); err != nil {
+		return nil, err
+	}
+	if err := cs.ClassMemberRepository.UpdateMember(ctx, member); err != nil {
+		return nil, err
+	}
+	return response.New[any](204, nil), nil
 }
 
 func (cs *ClassService) DeleteClass(ctx context.Context, userId, classId string) (*response.Response[any], error) {
@@ -147,6 +164,6 @@ func (cs *ClassService) AccessClass(ctx context.Context, userId, classId string)
 		return nil
 	}
 
-	msg := fmt.Sprintf("user with id %q does not has access to class with id %q", userId, classId)
+	msg := fmt.Sprintf("user with id %q does not has modify access to class with id %q", userId, classId)
 	return response.NewForbidden(msg)
 }

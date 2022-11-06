@@ -32,7 +32,7 @@ func TestClassService(t *testing.T) {
 	t.Run("get class tasks", cst.classTasks)
 	t.Run("create class tasks", cst.createClassTask)
 	t.Run("create, access and delete class", cst.classCreate)
-	t.Run("list member", cst.listMemberTask)
+	t.Run("list member", cst.listMember)
 }
 
 type classServiceTest struct {
@@ -217,7 +217,7 @@ func (cst *classServiceTest) createClassTask(t *testing.T) {
 	}
 }
 
-func (cst classServiceTest) listMemberTask(t *testing.T) {
+func (cst classServiceTest) listMember(t *testing.T) {
 	t.Parallel()
 
 	class := &domain.Class{
@@ -263,4 +263,19 @@ func (cst classServiceTest) listMemberTask(t *testing.T) {
 	assert.Equal(t, 200, resMember.Code)
 	assert.Equal(t, 11, len(resMember.Data))
 	assert.Nil(t, err)
+
+	_, err = cst.classService.UpdateMember(context.Background(), class.OwnerId, &domain.ClassMember{
+		ClassId: class.ClassId,
+		UserId:  bar.UserId,
+		Level:   "admin",
+	})
+	assert.Nil(t, err)
+
+	resMember, err = cst.classService.ListMember(context.Background(), class.ClassId)
+	assert.Nil(t, err)
+	for _, i := range resMember.Data {
+		if i.UserId == bar.UserId {
+			assert.Equal(t, "admin", i.Level)
+		}
+	}
 }

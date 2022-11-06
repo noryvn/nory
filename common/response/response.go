@@ -52,6 +52,10 @@ func NewConflict(msg string) *ResponseError {
 	return NewError(fiber.StatusConflict, msg)
 }
 
+func NewUnprocessableEntity(msg string) *ResponseError {
+	return NewError(fiber.StatusUnprocessableEntity, msg)
+}
+
 func NewTooManyRequests(msg string) *ResponseError {
 	return NewError(fiber.StatusTooManyRequests, msg)
 }

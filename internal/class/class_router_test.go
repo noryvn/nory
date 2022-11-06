@@ -48,6 +48,44 @@ func TestClassRouter(t *testing.T) {
 	app.Use(auth.MockMiddleware)
 	app.Route("/", classRoute)
 
+	t.Run("auth", func(t *testing.T) {
+		buff := bytes.NewBuffer(nil)
+		err := json.NewEncoder(buff).Encode(&domain.Class{
+			Name: "foo-f",
+		})
+		assert.Nil(t, err)
+		userId := uuid.NewString()
+
+		req := httptest.NewRequest("POST", "/create", buff)
+		req.Header.Set("content-type", "application/json")
+		req.Header.Set("user-id", userId)
+		resp, err := app.Test(req)
+		assert.Equal(t, 200, resp.StatusCode)
+		var body response.Response[*domain.Class]
+		err = json.NewDecoder(resp.Body).Decode(&body)
+		assert.Nil(t, err)
+
+		class := body.Data
+
+		t.Run("unauthenticated", func(t *testing.T) {
+			for _, tc := range []struct {
+				Method string
+				Path string
+			}{
+				{"DELETE", fmt.Sprintf("/%s", class.ClassId)},
+				{"DELETE", fmt.Sprintf("/%s/member/%s", class.ClassId, userId)},
+				{"POST", fmt.Sprintf("/%s/member", class.ClassId)},
+				{"POST", fmt.Sprintf("/%s/task", class.ClassId)},
+				{"POST", "/create"},
+			}{
+				req := httptest.NewRequest(tc.Method, tc.Path, nil)
+				resp, err := app.Test(req)
+				assert.Nil(t, err)
+				assert.Equal(t, 401, resp.StatusCode)
+			}
+		})
+	})
+
 	t.Run("create", func(t *testing.T) {
 		for _, tc := range []struct {
 			Name string
@@ -158,7 +196,35 @@ func TestClassRouter(t *testing.T) {
 				assert.Equal(t, 2, len(memBody.Data))
 
 				p = fmt.Sprintf("/%s/member/%s", body.Data.ClassId, user.UserId)
+				buff.Reset()
+				err = json.NewEncoder(buff).Encode(domain.ClassMember{
+					Level: "admin",
+				})
+				req = httptest.NewRequest("PATCH", p, buff)
+				req.Header.Set("user-id", tc.User.UserId)
+				req.Header.Set("content-type", "application/json")
+				resp, err = app.Test(req)
+				assert.Nil(t, err)
+				assert.Equal(t, 204, resp.StatusCode)
 
+				p = fmt.Sprintf("/%s/member", body.Data.ClassId)
+				req = httptest.NewRequest("GET", p, nil)
+				resp, err = app.Test(req)
+				assert.Nil(t, err)
+				assert.Equal(t, 200, resp.StatusCode)
+
+				memBody = response.Response[[]*domain.ClassMember]{}
+				err = json.NewDecoder(resp.Body).Decode(&memBody)
+				assert.Nil(t, err)
+				assert.Equal(t, 2, len(memBody.Data))
+
+				for _, member := range memBody.Data {
+					if member.UserId == user.UserId {
+						assert.Equal(t, "admin", member.Level)
+					}
+				}
+
+				p = fmt.Sprintf("/%s/member/%s", body.Data.ClassId, user.UserId)
 				req = httptest.NewRequest("DELETE", p, nil)
 				req.Header.Set("user-id", tc.User.UserId)
 				resp, err = app.Test(req)
