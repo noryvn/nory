@@ -26,6 +26,7 @@ func Route(userService UserService) func(router fiber.Router) {
 	return func(router fiber.Router) {
 		router.Get("/profile", ur.GetUserProfile)
 		router.Get("/class", ur.GetUserClasses)
+		router.Get("/joined", ur.GetUserJoinedClasses)
 		router.Get("/id/:userId/profile", ur.GetOtherUserProfile)
 		router.Get("/username/:username/profile", ur.GetOtherUserProfileByUsername)
 		router.Patch("/profile", ur.PatchUser)
@@ -97,6 +98,20 @@ func (ur userRouter) GetUserClasses(c *fiber.Ctx) error {
 	}
 
 	res, err := ur.us.GetUserClasses(c.Context(), user)
+	if err != nil {
+		return err
+	}
+
+	return res.Respond(c)
+}
+
+func (ur userRouter) GetUserJoinedClasses(c *fiber.Ctx) error {
+	user, err := auth.GetUser(c)
+	if err != nil {
+		return err
+	}
+
+	res, err := ur.us.GetUserJoinedClasses(c.Context(), user)
 	if err != nil {
 		return err
 	}
