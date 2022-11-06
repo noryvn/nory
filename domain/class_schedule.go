@@ -11,15 +11,15 @@ var (
 )
 
 type ClassSchedule struct {
-	ScheduleId string    `json:"scheduleId"` // unique
-	ClassId    string    `json:"classId"`    //
-	AuthorId   string    `json:"authorId"`
-	CreatedAt  time.Time `json:"createdAt"`
+	ScheduleId string    `json:"scheduleId"`  // immutable, unique
+	ClassId    string    `json:"classId"`     // immutable
+	AuthorId   string    `json:"authorId"` // immutable
+	CreatedAt  time.Time `json:"createdAt"` // immutable
 
-	Name     string        `json:"name"`     //
-	StartAt  time.Duration `json:"startAt"`  //
-	Duration int16         `json:"duration"` //
-	Day      int8          `json:"day"`      //
+	Name     string        `json:"name"`     // immutable
+	StartAt  time.Duration `json:"startAt"`  // immutable
+	Duration int16         `json:"duration"` // immutable
+	Day      int8          `json:"day"`      // immutable
 }
 
 type ClassScheduleRepository interface {
