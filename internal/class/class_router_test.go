@@ -74,6 +74,7 @@ func TestClassRouter(t *testing.T) {
 			}{
 				{"DELETE", fmt.Sprintf("/%s", class.ClassId)},
 				{"DELETE", fmt.Sprintf("/%s/member/%s", class.ClassId, userId)},
+				{"DELETE", fmt.Sprintf("/%s/task/%s", class.ClassId, "s")},
 				{"POST", fmt.Sprintf("/%s/member", class.ClassId)},
 				{"POST", fmt.Sprintf("/%s/task", class.ClassId)},
 				{"POST", "/create"},
@@ -154,6 +155,7 @@ func TestClassRouter(t *testing.T) {
 				resp, err = app.Test(req)
 				assert.Equal(t, 200, resp.StatusCode)
 
+				p = fmt.Sprintf("/%s/task", body.Data.ClassId)
 				req = httptest.NewRequest("GET", p, nil)
 				q := req.URL.Query()
 				q.Add("from", now.Format(time.RFC3339))
@@ -164,6 +166,25 @@ func TestClassRouter(t *testing.T) {
 				err = json.NewDecoder(resp.Body).Decode(&b)
 				assert.Nil(t, err)
 				assert.Equal(t, 1, len(b.Data))
+
+				p = fmt.Sprintf("/%s/task/%s", body.Data.ClassId, b.Data[0].TaskId)
+				req = httptest.NewRequest("DELETE", p , nil)
+				req.Header.Set("user-id", tc.User.UserId)
+				resp, err = app.Test(req)
+				assert.Nil(t, err)
+				assert.Equal(t, 204, resp.StatusCode)
+
+				p = fmt.Sprintf("/%s/task", body.Data.ClassId)
+				req = httptest.NewRequest("GET", p, nil)
+				q = req.URL.Query()
+				q.Add("from", now.Format(time.RFC3339))
+				req.URL.RawQuery = q.Encode()
+				resp, err = app.Test(req)
+				assert.Equal(t, 200, resp.StatusCode)
+				b = response.Response[[]*domain.ClassTask]{}
+				err = json.NewDecoder(resp.Body).Decode(&b)
+				assert.Nil(t, err)
+				assert.Equal(t, 0, len(b.Data))
 
 				user := &domain.User{
 					UserId:   uuid.NewString(),
