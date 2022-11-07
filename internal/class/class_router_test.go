@@ -70,7 +70,7 @@ func TestClassRouter(t *testing.T) {
 		t.Run("unauthenticated", func(t *testing.T) {
 			for _, tc := range []struct {
 				Method string
-				Path string
+				Path   string
 			}{
 				{"DELETE", fmt.Sprintf("/%s", class.ClassId)},
 				{"DELETE", fmt.Sprintf("/%s/member/%s", class.ClassId, userId)},
@@ -78,7 +78,7 @@ func TestClassRouter(t *testing.T) {
 				{"POST", fmt.Sprintf("/%s/member", class.ClassId)},
 				{"POST", fmt.Sprintf("/%s/task", class.ClassId)},
 				{"POST", "/create"},
-			}{
+			} {
 				req := httptest.NewRequest(tc.Method, tc.Path, nil)
 				resp, err := app.Test(req)
 				assert.Nil(t, err)
@@ -168,7 +168,7 @@ func TestClassRouter(t *testing.T) {
 				assert.Equal(t, 1, len(b.Data))
 
 				p = fmt.Sprintf("/%s/task/%s", body.Data.ClassId, b.Data[0].TaskId)
-				req = httptest.NewRequest("DELETE", p , nil)
+				req = httptest.NewRequest("DELETE", p, nil)
 				req.Header.Set("user-id", tc.User.UserId)
 				resp, err = app.Test(req)
 				assert.Nil(t, err)
