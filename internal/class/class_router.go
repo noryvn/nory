@@ -32,6 +32,7 @@ func Route(classService ClassService) func(router fiber.Router) {
 	return func(router fiber.Router) {
 		router.Delete("/:classId", cr.deleteClass)
 		router.Delete("/:classId/member/:memberId", cr.deleteMember)
+		router.Delete("/:classId/task/:taskId", cr.deleteClassTask)
 		router.Patch("/:classId/member/:memberId", cr.updateMember)
 		router.Get("/:classId/info", cr.getClassInfo)
 		router.Get("/:classId/task", cr.getClassTask)
@@ -101,6 +102,22 @@ func (cr classRouter) createClassTask(c *fiber.Ctx) error {
 	task.ClassId = classId
 	task.AuthorId = user.UserId
 	res, err := cr.cs.CreateClassTask(c.Context(), user.UserId, &task)
+	if err != nil {
+		return err
+	}
+
+	return res.Respond(c)
+}
+
+func (cr classRouter) deleteClassTask(c *fiber.Ctx) error {
+	taskId := c.Params("taskId")
+
+	user, err := auth.GetUser(c)
+	if err != nil {
+		return err
+	}
+
+	res, err := cr.cs.DeleteClassTask(c.Context(), user.UserId, taskId)
 	if err != nil {
 		return err
 	}

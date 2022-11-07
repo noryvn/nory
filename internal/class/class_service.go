@@ -71,6 +71,27 @@ func (cs *ClassService) CreateClassTask(ctx context.Context, userId string, task
 	return response.New(200, task), nil
 }
 
+func (cs *ClassService) DeleteClassTask(ctx context.Context, userId, taskId string) (*response.Response[any], error) {
+	task, err := cs.ClassTaskRepository.GetTask(ctx, taskId)
+	if errors.Is(err, domain.ErrClassTaskNotExists) {
+		msg := fmt.Sprintf("can not find task with id %q", taskId)
+		return nil, response.NewUnprocessableEntity(msg)
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	if err := cs.AccessClass(ctx, userId, task.ClassId); err != nil {
+		return nil, err
+	}
+
+	if err := cs.ClassTaskRepository.DeleteTask(ctx, taskId); err != nil {
+		return nil, err
+	}
+
+	return response.New[any](204, nil), nil
+}
+
 func (cs *ClassService) AddMember(ctx context.Context, userId string, member *domain.ClassMember) (*response.Response[any], error) {
 	if err := validator.ValidateStruct(member); err != nil {
 		return nil, err
