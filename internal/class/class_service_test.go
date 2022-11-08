@@ -106,6 +106,18 @@ func (cst classServiceTest) classTasks(t *testing.T) {
 		assert.Nil(t, err)
 		assert.Equal(t, tc.Len, len(res.Data))
 	}
+
+	res, err := cst.classService.GetClassTasks(context.Background(), class.ClassId, time.Time{}, time.Time{})
+	assert.Nil(t, err)
+
+	for _, task := range res.Data {
+		_, err := cst.classService.DeleteClassTask(context.Background(), class.OwnerId, task.TaskId)
+		assert.Nil(t, err)
+	}
+
+	res, err = cst.classService.GetClassTasks(context.Background(), class.ClassId, time.Time{}, time.Time{})
+	assert.Nil(t, err)
+	assert.Equal(t, 0, len(res.Data))
 }
 
 func (cst classServiceTest) classCreate(t *testing.T) {
