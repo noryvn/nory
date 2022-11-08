@@ -19,7 +19,7 @@ import (
 
 var (
 	SpecialDate = time.Date(2005, time.August, 11, 0, 0, 0, 0, time.UTC)
-	Now         = time.Now().UTC().Round(time.Hour)
+	Now         = time.Now().UTC().Round(24 * time.Hour)
 	Tomorrow    = Now.Add(24 * time.Hour)
 )
 
