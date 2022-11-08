@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS class_task (
 
 	author_display_name VARCHAR(20) NOT NULL,
 	name VARCHAR(20) NOT NULL,
-	due_date TIMESTAMP NOT NULL,
+	due_date DATE NOT NULL,
 	description VARCHAR(1024) NOT NULL,
 
 	CONSTRAINT class_task_pk PRIMARY KEY(task_id),
