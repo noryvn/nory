@@ -22,7 +22,7 @@ func (csrp *ClassScheduleRepositoryPg) CreateSchedule(ctx context.Context, sched
 
 	_, err := csrp.pool.Exec(
 		ctx,
-		`INSERT INTO class_schedule(schedule_id, class_id, author_id, name, start_at, duration, day)`,
+		`INSERT INTO class_schedule(schedule_id, class_id, author_id, name, start_at, duration, day) VALUES($1, $2, $3, $4, $5, $6)`,
 		schedule.ScheduleId,
 		schedule.ClassId,
 		schedule.AuthorId,
@@ -47,6 +47,11 @@ func (csrp *ClassScheduleRepositoryPg) DeleteSchedule(ctx context.Context, sched
 }
 
 func (csrp *ClassScheduleRepositoryPg) ClearSchedules(ctx context.Context, classId string, day int8) error {
-	return nil
+	_, err := csrp.pool.Exec(
+		ctx,
+		"DELETE FROM class_schedule WHERE day = $1",
+		day,
+	)
+	return err
 }
 
