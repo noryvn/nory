@@ -43,17 +43,17 @@ func (csrp *ClassScheduleRepositoryPg) GetSchedule(ctx context.Context, schedule
 	}
 	row := csrp.pool.QueryRow(
 		ctx,
-		"SELECT (class_id, author_id, created_at, name, start_at, duration, day) FROM class_schedule WHERE schedule_id = $1",
+		"SELECT class_id, author_id, created_at, name, start_at, duration, day FROM class_schedule WHERE schedule_id = $1",
 		scheduleId,
 	)
 	err := row.Scan(
-		schedule.ClassId,
-		schedule.AuthorId,
-		schedule.CreatedAt,
-		schedule.Name,
-		schedule.StartAt,
-		schedule.Duration,
-		schedule.Day,
+		&schedule.ClassId,
+		&schedule.AuthorId,
+		&schedule.CreatedAt,
+		&schedule.Name,
+		&schedule.StartAt,
+		&schedule.Duration,
+		&schedule.Day,
 	)
 	if errors.Is(err, pgx.ErrNoRows) {
 		err = domain.ErrClassScheduleNotExists
@@ -61,7 +61,7 @@ func (csrp *ClassScheduleRepositoryPg) GetSchedule(ctx context.Context, schedule
 	if err != nil {
 		return nil, err
 	}
-	return nil, nil
+	return schedule, nil
 }
 
 func (csrp *ClassScheduleRepositoryPg) GetSchedules(ctx context.Context, classId string) ([]*domain.ClassSchedule, error) {
@@ -69,7 +69,8 @@ func (csrp *ClassScheduleRepositoryPg) GetSchedules(ctx context.Context, classId
 
 	rows, err := csrp.pool.Query(
 		ctx,
-		"SELECT (schedule_id, author_id, created_at, name, start_at, duration, day) FROM class_schedule WHERE class_id = $1 ORDER BY schedule_id",
+		"SELECT schedule_id, author_id, created_at, name, start_at, duration, day FROM class_schedule WHERE class_id = $1 ORDER BY schedule_id",
+		classId,
 	)
 	if err != nil {
 		return nil, err
@@ -81,13 +82,13 @@ func (csrp *ClassScheduleRepositoryPg) GetSchedules(ctx context.Context, classId
 		}
 
 		err := rows.Scan(
-			schedule.ScheduleId,
-			schedule.AuthorId,
-			schedule.CreatedAt,
-			schedule.Name,
-			schedule.StartAt,
-			schedule.Duration,
-			schedule.Day,
+			&schedule.ScheduleId,
+			&schedule.AuthorId,
+			&schedule.CreatedAt,
+			&schedule.Name,
+			&schedule.StartAt,
+			&schedule.Duration,
+			&schedule.Day,
 		)
 		if err != nil {
 			return nil, err

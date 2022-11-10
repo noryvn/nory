@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 	"testing"
+	"time"
 
 	"nory/domain"
 	"nory/internal/class"
@@ -15,6 +16,8 @@ import (
 	"github.com/rs/xid"
 	"github.com/stretchr/testify/assert"
 )
+
+var now = time.Now().UTC().Round(time.Hour)
 
 func TestClassScheduleRepository(t *testing.T) {
 	t.Parallel()
@@ -106,11 +109,11 @@ func (r *Repository) testCreateSchedule(t *testing.T) {
 		Schedule domain.ClassSchedule
 		Err      error
 	}{
-		{"success", domain.ClassSchedule{ClassId: r.getClass("classFoo"), AuthorId: r.getUser("classFoo"), Day: int8(2), StartAt: "00:00:00"}, nil},
-		{"success", domain.ClassSchedule{ClassId: r.getClass("classFoo"), AuthorId: r.getUser("classFoo"), Day: int8(1), StartAt: "00:00:00"}, nil},
-		{"success", domain.ClassSchedule{ClassId: r.getClass("classFoo"), AuthorId: r.getUser("classFoo"), Day: int8(1), StartAt: "00:00:00"}, nil},
-		{"success", domain.ClassSchedule{ClassId: r.getClass("classBar"), AuthorId: r.getUser("classBar"), Day: int8(1), StartAt: "00:00:00"}, nil},
-		{"success", domain.ClassSchedule{ClassId: r.getClass("classBar"), AuthorId: r.getUser("classBar"), Day: int8(1), StartAt: "00:00:00"}, nil},
+		{"success", domain.ClassSchedule{ClassId: r.getClass("classFoo"), AuthorId: r.getUser("classFoo"), Day: int8(2), StartAt: now}, nil},
+		{"success", domain.ClassSchedule{ClassId: r.getClass("classFoo"), AuthorId: r.getUser("classFoo"), Day: int8(1), StartAt: now}, nil},
+		{"success", domain.ClassSchedule{ClassId: r.getClass("classFoo"), AuthorId: r.getUser("classFoo"), Day: int8(1), StartAt: now}, nil},
+		{"success", domain.ClassSchedule{ClassId: r.getClass("classBar"), AuthorId: r.getUser("classBar"), Day: int8(1), StartAt: now}, nil},
+		{"success", domain.ClassSchedule{ClassId: r.getClass("classBar"), AuthorId: r.getUser("classBar"), Day: int8(1), StartAt: now}, nil},
 	}
 
 	for _, tc := range testCases {
