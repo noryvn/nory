@@ -152,6 +152,22 @@ func (cr classRouter) createClassSchedule(c *fiber.Ctx) error {
 	return res.Respond(c)
 }
 
+func (cr classRouter) deleteClassSchedule(c *fiber.Ctx) error {
+	scheduleId := c.Params("scheduleId")
+
+	user, err := auth.GetUser(c)
+	if err != nil {
+		return err
+	}
+
+	res, err := cr.cs.DeleteSchedule(c.Context(), user.UserId, scheduleId)
+	if err != nil {
+		return err
+	}
+
+	return res.Respond(c)
+}
+
 func (cr classRouter) createClass(c *fiber.Ctx) error {
 	user, err := auth.GetUser(c)
 	if err != nil {
