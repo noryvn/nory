@@ -41,6 +41,7 @@ func Route(classService ClassService) func(router fiber.Router) {
 		router.Get("/:classId/info", cr.getClassInfo)
 		router.Get("/:classId/task", cr.getClassTask)
 		router.Get("/:classId/member", cr.listMember)
+		router.Get("/:classId/schedule", cr.getClassSchedule)
 		router.Post("/:classId/task", cr.createClassTask)
 		router.Post("/:classId/schedule", cr.createClassSchedule)
 		router.Post("/:classId/member", cr.addMember)
@@ -146,6 +147,16 @@ func (cr classRouter) createClassSchedule(c *fiber.Ctx) error {
 	task.ClassId = classId
 	task.AuthorId = user.UserId
 	res, err := cr.cs.CreateSchedule(c.Context(), &task)
+	if err != nil {
+		return err
+	}
+
+	return res.Respond(c)
+}
+
+func (cr classRouter) getClassSchedule(c *fiber.Ctx) error {
+	classId := c.Params("classId")
+	res, err := cr.cs.GetClassSchedules(c.Context(), classId)
 	if err != nil {
 		return err
 	}
