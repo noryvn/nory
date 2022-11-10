@@ -20,6 +20,7 @@ import (
 	. "nory/internal/class"
 	classmember "nory/internal/class_member"
 	classtask "nory/internal/class_task"
+	classschedule "nory/internal/class_schedule"
 	"nory/internal/user"
 )
 
@@ -31,6 +32,7 @@ func TestClassRouter(t *testing.T) {
 		ClassRepository:       NewClassRepositoryMem(),
 		ClassTaskRepository:   classtask.NewClassTaskRepositoryMem(),
 		ClassMemberRepository: classmember.NewClassMemberRepositoryMem(),
+		ClassScheduleRepository: classschedule.NewClassScheduleRepositoryMem(),
 	}
 	classRoute := Route(classService)
 

@@ -41,6 +41,7 @@ func Route(classService ClassService) func(router fiber.Router) {
 		router.Get("/:classId/task", cr.getClassTask)
 		router.Get("/:classId/member", cr.listMember)
 		router.Post("/:classId/task", cr.createClassTask)
+		router.Post("/:classId/schedule", cr.createClassSchedule)
 		router.Post("/:classId/member", cr.addMember)
 		router.Post("/create", cr.createClass)
 	}
@@ -121,6 +122,29 @@ func (cr classRouter) deleteClassTask(c *fiber.Ctx) error {
 	}
 
 	res, err := cr.cs.DeleteClassTask(c.Context(), user.UserId, taskId)
+	if err != nil {
+		return err
+	}
+
+	return res.Respond(c)
+}
+
+func (cr classRouter) createClassSchedule(c *fiber.Ctx) error {
+	classId := c.Params("classId")
+
+	user, err := auth.GetUser(c)
+	if err != nil {
+		return err
+	}
+
+	var task domain.ClassSchedule
+	if err := c.BodyParser(&task); err != nil {
+		return err
+	}
+
+	task.ClassId = classId
+	task.AuthorId = user.UserId
+	res, err := cr.cs.CreateSchedule(c.Context(), &task)
 	if err != nil {
 		return err
 	}
