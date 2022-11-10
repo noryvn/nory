@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/rs/xid"
 
 	"nory/domain"
 )
@@ -17,7 +18,20 @@ func NewClassScheduleRepositoryPg(pool *pgxpool.Pool) *ClassScheduleRepositoryPg
 }
 
 func (csrp *ClassScheduleRepositoryPg) CreateSchedule(ctx context.Context, schedule *domain.ClassSchedule) error {
-	return nil
+	schedule.ScheduleId = xid.New().String()
+
+	_, err := csrp.pool.Exec(
+		ctx,
+		`INSERT INTO class_schedule(schedule_id, class_id, author_id, name, start_at, duration, day)`,
+		schedule.ScheduleId,
+		schedule.ClassId,
+		schedule.AuthorId,
+		schedule.Name,
+		schedule.Duration,
+		schedule.Day,
+	)
+
+	return err
 }
 
 func (csrp *ClassScheduleRepositoryPg) GetSchedule(ctx context.Context, scheduleId string) (*domain.ClassSchedule, error) {
