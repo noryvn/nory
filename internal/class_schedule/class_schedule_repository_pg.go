@@ -43,7 +43,8 @@ func (csrp *ClassScheduleRepositoryPg) GetSchedule(ctx context.Context, schedule
 	}
 	row := csrp.pool.QueryRow(
 		ctx,
-		"SELECT (class_id, author_id, created_at, name, start_at, duration, day) FROM",
+		"SELECT (class_id, author_id, created_at, name, start_at, duration, day) FROM class_schedule WHERE schedule_id = $1",
+		scheduleId,
 	)
 	err := row.Scan(
 		schedule.ClassId,
@@ -64,7 +65,38 @@ func (csrp *ClassScheduleRepositoryPg) GetSchedule(ctx context.Context, schedule
 }
 
 func (csrp *ClassScheduleRepositoryPg) GetSchedules(ctx context.Context, classId string) ([]*domain.ClassSchedule, error) {
-	return nil, nil
+	schedules := make([]*domain.ClassSchedule, 5)
+
+	rows, err := csrp.pool.Query(
+		ctx,
+		"SELECT (schedule_id, author_id, created_at, name, start_at, duration, day) FROM class_schedule WHERE class_id = $1 ORDER BY schedule_id",
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		schedule := &domain.ClassSchedule{
+			ClassId: classId,
+		}
+
+		err := rows.Scan(
+			schedule.ScheduleId,
+			schedule.AuthorId,
+			schedule.CreatedAt,
+			schedule.Name,
+			schedule.StartAt,
+			schedule.Duration,
+			schedule.Day,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		schedules = append(schedules, schedule)
+	}
+
+	return schedules, nil
 }
 
 func (csrp *ClassScheduleRepositoryPg) DeleteSchedule(ctx context.Context, scheduleId string) error {
