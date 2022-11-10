@@ -53,10 +53,10 @@ func main() {
 		ClassMemberRepository: classMemberRepository,
 	})
 	classRoute := class.Route(class.ClassService{
-		UserRepository:        userRepository,
-		ClassRepository:       classRepository,
-		ClassTaskRepository:   classTaskRepository,
-		ClassMemberRepository: classMemberRepository,
+		UserRepository:          userRepository,
+		ClassRepository:         classRepository,
+		ClassTaskRepository:     classTaskRepository,
+		ClassMemberRepository:   classMemberRepository,
 		ClassScheduleRepository: classScheduleRepository,
 	})
 	authMiddleware := auth.Auth{
