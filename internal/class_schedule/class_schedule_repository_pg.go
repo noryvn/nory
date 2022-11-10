@@ -65,7 +65,7 @@ func (csrp *ClassScheduleRepositoryPg) GetSchedule(ctx context.Context, schedule
 }
 
 func (csrp *ClassScheduleRepositoryPg) GetSchedules(ctx context.Context, classId string) ([]*domain.ClassSchedule, error) {
-	schedules := make([]*domain.ClassSchedule, 5)
+	var schedules []*domain.ClassSchedule
 
 	rows, err := csrp.pool.Query(
 		ctx,

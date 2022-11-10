@@ -17,7 +17,7 @@ type ClassSchedule struct {
 	CreatedAt  time.Time `json:"createdAt"`  // immutable
 
 	Name     string        `json:"name"`     // immutable
-	StartAt  time.Duration `json:"startAt"`  // immutable
+	StartAt  string `json:"startAt"`  // immutable
 	Duration int16         `json:"duration"` // immutable
 	Day      int8          `json:"day"`      // immutable
 }
