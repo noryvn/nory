@@ -19,6 +19,7 @@ import (
 	"nory/domain"
 	. "nory/internal/class"
 	classmember "nory/internal/class_member"
+	classschedule "nory/internal/class_schedule"
 	classtask "nory/internal/class_task"
 	"nory/internal/user"
 )
@@ -27,10 +28,11 @@ func TestClassRouter(t *testing.T) {
 	t.Parallel()
 
 	classService := ClassService{
-		UserRepository:        user.NewUserRepositoryMem(),
-		ClassRepository:       NewClassRepositoryMem(),
-		ClassTaskRepository:   classtask.NewClassTaskRepositoryMem(),
-		ClassMemberRepository: classmember.NewClassMemberRepositoryMem(),
+		UserRepository:          user.NewUserRepositoryMem(),
+		ClassRepository:         NewClassRepositoryMem(),
+		ClassTaskRepository:     classtask.NewClassTaskRepositoryMem(),
+		ClassMemberRepository:   classmember.NewClassMemberRepositoryMem(),
+		ClassScheduleRepository: classschedule.NewClassScheduleRepositoryMem(),
 	}
 	classRoute := Route(classService)
 
@@ -185,6 +187,52 @@ func TestClassRouter(t *testing.T) {
 				err = json.NewDecoder(resp.Body).Decode(&b)
 				assert.Nil(t, err)
 				assert.Equal(t, 0, len(b.Data))
+
+				buff.Reset()
+				for i := 0; i < 10; i++ {
+					err = json.NewEncoder(buff).Encode(domain.ClassSchedule{
+						ClassId:  body.Data.ClassId,
+						AuthorId: body.Data.OwnerId,
+						Name:     "MATH!!!",
+						StartAt:  time.Now().UTC().Round(time.Hour),
+						Duration: int16(20),
+						Day:      int8(0),
+					})
+					assert.Nil(t, err)
+					p = fmt.Sprintf("/%s/schedule", body.Data.ClassId)
+					req = httptest.NewRequest("POST", p, buff)
+					req.Header.Set("content-type", "application/json")
+					req.Header.Set("user-id", tc.User.UserId)
+					resp, err = app.Test(req)
+					assert.Equal(t, 204, resp.StatusCode)
+				}
+
+				p = fmt.Sprintf("/%s/schedule", body.Data.ClassId)
+				req = httptest.NewRequest("GET", p, nil)
+				resp, err = app.Test(req)
+				assert.Nil(t, err)
+				assert.Equal(t, 200, resp.StatusCode)
+				var sch response.Response[[]*domain.ClassSchedule]
+				err = json.NewDecoder(resp.Body).Decode(&sch)
+				assert.Nil(t, err)
+				assert.Equal(t, 10, len(sch.Data))
+
+				p = fmt.Sprintf("/%s/schedule/%s", body.Data.ClassId, sch.Data[0].ScheduleId)
+				req = httptest.NewRequest("DELETE", p, nil)
+				req.Header.Set("user-id", tc.User.UserId)
+				resp, err = app.Test(req)
+				assert.Nil(t, err)
+				assert.Equal(t, 204, resp.StatusCode)
+
+				p = fmt.Sprintf("/%s/schedule", body.Data.ClassId)
+				req = httptest.NewRequest("GET", p, nil)
+				resp, err = app.Test(req)
+				assert.Nil(t, err)
+				assert.Equal(t, 200, resp.StatusCode)
+				sch = response.Response[[]*domain.ClassSchedule]{}
+				err = json.NewDecoder(resp.Body).Decode(&sch)
+				assert.Nil(t, err)
+				assert.Equal(t, 9, len(sch.Data))
 
 				user := &domain.User{
 					UserId:   uuid.NewString(),

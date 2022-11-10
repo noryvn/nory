@@ -12,10 +12,11 @@ import (
 )
 
 type ClassService struct {
-	UserRepository        domain.UserRepository
-	ClassRepository       domain.ClassRepository
-	ClassTaskRepository   domain.ClassTaskRepository
-	ClassMemberRepository domain.ClassMemberRepository
+	UserRepository          domain.UserRepository
+	ClassRepository         domain.ClassRepository
+	ClassTaskRepository     domain.ClassTaskRepository
+	ClassMemberRepository   domain.ClassMemberRepository
+	ClassScheduleRepository domain.ClassScheduleRepository
 }
 
 func (cs *ClassService) GetClassInfo(ctx context.Context, classId string) (*response.Response[*domain.Class], error) {
@@ -160,6 +161,65 @@ func (cs *ClassService) DeleteClass(ctx context.Context, userId, classId string)
 	}
 
 	return response.New[any](204, nil), nil
+}
+
+func (cs *ClassService) CreateSchedule(ctx context.Context, schedule *domain.ClassSchedule) (*response.Response[any], error) {
+	if err := cs.AccessClass(ctx, schedule.AuthorId, schedule.ClassId); err != nil {
+		return nil, err
+	}
+	if err := cs.ClassScheduleRepository.CreateSchedule(ctx, schedule); err != nil {
+		return nil, err
+	}
+	return response.New[any](204, nil), nil
+}
+
+func (cs *ClassService) DeleteSchedule(ctx context.Context, userId, scheduleId string) (*response.Response[any], error) {
+	schedule, err := cs.ClassScheduleRepository.GetSchedule(ctx, scheduleId)
+	if errors.Is(err, domain.ErrClassScheduleNotExists) {
+		msg := fmt.Sprintf("can not find class schedule with id %q", scheduleId)
+		return nil, response.NewUnprocessableEntity(msg)
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	if err := cs.AccessClass(ctx, userId, schedule.ClassId); err != nil {
+		return nil, err
+	}
+	if err := cs.ClassScheduleRepository.DeleteSchedule(ctx, scheduleId); err != nil {
+		return nil, err
+	}
+	return response.New[any](204, nil), nil
+}
+
+func (cs *ClassService) ClearSchedules(ctx context.Context, userId, classId string, day int8) (*response.Response[any], error) {
+	if err := cs.AccessClass(ctx, userId, classId); err != nil {
+		return nil, err
+	}
+	if err := cs.ClassScheduleRepository.ClearSchedules(ctx, classId, day); err != nil {
+		return nil, err
+	}
+	return response.New[any](204, nil), nil
+}
+
+func (cs *ClassService) GetClassSchedules(ctx context.Context, classId string) (*response.Response[[]*domain.ClassSchedule], error) {
+	schedules, err := cs.ClassScheduleRepository.GetSchedules(ctx, classId)
+	if err != nil {
+		return nil, err
+	}
+	return response.New(200, schedules), nil
+}
+
+func (cs *ClassService) GetSchedule(ctx context.Context, scheduleId string) (*response.Response[*domain.ClassSchedule], error) {
+	schedules, err := cs.ClassScheduleRepository.GetSchedule(ctx, scheduleId)
+	if errors.Is(err, domain.ErrClassScheduleNotExists) {
+		msg := fmt.Sprintf("can not find class schedule with id %q", scheduleId)
+		return nil, response.NewNotFound(msg)
+	}
+	if err != nil {
+		return nil, err
+	}
+	return response.New(200, schedules), nil
 }
 
 func (cs *ClassService) AccessClass(ctx context.Context, userId, classId string) error {

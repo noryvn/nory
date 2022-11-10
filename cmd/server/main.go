@@ -13,15 +13,17 @@ import (
 	"github.com/nedpals/supabase-go"
 
 	"nory/common/auth"
+	"nory/common/middleware"
 	"nory/common/response"
 	"nory/internal/class"
-	classmember "nory/internal/class_member"
+	"nory/internal/class_member"
 	"nory/internal/class_task"
 	"nory/internal/user"
 )
 
 func main() {
 	addr := getEnv("SERVER_ADDRESS", ":8080")
+	allowOrigins := getEnv("ALLOW_ORIGINS", "*")
 	dev := getEnv("ENVIRONMENT", "development") == "development"
 	databaseUrl := mustGetEnv("DATABASE_URL")
 
@@ -80,11 +82,13 @@ func main() {
 		EnableStackTrace: true,
 	}))
 	app.Use(cors.New(cors.Config{
+		AllowOrigins: allowOrigins,
 		AllowHeaders: "*",
 		MaxAge:       86400,
 	}))
 	app.Use(logger.New())
 	app.Use(authMiddleware.Middleware)
+	app.Use(middleware.DefaultHeader)
 	app.Route("/user", userRoute, "user")
 	app.Route("/class", classRoute, "class")
 

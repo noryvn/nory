@@ -27,17 +27,23 @@ func Route(classService ClassService) func(router fiber.Router) {
 	if classService.ClassMemberRepository == nil {
 		panic("classRoute: nil ClassService.ClassMemberRepository")
 	}
+	if classService.ClassScheduleRepository == nil {
+		panic("classRoute: nil ClassService.ClassScheduleRepository")
+	}
 
 	cr := classRouter{classService}
 	return func(router fiber.Router) {
 		router.Delete("/:classId", cr.deleteClass)
 		router.Delete("/:classId/member/:memberId", cr.deleteMember)
 		router.Delete("/:classId/task/:taskId", cr.deleteClassTask)
+		router.Delete("/:classId/schedule/:scheduleId", cr.deleteClassSchedule)
 		router.Patch("/:classId/member/:memberId", cr.updateMember)
 		router.Get("/:classId/info", cr.getClassInfo)
 		router.Get("/:classId/task", cr.getClassTask)
 		router.Get("/:classId/member", cr.listMember)
+		router.Get("/:classId/schedule", cr.getClassSchedule)
 		router.Post("/:classId/task", cr.createClassTask)
+		router.Post("/:classId/schedule", cr.createClassSchedule)
 		router.Post("/:classId/member", cr.addMember)
 		router.Post("/create", cr.createClass)
 	}
@@ -118,6 +124,55 @@ func (cr classRouter) deleteClassTask(c *fiber.Ctx) error {
 	}
 
 	res, err := cr.cs.DeleteClassTask(c.Context(), user.UserId, taskId)
+	if err != nil {
+		return err
+	}
+
+	return res.Respond(c)
+}
+
+func (cr classRouter) createClassSchedule(c *fiber.Ctx) error {
+	classId := c.Params("classId")
+
+	user, err := auth.GetUser(c)
+	if err != nil {
+		return err
+	}
+
+	var task domain.ClassSchedule
+	if err := c.BodyParser(&task); err != nil {
+		return err
+	}
+
+	task.ClassId = classId
+	task.AuthorId = user.UserId
+	res, err := cr.cs.CreateSchedule(c.Context(), &task)
+	if err != nil {
+		return err
+	}
+
+	return res.Respond(c)
+}
+
+func (cr classRouter) getClassSchedule(c *fiber.Ctx) error {
+	classId := c.Params("classId")
+	res, err := cr.cs.GetClassSchedules(c.Context(), classId)
+	if err != nil {
+		return err
+	}
+
+	return res.Respond(c)
+}
+
+func (cr classRouter) deleteClassSchedule(c *fiber.Ctx) error {
+	scheduleId := c.Params("scheduleId")
+
+	user, err := auth.GetUser(c)
+	if err != nil {
+		return err
+	}
+
+	res, err := cr.cs.DeleteSchedule(c.Context(), user.UserId, scheduleId)
 	if err != nil {
 		return err
 	}
