@@ -16,10 +16,10 @@ type ClassSchedule struct {
 	AuthorId   string    `json:"authorId"`   // immutable
 	CreatedAt  time.Time `json:"createdAt"`  // immutable
 
-	Name     string        `json:"name"`     // immutable
+	Name     string `json:"name"`     // immutable
 	StartAt  string `json:"startAt"`  // immutable
-	Duration int16         `json:"duration"` // immutable
-	Day      int8          `json:"day"`      // immutable
+	Duration int16  `json:"duration"` // immutable
+	Day      int8   `json:"day"`      // immutable
 }
 
 type ClassScheduleRepository interface {

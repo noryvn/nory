@@ -25,17 +25,17 @@ func TestClassScheduleRepository(t *testing.T) {
 
 	repos := []Repository{
 		{
-			Name: "memory",
-			ClassScheduleRepository:    NewClassScheduleRepositoryMem(),
-			ClassRepository: class.NewClassRepositoryMem(),
-			UserRepository: user.NewUserRepositoryMem(),
+			Name:                    "memory",
+			ClassScheduleRepository: NewClassScheduleRepositoryMem(),
+			ClassRepository:         class.NewClassRepositoryMem(),
+			UserRepository:          user.NewUserRepositoryMem(),
 		},
 		{
-			Skip:                os.Getenv("DATABASE_URL") == "",
-			Name: "postgres",
-			ClassScheduleRepository:    NewClassScheduleRepositoryPg(pool),
-			ClassRepository: class.NewClassRepositoryPostgres(pool),
-			UserRepository: user.NewUserRepositoryPostgres(pool),
+			Skip:                    os.Getenv("DATABASE_URL") == "",
+			Name:                    "postgres",
+			ClassScheduleRepository: NewClassScheduleRepositoryPg(pool),
+			ClassRepository:         class.NewClassRepositoryPostgres(pool),
+			UserRepository:          user.NewUserRepositoryPostgres(pool),
 		},
 	}
 
@@ -57,15 +57,15 @@ func TestClassScheduleRepository(t *testing.T) {
 }
 
 type Repository struct {
-	Name      string
-	ClassScheduleRepository         domain.ClassScheduleRepository
+	Name                    string
+	ClassScheduleRepository domain.ClassScheduleRepository
 	ClassRepository         domain.ClassRepository
-	UserRepository         domain.UserRepository
-	Skip      bool
-	Schedules []domain.ClassSchedule
+	UserRepository          domain.UserRepository
+	Skip                    bool
+	Schedules               []domain.ClassSchedule
 
 	classes map[string]*domain.Class
-	t *testing.T
+	t       *testing.T
 }
 
 func (r *Repository) getClass(name string) string {

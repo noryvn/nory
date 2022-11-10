@@ -2,6 +2,6 @@ package classschedule
 
 import ()
 
-type ClassscheduleService struct {}
+type ClassscheduleService struct{}
 
 // func (cts *ClassscheduleService)

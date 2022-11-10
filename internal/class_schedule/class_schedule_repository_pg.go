@@ -116,4 +116,3 @@ func (csrp *ClassScheduleRepositoryPg) ClearSchedules(ctx context.Context, class
 	)
 	return err
 }
-
