@@ -2,7 +2,9 @@ package classschedule
 
 import (
 	"context"
+	"errors"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/rs/xid"
 
@@ -22,11 +24,12 @@ func (csrp *ClassScheduleRepositoryPg) CreateSchedule(ctx context.Context, sched
 
 	_, err := csrp.pool.Exec(
 		ctx,
-		`INSERT INTO class_schedule(schedule_id, class_id, author_id, name, start_at, duration, day) VALUES($1, $2, $3, $4, $5, $6)`,
+		`INSERT INTO class_schedule(schedule_id, class_id, author_id, name, start_at, duration, day) VALUES($1, $2, $3, $4, $5, $6, $7)`,
 		schedule.ScheduleId,
 		schedule.ClassId,
 		schedule.AuthorId,
 		schedule.Name,
+		schedule.StartAt,
 		schedule.Duration,
 		schedule.Day,
 	)
@@ -35,6 +38,28 @@ func (csrp *ClassScheduleRepositoryPg) CreateSchedule(ctx context.Context, sched
 }
 
 func (csrp *ClassScheduleRepositoryPg) GetSchedule(ctx context.Context, scheduleId string) (*domain.ClassSchedule, error) {
+	schedule := &domain.ClassSchedule{
+		ScheduleId: scheduleId,
+	}
+	row := csrp.pool.QueryRow(
+		ctx,
+		"SELECT (class_id, author_id, created_at, name, start_at, duration, day) FROM",
+	)
+	err := row.Scan(
+		schedule.ClassId,
+		schedule.AuthorId,
+		schedule.CreatedAt,
+		schedule.Name,
+		schedule.StartAt,
+		schedule.Duration,
+		schedule.Day,
+	)
+	if errors.Is(err, pgx.ErrNoRows) {
+		err = domain.ErrClassScheduleNotExists
+	}
+	if err != nil {
+		return nil, err
+	}
 	return nil, nil
 }
 
