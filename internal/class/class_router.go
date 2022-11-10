@@ -27,6 +27,9 @@ func Route(classService ClassService) func(router fiber.Router) {
 	if classService.ClassMemberRepository == nil {
 		panic("classRoute: nil ClassService.ClassMemberRepository")
 	}
+	if classService.ClassScheduleRepository == nil {
+		panic("classRoute: nil ClassService.ClassScheduleRepository")
+	}
 
 	cr := classRouter{classService}
 	return func(router fiber.Router) {

@@ -9,6 +9,7 @@ import (
 	"nory/domain"
 	. "nory/internal/class"
 	classmember "nory/internal/class_member"
+	classschedule "nory/internal/class_schedule"
 	classtask "nory/internal/class_task"
 	"nory/internal/user"
 
@@ -24,22 +25,24 @@ func TestClassService(t *testing.T) {
 		ClassRepository:       NewClassRepositoryMem(),
 		ClassTaskRepository:   classtask.NewClassTaskRepositoryMem(),
 		ClassMemberRepository: classmember.NewClassMemberRepositoryMem(),
+		ClassScheduleRepository: classschedule.NewClassScheduleRepositoryMem(),
 	}
 
 	cst := classServiceTest{classService}
 
-	t.Run("get class info", cst.classInfo)
-	t.Run("get class tasks", cst.classTasks)
-	t.Run("create class tasks", cst.createClassTask)
-	t.Run("create, access and delete class", cst.classCreate)
-	t.Run("list member", cst.listMember)
+	t.Run("get class info", cst.testClassInfo)
+	t.Run("get class tasks", cst.testClassTasks)
+	t.Run("create class tasks", cst.testCreateClassTask)
+	t.Run("create class Schedule", cst.testClassSchedule)
+	t.Run("create, access and delete class", cst.testClassCreate)
+	t.Run("list member", cst.testListMember)
 }
 
 type classServiceTest struct {
 	classService ClassService
 }
 
-func (cst classServiceTest) classInfo(t *testing.T) {
+func (cst classServiceTest) testClassInfo(t *testing.T) {
 	t.Parallel()
 	createClass := func() (c *domain.Class) {
 		c = &domain.Class{}
@@ -60,7 +63,7 @@ func (cst classServiceTest) classInfo(t *testing.T) {
 	assert.Equal(t, classA, res.Data)
 }
 
-func (cst classServiceTest) classTasks(t *testing.T) {
+func (cst classServiceTest) testClassTasks(t *testing.T) {
 	t.Parallel()
 
 	class := &domain.Class{
@@ -120,7 +123,89 @@ func (cst classServiceTest) classTasks(t *testing.T) {
 	assert.Equal(t, 0, len(res.Data))
 }
 
-func (cst classServiceTest) classCreate(t *testing.T) {
+func (cst classServiceTest) testClassSchedule(t *testing.T) {
+	t.Parallel()
+
+	class := &domain.Class{
+		OwnerId: uuid.NewString(),
+		Name:    "foo",
+	}
+
+	r, err := cst.classService.CreateClass(context.Background(), class)
+	assert.Nil(t, err)
+	assert.Equal(t, 200, r.Code)
+
+	_, err = cst.classService.GetSchedule(context.Background(), xid.New().String())
+	assert.NotNil(t, err)
+
+	for i := 0; i < 7; i ++ {
+		schedule := &domain.ClassSchedule{
+			AuthorId: class.OwnerId,
+			ClassId: class.ClassId,
+			Name: "MATH!!!",
+			Day: int8(i),
+			StartAt: time.Now().UTC().Round(time.Hour),
+			Duration: int16(20),
+		}
+		_, err := cst.classService.CreateSchedule(context.Background(), schedule)
+		assert.Nil(t, err)
+
+		res, err := cst.classService.GetSchedule(context.Background(), schedule.ScheduleId)
+		res.Data.CreatedAt = time.Time{}
+		assert.Nil(t, err)
+		assert.Equal(t, schedule, res.Data)
+
+		t.Cleanup(func() {
+			_, err := cst.classService.DeleteSchedule(context.Background(), uuid.NewString(), class.ClassId, schedule.ScheduleId)
+			assert.NotNil(t, err)
+			_, err = cst.classService.DeleteSchedule(context.Background(), class.OwnerId, class.ClassId, schedule.ScheduleId)
+			assert.Nil(t, err)
+		})
+	}
+
+	schedules, err := cst.classService.GetClassSchedules(context.Background(), class.ClassId)
+	assert.Nil(t, err)
+	assert.Equal(t, 7, len(schedules.Data))
+
+	class = &domain.Class{
+		OwnerId: uuid.NewString(),
+		Name:    "foo",
+	}
+
+	r, err = cst.classService.CreateClass(context.Background(), class)
+	assert.Nil(t, err)
+	assert.Equal(t, 200, r.Code)
+
+	for i := 0; i < 7; i ++ {
+		schedule := &domain.ClassSchedule{
+			AuthorId: class.OwnerId,
+			ClassId: class.ClassId,
+			Name: "MATH!!!",
+			Day: int8(i),
+			StartAt: time.Now().UTC().Round(time.Hour),
+			Duration: int16(20),
+		}
+		_, err := cst.classService.CreateSchedule(context.Background(), schedule)
+		assert.Nil(t, err)
+	}
+
+	for i := 0; i < 7; i ++ {
+		schedules, err := cst.classService.GetClassSchedules(context.Background(), class.ClassId)
+		assert.Nil(t, err)
+		assert.Equal(t, 7 - i, len(schedules.Data))
+
+		_, err = cst.classService.ClearSchedules(context.Background(), uuid.NewString(), class.ClassId, int8(i))
+		assert.NotNil(t, err)
+		_, err = cst.classService.ClearSchedules(context.Background(), class.OwnerId, class.ClassId, int8(i))
+		assert.Nil(t, err)
+
+		schedules, err = cst.classService.GetClassSchedules(context.Background(), class.ClassId)
+		assert.Nil(t, err)
+		assert.Equal(t, 6 - i, len(schedules.Data))
+	}
+}
+
+func (cst classServiceTest) testClassCreate(t *testing.T) {
 	t.Parallel()
 
 	class := &domain.Class{
@@ -198,7 +283,7 @@ func (cst classServiceTest) classCreate(t *testing.T) {
 	}
 }
 
-func (cst *classServiceTest) createClassTask(t *testing.T) {
+func (cst *classServiceTest) testCreateClassTask(t *testing.T) {
 	t.Parallel()
 	class := &domain.Class{
 		OwnerId: uuid.NewString(),
@@ -229,7 +314,7 @@ func (cst *classServiceTest) createClassTask(t *testing.T) {
 	}
 }
 
-func (cst classServiceTest) listMember(t *testing.T) {
+func (cst classServiceTest) testListMember(t *testing.T) {
 	t.Parallel()
 
 	class := &domain.Class{
