@@ -43,7 +43,12 @@ func (csrp *ClassScheduleRepositoryPg) GetSchedules(ctx context.Context, classId
 }
 
 func (csrp *ClassScheduleRepositoryPg) DeleteSchedule(ctx context.Context, scheduleId string) error {
-	return nil
+	_, err := csrp.pool.Exec(
+		ctx,
+		"DELETE FROM class_schedule WHERE schedule_id = $1",
+		scheduleId,
+	)
+	return err
 }
 
 func (csrp *ClassScheduleRepositoryPg) ClearSchedules(ctx context.Context, classId string, day int8) error {
