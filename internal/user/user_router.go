@@ -75,7 +75,6 @@ func (ur userRouter) GetOtherUserProfile(c *fiber.Ctx) error {
 		return err
 	}
 
-	c.Set(fiber.HeaderCacheControl, "private, max-age=60")
 	return res.Respond(c)
 }
 
@@ -87,7 +86,6 @@ func (ur userRouter) GetOtherUserProfileByUsername(c *fiber.Ctx) error {
 		return err
 	}
 
-	c.Set(fiber.HeaderCacheControl, "private, max-age=60")
 	return res.Respond(c)
 }
 
