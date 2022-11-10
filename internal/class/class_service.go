@@ -12,10 +12,10 @@ import (
 )
 
 type ClassService struct {
-	UserRepository        domain.UserRepository
-	ClassRepository       domain.ClassRepository
-	ClassTaskRepository   domain.ClassTaskRepository
-	ClassMemberRepository domain.ClassMemberRepository
+	UserRepository          domain.UserRepository
+	ClassRepository         domain.ClassRepository
+	ClassTaskRepository     domain.ClassTaskRepository
+	ClassMemberRepository   domain.ClassMemberRepository
 	ClassScheduleRepository domain.ClassScheduleRepository
 }
 

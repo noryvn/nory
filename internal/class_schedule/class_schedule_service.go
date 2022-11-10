@@ -8,7 +8,7 @@ import (
 	"nory/domain"
 )
 
-type ClassScheduleService struct{
+type ClassScheduleService struct {
 	ClassScheduleRepository domain.ClassScheduleRepository
 }
 
