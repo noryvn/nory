@@ -36,6 +36,7 @@ func Route(classService ClassService) func(router fiber.Router) {
 		router.Delete("/:classId", cr.deleteClass)
 		router.Delete("/:classId/member/:memberId", cr.deleteMember)
 		router.Delete("/:classId/task/:taskId", cr.deleteClassTask)
+		router.Delete("/:classId/schedule/:scheduleId", cr.deleteClassSchedule)
 		router.Patch("/:classId/member/:memberId", cr.updateMember)
 		router.Get("/:classId/info", cr.getClassInfo)
 		router.Get("/:classId/task", cr.getClassTask)

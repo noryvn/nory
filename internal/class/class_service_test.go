@@ -156,9 +156,9 @@ func (cst classServiceTest) testClassSchedule(t *testing.T) {
 		assert.Equal(t, schedule, res.Data)
 
 		t.Cleanup(func() {
-			_, err := cst.classService.DeleteSchedule(context.Background(), uuid.NewString(), class.ClassId, schedule.ScheduleId)
+			_, err := cst.classService.DeleteSchedule(context.Background(), uuid.NewString(), schedule.ScheduleId)
 			assert.NotNil(t, err)
-			_, err = cst.classService.DeleteSchedule(context.Background(), class.OwnerId, class.ClassId, schedule.ScheduleId)
+			_, err = cst.classService.DeleteSchedule(context.Background(), class.OwnerId, schedule.ScheduleId)
 			assert.Nil(t, err)
 		})
 	}
@@ -167,41 +167,44 @@ func (cst classServiceTest) testClassSchedule(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, 7, len(schedules.Data))
 
-	class = &domain.Class{
-		OwnerId: uuid.NewString(),
-		Name:    "foo",
-	}
+	{
 
-	r, err = cst.classService.CreateClass(context.Background(), class)
-	assert.Nil(t, err)
-	assert.Equal(t, 200, r.Code)
-
-	for i := 0; i < 7; i++ {
-		schedule := &domain.ClassSchedule{
-			AuthorId: class.OwnerId,
-			ClassId:  class.ClassId,
-			Name:     "MATH!!!",
-			Day:      int8(i),
-			StartAt:  time.Now().UTC().Round(time.Hour),
-			Duration: int16(20),
+		class := &domain.Class{
+			OwnerId: uuid.NewString(),
+			Name:    "foo",
 		}
-		_, err := cst.classService.CreateSchedule(context.Background(), schedule)
-		assert.Nil(t, err)
-	}
 
-	for i := 0; i < 7; i++ {
-		schedules, err := cst.classService.GetClassSchedules(context.Background(), class.ClassId)
+		r, err = cst.classService.CreateClass(context.Background(), class)
 		assert.Nil(t, err)
-		assert.Equal(t, 7-i, len(schedules.Data))
+		assert.Equal(t, 200, r.Code)
 
-		_, err = cst.classService.ClearSchedules(context.Background(), uuid.NewString(), class.ClassId, int8(i))
-		assert.NotNil(t, err)
-		_, err = cst.classService.ClearSchedules(context.Background(), class.OwnerId, class.ClassId, int8(i))
-		assert.Nil(t, err)
+		for i := 0; i < 7; i++ {
+			schedule := &domain.ClassSchedule{
+				AuthorId: class.OwnerId,
+				ClassId:  class.ClassId,
+				Name:     "MATH!!!",
+				Day:      int8(i),
+				StartAt:  time.Now().UTC().Round(time.Hour),
+				Duration: int16(20),
+			}
+			_, err := cst.classService.CreateSchedule(context.Background(), schedule)
+			assert.Nil(t, err)
+		}
 
-		schedules, err = cst.classService.GetClassSchedules(context.Background(), class.ClassId)
-		assert.Nil(t, err)
-		assert.Equal(t, 6-i, len(schedules.Data))
+		for i := 0; i < 7; i++ {
+			schedules, err := cst.classService.GetClassSchedules(context.Background(), class.ClassId)
+			assert.Nil(t, err)
+			assert.Equal(t, 7-i, len(schedules.Data))
+
+			_, err = cst.classService.ClearSchedules(context.Background(), uuid.NewString(), class.ClassId, int8(i))
+			assert.NotNil(t, err)
+			_, err = cst.classService.ClearSchedules(context.Background(), class.OwnerId, class.ClassId, int8(i))
+			assert.Nil(t, err)
+
+			schedules, err = cst.classService.GetClassSchedules(context.Background(), class.ClassId)
+			assert.Nil(t, err)
+			assert.Equal(t, 6-i, len(schedules.Data))
+		}
 	}
 }
 

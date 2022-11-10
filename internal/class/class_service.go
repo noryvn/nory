@@ -173,8 +173,17 @@ func (cs *ClassService) CreateSchedule(ctx context.Context, schedule *domain.Cla
 	return response.New[any](204, nil), nil
 }
 
-func (cs *ClassService) DeleteSchedule(ctx context.Context, userId, classId, scheduleId string) (*response.Response[any], error) {
-	if err := cs.AccessClass(ctx, userId, classId); err != nil {
+func (cs *ClassService) DeleteSchedule(ctx context.Context, userId, scheduleId string) (*response.Response[any], error) {
+	schedule, err := cs.ClassScheduleRepository.GetSchedule(ctx, scheduleId)
+	if errors.Is(err, domain.ErrClassScheduleNotExists) {
+		msg := fmt.Sprintf("can not find class schedule with id %q", scheduleId)
+		return nil, response.NewUnprocessableEntity(msg)
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	if err := cs.AccessClass(ctx, userId, schedule.ClassId); err != nil {
 		return nil, err
 	}
 	if err := cs.ClassScheduleRepository.DeleteSchedule(ctx, scheduleId); err != nil {
