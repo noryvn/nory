@@ -17,6 +17,7 @@ import (
 	"nory/common/response"
 	"nory/internal/class"
 	"nory/internal/class_member"
+	classschedule "nory/internal/class_schedule"
 	"nory/internal/class_task"
 	"nory/internal/user"
 )
@@ -44,6 +45,7 @@ func main() {
 	classRepository := class.NewClassRepositoryPostgres(pool)
 	classTaskRepository := classtask.NewClassTaskRepositoryPostgres(pool)
 	classMemberRepository := classmember.NewClassMemberRepositoryPostgres(pool)
+	classScheduleRepository := classschedule.NewClassScheduleRepositoryPg(pool)
 
 	userRoute := user.Route(user.UserService{
 		UserRepository:        userRepository,
@@ -55,6 +57,7 @@ func main() {
 		ClassRepository:       classRepository,
 		ClassTaskRepository:   classTaskRepository,
 		ClassMemberRepository: classMemberRepository,
+		ClassScheduleRepository: classScheduleRepository,
 	})
 	authMiddleware := auth.Auth{
 		SupabaseAuth:   supa.Auth,
