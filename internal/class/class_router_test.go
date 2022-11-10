@@ -19,8 +19,8 @@ import (
 	"nory/domain"
 	. "nory/internal/class"
 	classmember "nory/internal/class_member"
-	classtask "nory/internal/class_task"
 	classschedule "nory/internal/class_schedule"
+	classtask "nory/internal/class_task"
 	"nory/internal/user"
 )
 
@@ -28,10 +28,10 @@ func TestClassRouter(t *testing.T) {
 	t.Parallel()
 
 	classService := ClassService{
-		UserRepository:        user.NewUserRepositoryMem(),
-		ClassRepository:       NewClassRepositoryMem(),
-		ClassTaskRepository:   classtask.NewClassTaskRepositoryMem(),
-		ClassMemberRepository: classmember.NewClassMemberRepositoryMem(),
+		UserRepository:          user.NewUserRepositoryMem(),
+		ClassRepository:         NewClassRepositoryMem(),
+		ClassTaskRepository:     classtask.NewClassTaskRepositoryMem(),
+		ClassMemberRepository:   classmember.NewClassMemberRepositoryMem(),
 		ClassScheduleRepository: classschedule.NewClassScheduleRepositoryMem(),
 	}
 	classRoute := Route(classService)
@@ -191,12 +191,12 @@ func TestClassRouter(t *testing.T) {
 				buff.Reset()
 				for i := 0; i < 10; i++ {
 					err = json.NewEncoder(buff).Encode(domain.ClassSchedule{
-						ClassId: body.Data.ClassId,
+						ClassId:  body.Data.ClassId,
 						AuthorId: body.Data.OwnerId,
-						Name: "MATH!!!",
-						StartAt: time.Now().UTC().Round(time.Hour),
+						Name:     "MATH!!!",
+						StartAt:  time.Now().UTC().Round(time.Hour),
 						Duration: int16(20),
-						Day: int8(0),
+						Day:      int8(0),
 					})
 					assert.Nil(t, err)
 					p = fmt.Sprintf("/%s/schedule", body.Data.ClassId)
