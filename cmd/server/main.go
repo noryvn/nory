@@ -13,9 +13,10 @@ import (
 	"github.com/nedpals/supabase-go"
 
 	"nory/common/auth"
+	"nory/common/middleware"
 	"nory/common/response"
 	"nory/internal/class"
-	classmember "nory/internal/class_member"
+	"nory/internal/class_member"
 	"nory/internal/class_task"
 	"nory/internal/user"
 )
@@ -85,6 +86,7 @@ func main() {
 	}))
 	app.Use(logger.New())
 	app.Use(authMiddleware.Middleware)
+	app.Use(middleware.DefaultHeader)
 	app.Route("/user", userRoute, "user")
 	app.Route("/class", classRoute, "class")
 
