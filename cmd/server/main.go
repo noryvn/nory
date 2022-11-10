@@ -23,6 +23,7 @@ import (
 
 func main() {
 	addr := getEnv("SERVER_ADDRESS", ":8080")
+	allowOrigins := getEnv("ALLOW_ORIGINS", "*")
 	dev := getEnv("ENVIRONMENT", "development") == "development"
 	databaseUrl := mustGetEnv("DATABASE_URL")
 
@@ -81,6 +82,7 @@ func main() {
 		EnableStackTrace: true,
 	}))
 	app.Use(cors.New(cors.Config{
+		AllowOrigins: allowOrigins,
 		AllowHeaders: "*",
 		MaxAge:       86400,
 	}))
