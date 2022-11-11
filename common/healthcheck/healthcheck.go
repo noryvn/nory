@@ -19,6 +19,6 @@ func (hc *HealthCheck) Handler(c *fiber.Ctx) error {
 		fiber.NewError(fiber.StatusInternalServerError, "failed to ping database")
 	}
 
-	return nil
+	return c.SendStatus(fiber.StatusNoContent)
 }
 
