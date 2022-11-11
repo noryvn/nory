@@ -31,6 +31,18 @@ func (cs *ClassService) GetClassInfo(ctx context.Context, classId string) (*resp
 	return response.New(200, class), nil
 }
 
+func (cs *ClassService) GetClassInfoByName(ctx context.Context, ownerId, name string)  (*response.Response[*domain.Class], error) {
+	class, err := cs.ClassRepository.GetClassByName(ctx, ownerId, name)
+	if errors.Is(err, domain.ErrClassNotExists) {
+		msg := fmt.Sprintf("can not find class with name %q that owned by %q", name, ownerId)
+		return nil, response.NewNotFound(msg)
+	}
+	if err != nil {
+		return nil, err
+	}
+	return response.New(200, class), nil
+}
+
 func (cs *ClassService) GetClassTasks(ctx context.Context, classId string, from, to time.Time) (*response.Response[[]*domain.ClassTask], error) {
 	if from.IsZero() {
 		from = time.Now()

@@ -162,6 +162,17 @@ func (r *Repository) testGet(t *testing.T) {
 	}
 }
 
+func (r *Repository) testGetByName(t *testing.T) {
+	for _, c := range r.classes {
+		cc, err := r.ClassRepository.GetClassByName(context.Background(), c.OwnerId, c.Name)
+		assert.Nil(t, err)
+		assert.Equal(t, c, cc)
+
+		_, err = r.ClassRepository.GetClassByName(context.Background(), uuid.NewString(), c.Name)
+		assert.NotNil(t, err)
+	}
+}
+
 func (r *Repository) testGetByOwnerId(t *testing.T) {
 	foo := r.getUser("foo")
 	bar := r.getUser("bar")

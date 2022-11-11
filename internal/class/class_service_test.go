@@ -45,7 +45,9 @@ type classServiceTest struct {
 func (cst classServiceTest) testClassInfo(t *testing.T) {
 	t.Parallel()
 	createClass := func() (c *domain.Class) {
-		c = &domain.Class{}
+		c = &domain.Class{
+			Name: xid.New().String(),
+		}
 		err := cst.classService.ClassRepository.CreateClass(context.Background(), c)
 		assert.Nil(t, err)
 		t.Cleanup(func() {
@@ -58,6 +60,10 @@ func (cst classServiceTest) testClassInfo(t *testing.T) {
 	assert.ErrorContains(t, err, "can not find class with id \"foobarbazqux\"")
 	classA := createClass()
 	res, err := cst.classService.GetClassInfo(context.Background(), classA.ClassId)
+	assert.Nil(t, err)
+	assert.Equal(t, 200, res.Code)
+	assert.Equal(t, classA, res.Data)
+	res, err = cst.classService.GetClassInfoByName(context.Background(), classA.OwnerId, classA.Name)
 	assert.Nil(t, err)
 	assert.Equal(t, 200, res.Code)
 	assert.Equal(t, classA, res.Data)
