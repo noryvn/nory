@@ -1,6 +1,8 @@
 package healthcheck
 
 import (
+	"errors"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -16,7 +18,7 @@ func (hc *HealthCheck) Route(r fiber.Router) {
 
 func (hc *HealthCheck) Handler(c *fiber.Ctx) error {
 	if err := hc.Pool.Ping(c.Context()); err != nil {
-		fiber.NewError(fiber.StatusInternalServerError, "failed to ping database")
+		return errors.New("failed to ping database")
 	}
 
 	return c.SendStatus(fiber.StatusNoContent)
