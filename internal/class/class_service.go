@@ -31,10 +31,19 @@ func (cs *ClassService) GetClassInfo(ctx context.Context, classId string) (*resp
 	return response.New(200, class), nil
 }
 
-func (cs *ClassService) GetClassInfoByName(ctx context.Context, ownerId, name string)  (*response.Response[*domain.Class], error) {
-	class, err := cs.ClassRepository.GetClassByName(ctx, ownerId, name)
+func (cs *ClassService) GetClassInfoByName(ctx context.Context, username, name string)  (*response.Response[*domain.Class], error) {
+	user, err := cs.UserRepository.GetUserByUsername(ctx, username)
+	if errors.Is(err, domain.ErrUserNotExists) {
+		msg := fmt.Sprintf("can not find user with username %q", username)
+		return nil, response.NewNotFound(msg)
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	class, err := cs.ClassRepository.GetClassByName(ctx, user.UserId, name)
 	if errors.Is(err, domain.ErrClassNotExists) {
-		msg := fmt.Sprintf("can not find class with name %q that owned by %q", name, ownerId)
+		msg := fmt.Sprintf("can not find class with name %q that owned by %q", name, username)
 		return nil, response.NewNotFound(msg)
 	}
 	if err != nil {

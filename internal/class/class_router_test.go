@@ -98,7 +98,7 @@ func TestClassRouter(t *testing.T) {
 		}{
 			{
 				Name: "Success",
-				User: domain.User{UserId: uuid.NewString()},
+				User: domain.User{UserId: uuid.NewString(), Username: xid.New().String()},
 				Body: domain.Class{Name: "foo"},
 				Code: 200,
 			},
@@ -111,6 +111,8 @@ func TestClassRouter(t *testing.T) {
 		} {
 			tc := tc
 			t.Run(tc.Name, func(t *testing.T) {
+				classService.UserRepository.CreateUser(context.Background(), &tc.User)
+
 				buff := bytes.NewBuffer(nil)
 				err := json.NewEncoder(buff).Encode(tc.Body)
 				assert.Nil(t, err)
@@ -142,7 +144,7 @@ func TestClassRouter(t *testing.T) {
 				assert.Equal(t, tc.Body.Name, body.Data.Name)
 				assert.NotEqual(t, "", body.Data.ClassId)
 
-				p = fmt.Sprintf("/info?name=%s&ownerId=%s", body.Data.Name, body.Data.OwnerId)
+				p = fmt.Sprintf("/info?name=%s&ownerUsername=%s", body.Data.Name, tc.User.Username)
 				req = httptest.NewRequest("GET", p, nil)
 				resp, err = app.Test(req)
 				assert.Nil(t, err)
