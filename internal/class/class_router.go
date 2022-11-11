@@ -68,8 +68,8 @@ func (cr classRouter) deleteClass(c *fiber.Ctx) error {
 
 func (cr classRouter) getClassInfoByName(c *fiber.Ctx) error {
 	name := c.Query("name")
-	ownerId := c.Query("ownerId")
-	res, err := cr.cs.GetClassInfoByName(c.Context(), ownerId, name)
+	ownerUsername := c.Query("ownerUsername")
+	res, err := cr.cs.GetClassInfoByName(c.Context(), ownerUsername, name)
 	if err != nil {
 		return err
 	}

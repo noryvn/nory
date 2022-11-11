@@ -44,26 +44,28 @@ type classServiceTest struct {
 
 func (cst classServiceTest) testClassInfo(t *testing.T) {
 	t.Parallel()
-	createClass := func() (c *domain.Class) {
-		c = &domain.Class{
-			Name: xid.New().String(),
-		}
-		err := cst.classService.ClassRepository.CreateClass(context.Background(), c)
-		assert.Nil(t, err)
-		t.Cleanup(func() {
-			cst.classService.ClassRepository.DeleteClass(context.Background(), c.ClassId)
-		})
-		return
-	}
 
 	_, err := cst.classService.GetClassInfo(context.Background(), "foobarbazqux")
 	assert.ErrorContains(t, err, "can not find class with id \"foobarbazqux\"")
-	classA := createClass()
+	u := &domain.User{
+		UserId: uuid.NewString(),
+		Name: xid.New().String(),
+		Username: xid.New().String(),
+		Email: xid.New().String(),
+	}
+
+	err = cst.classService.UserRepository.CreateUser(context.Background(), u)
+	assert.Nil(t, err)
+
+	classA := &domain.Class{OwnerId: u.UserId, Name: xid.New().String()}
+	_, err = cst.classService.CreateClass(context.Background(), classA)
+	assert.Nil(t, err)
+
 	res, err := cst.classService.GetClassInfo(context.Background(), classA.ClassId)
 	assert.Nil(t, err)
 	assert.Equal(t, 200, res.Code)
 	assert.Equal(t, classA, res.Data)
-	res, err = cst.classService.GetClassInfoByName(context.Background(), classA.OwnerId, classA.Name)
+	res, err = cst.classService.GetClassInfoByName(context.Background(), u.Username, classA.Name)
 	assert.Nil(t, err)
 	assert.Equal(t, 200, res.Code)
 	assert.Equal(t, classA, res.Data)
