@@ -30,6 +30,17 @@ func (crm *ClassRepositoryMem) GetClass(ctx context.Context, classId string) (*d
 	return c, nil
 }
 
+func (crm *ClassRepositoryMem) GetClassByName(ctx context.Context, ownerId, name string) (*domain.Class, error) {
+	crm.mx.Lock()
+	defer crm.mx.Unlock()
+	for _, c := range crm.m {
+		if c.OwnerId == ownerId && c.Name == name {
+			return c, nil
+		}
+	}
+	return nil, domain.ErrClassNotExists
+}
+
 func (crm *ClassRepositoryMem) GetClassesByOwnerId(ctx context.Context, ownerId string) ([]*domain.Class, error) {
 	crm.mx.Lock()
 	defer crm.mx.Unlock()

@@ -36,6 +36,23 @@ func (crp *ClassRepositoryPostgres) GetClass(ctx context.Context, classId string
 	return class, err
 }
 
+func (crp *ClassRepositoryPostgres) GetClassByName(ctx context.Context, ownerId, name string) (*domain.Class, error) {
+	class := &domain.Class{
+		OwnerId: ownerId,
+	}
+	row := crp.pool.QueryRow(ctx, "SELECT class_id, created_at, name, description FROM class WHERE owner_id = $1 AND name = $2", ownerId, name)
+	err := row.Scan(
+		&class.ClassId,
+		&class.CreatedAt,
+		&class.Name,
+		&class.Description,
+	)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return nil, domain.ErrClassNotExists
+	}
+	return class, err
+}
+
 func (crp *ClassRepositoryPostgres) GetClassesByOwnerId(ctx context.Context, ownerId string) ([]*domain.Class, error) {
 	classes := make([]*domain.Class, 0)
 	rows, err := crp.pool.Query(ctx, "SELECT class_id, created_at, name, description FROM class WHERE owner_id = $1 ORDER BY class_id", ownerId)

@@ -31,6 +31,18 @@ func (cs *ClassService) GetClassInfo(ctx context.Context, classId string) (*resp
 	return response.New(200, class), nil
 }
 
+func (cs *ClassService) GetClassInfoByName(ctx context.Context, ownerId, name string)  (*response.Response[*domain.Class], error) {
+	class, err := cs.ClassRepository.GetClassByName(ctx, ownerId, name)
+	if errors.Is(err, domain.ErrClassNotExists) {
+		msg := fmt.Sprintf("can not find class with name %q that owned by %q", name, ownerId)
+		return nil, response.NewNotFound(msg)
+	}
+	if err != nil {
+		return nil, err
+	}
+	return response.New(200, class), nil
+}
+
 func (cs *ClassService) GetClassTasks(ctx context.Context, classId string, from, to time.Time) (*response.Response[[]*domain.ClassTask], error) {
 	if from.IsZero() {
 		from = time.Now()
@@ -239,10 +251,16 @@ func permissionLevelFromString(s string) permissionLevel {
 }
 
 func (cs *ClassService) AccessClass(ctx context.Context, userId, classId, minimum string) error {
+	msg := fmt.Sprintf("user with id %q does not has %q access to class with id %q", userId, minimum, classId)
+	resErr := response.NewForbidden(msg)
+
 	member, err := cs.ClassMemberRepository.GetMember(ctx, &domain.ClassMember{
 		ClassId: classId,
 		UserId:  userId,
 	})
+	if errors.Is(err, domain.ErrClassMemberNotExists) {
+		return resErr
+	}
 	if err != nil {
 		return err
 	}
@@ -254,6 +272,5 @@ func (cs *ClassService) AccessClass(ctx context.Context, userId, classId, minimu
 		return nil
 	}
 
-	msg := fmt.Sprintf("user with id %q does not has modify access to class with id %q", userId, classId)
-	return response.NewForbidden(msg)
+	return resErr
 }
