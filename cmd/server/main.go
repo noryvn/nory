@@ -13,6 +13,7 @@ import (
 	"github.com/nedpals/supabase-go"
 
 	"nory/common/auth"
+	"nory/common/healthcheck"
 	"nory/common/middleware"
 	"nory/common/response"
 	"nory/internal/class"
@@ -40,6 +41,10 @@ func main() {
 		mustGetEnv("SUPABASE_URL"),
 		mustGetEnv("SUPABASE_KEY"),
 	)
+
+	health := healthcheck.HealthCheck{
+		Pool: pool,
+	}
 
 	userRepository := user.NewUserRepositoryPostgres(pool)
 	classRepository := class.NewClassRepositoryPostgres(pool)
@@ -94,6 +99,7 @@ func main() {
 	app.Use(middleware.DefaultHeader)
 	app.Route("/user", userRoute, "user")
 	app.Route("/class", classRoute, "class")
+	app.Route("/health", health.Route, "health")
 
 	if err := app.Listen(addr); err != nil {
 		panic(err)
