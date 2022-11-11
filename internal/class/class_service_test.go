@@ -245,16 +245,16 @@ func (cst classServiceTest) testClassCreate(t *testing.T) {
 	_, err = cst.classService.ClassRepository.GetClass(context.Background(), class.ClassId)
 	assert.Nil(t, err)
 
-	err = cst.classService.AccessClass(context.Background(), uuid.NewString(), class.ClassId)
+	err = cst.classService.AccessClass(context.Background(), uuid.NewString(), class.ClassId, "admin")
 	assert.NotNil(t, err)
 
-	err = cst.classService.AccessClass(context.Background(), class.OwnerId, class.ClassId)
+	err = cst.classService.AccessClass(context.Background(), class.OwnerId, class.ClassId, "admin")
 	assert.Nil(t, err)
 
-	err = cst.classService.AccessClass(context.Background(), member, class.ClassId)
+	err = cst.classService.AccessClass(context.Background(), member, class.ClassId, "admin")
 	assert.NotNil(t, err)
 
-	err = cst.classService.AccessClass(context.Background(), admin, class.ClassId)
+	err = cst.classService.AccessClass(context.Background(), admin, class.ClassId, "admin")
 	assert.Nil(t, err)
 
 	// delete existing class
@@ -281,7 +281,7 @@ func (cst classServiceTest) testClassCreate(t *testing.T) {
 		_, err := cst.classService.CreateClass(context.Background(), &tc.class)
 		assert.NotNilf(t, err, "unexpected at %#+v", tc.class)
 
-		_, err = cst.classService.DeleteClass(context.Background(), class.OwnerId, class.ClassId)
+		_, err = cst.classService.DeleteClass(context.Background(), uuid.NewString(), class.ClassId)
 		assert.NotNil(t, err)
 	}
 }
@@ -289,9 +289,10 @@ func (cst classServiceTest) testClassCreate(t *testing.T) {
 func (cst *classServiceTest) testCreateClassTask(t *testing.T) {
 	t.Parallel()
 	class := &domain.Class{
+		Name: "foo",
 		OwnerId: uuid.NewString(),
 	}
-	err := cst.classService.ClassRepository.CreateClass(context.Background(), class)
+	_, err := cst.classService.CreateClass(context.Background(), class)
 	assert.Nil(t, err)
 
 	task := &domain.ClassTask{
@@ -322,8 +323,9 @@ func (cst classServiceTest) testListMember(t *testing.T) {
 
 	class := &domain.Class{
 		OwnerId: uuid.NewString(),
+		Name: "foo",
 	}
-	err := cst.classService.ClassRepository.CreateClass(context.Background(), class)
+	_, err := cst.classService.CreateClass(context.Background(), class)
 	assert.Nil(t, err)
 
 	foo := &domain.User{UserId: uuid.NewString(), Username: "foo", Email: "foo"}
@@ -354,14 +356,14 @@ func (cst classServiceTest) testListMember(t *testing.T) {
 	resMember, err := cst.classService.ListMember(context.Background(), class.ClassId)
 	assert.Nil(t, err)
 	assert.Equal(t, 200, resMember.Code)
-	assert.Equal(t, 12, len(resMember.Data))
+	assert.Equal(t, 13, len(resMember.Data))
 
 	_, err = cst.classService.DeleteMember(context.Background(), class.OwnerId, class.ClassId, foo.UserId)
 
 	resMember, err = cst.classService.ListMember(context.Background(), class.ClassId)
 	assert.Nil(t, err)
 	assert.Equal(t, 200, resMember.Code)
-	assert.Equal(t, 11, len(resMember.Data))
+	assert.Equal(t, 12, len(resMember.Data))
 	assert.Nil(t, err)
 
 	_, err = cst.classService.UpdateMember(context.Background(), class.OwnerId, &domain.ClassMember{
