@@ -33,6 +33,7 @@ func (c *Class) Update(cc *Class) {
 
 type ClassRepository interface {
 	GetClass(ctx context.Context, classId string) (*Class, error)
+	GetClassByName(ctx context.Context, ownerId, className string) (*Class, error)
 	GetClassesByOwnerId(ctx context.Context, ownerId string) ([]*Class, error)
 	CreateClass(ctx context.Context, class *Class) error
 	DeleteClass(ctx context.Context, classId string) error

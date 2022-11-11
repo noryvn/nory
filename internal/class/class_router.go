@@ -39,6 +39,7 @@ func Route(classService ClassService) func(router fiber.Router) {
 		router.Delete("/:classId/schedule/:scheduleId", cr.deleteClassSchedule)
 		router.Patch("/:classId/member/:memberId", cr.updateMember)
 		router.Get("/:classId/info", cr.getClassInfo)
+		router.Get("/info", cr.getClassInfoByName)
 		router.Get("/:classId/task", cr.getClassTask)
 		router.Get("/:classId/member", cr.listMember)
 		router.Get("/:classId/schedule", cr.getClassSchedule)
@@ -58,6 +59,17 @@ func (cr classRouter) deleteClass(c *fiber.Ctx) error {
 	}
 
 	res, err := cr.cs.DeleteClass(c.Context(), user.UserId, classId)
+	if err != nil {
+		return err
+	}
+
+	return res.Respond(c)
+}
+
+func (cr classRouter) getClassInfoByName(c *fiber.Ctx) error {
+	name := c.Query("name")
+	ownerId := c.Query("ownerId")
+	res, err := cr.cs.GetClassInfoByName(c.Context(), ownerId, name)
 	if err != nil {
 		return err
 	}

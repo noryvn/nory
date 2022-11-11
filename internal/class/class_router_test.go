@@ -142,6 +142,18 @@ func TestClassRouter(t *testing.T) {
 				assert.Equal(t, tc.Body.Name, body.Data.Name)
 				assert.NotEqual(t, "", body.Data.ClassId)
 
+				p = fmt.Sprintf("/info?name=%s&ownerId=%s", body.Data.Name, body.Data.OwnerId)
+				req = httptest.NewRequest("GET", p, nil)
+				resp, err = app.Test(req)
+				assert.Nil(t, err)
+				assert.Equal(t, 200, resp.StatusCode)
+				var body2 response.Response[*domain.Class]
+				err = json.NewDecoder(resp.Body).Decode(&body2)
+				assert.Nil(t, err)
+				assert.Equal(t, tc.Body.Name, body2.Data.Name)
+				assert.NotEqual(t, "", body2.Data.ClassId)
+
+
 				now := time.Now().UTC()
 				p = fmt.Sprintf("/%s/task", body.Data.ClassId)
 				buff.Reset()
