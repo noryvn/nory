@@ -312,12 +312,12 @@ func TestClassRouter(t *testing.T) {
 				assert.Equal(t, 1, len(memBody.Data))
 
 				p = fmt.Sprintf("/%s", body.Data.ClassId)
-				// unauthorized
+				// unauthenticated
 				req = httptest.NewRequest("DELETE", p, nil)
 				resp, err = app.Test(req)
 				assert.Nil(t, err)
 				assert.Equal(t, 401, resp.StatusCode)
-				// unauthenticated
+				// unauthorized
 				req = httptest.NewRequest("DELETE", p, nil)
 				req.Header.Set("user-id", xid.New().String())
 				resp, err = app.Test(req)

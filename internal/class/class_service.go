@@ -239,10 +239,16 @@ func permissionLevelFromString(s string) permissionLevel {
 }
 
 func (cs *ClassService) AccessClass(ctx context.Context, userId, classId, minimum string) error {
+	msg := fmt.Sprintf("user with id %q does not has %q access to class with id %q", userId, minimum, classId)
+	resErr := response.NewForbidden(msg)
+
 	member, err := cs.ClassMemberRepository.GetMember(ctx, &domain.ClassMember{
 		ClassId: classId,
 		UserId:  userId,
 	})
+	if errors.Is(err, domain.ErrClassMemberNotExists) {
+		return resErr
+	}
 	if err != nil {
 		return err
 	}
@@ -254,6 +260,5 @@ func (cs *ClassService) AccessClass(ctx context.Context, userId, classId, minimu
 		return nil
 	}
 
-	msg := fmt.Sprintf("user with id %q does not has modify access to class with id %q", userId, classId)
-	return response.NewForbidden(msg)
+	return resErr
 }
