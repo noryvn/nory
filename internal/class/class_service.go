@@ -246,9 +246,9 @@ func (cs *ClassService) GetSchedule(ctx context.Context, scheduleId string) (*re
 type permissionLevel uint8
 
 const (
-	permissionOwner permissionLevel = 255 - iota
+	permissionUser  permissionLevel = 1 << iota
 	permissionAdmin
-	permissionUser
+	permissionOwner
 )
 
 func permissionLevelFromString(s string) permissionLevel {
