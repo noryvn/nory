@@ -307,6 +307,34 @@ func TestClassRouter(t *testing.T) {
 					}
 				}
 
+				buff.Reset()
+				err = json.NewEncoder(buff).Encode(domain.Class{
+					ClassId: body.Data.ClassId,
+					Name: "foo",
+				})
+				assert.Nil(t, err)
+				p = fmt.Sprintf("/%s", body.Data.ClassId)
+				req = httptest.NewRequest("PATCH", p, buff)
+				req.Header.Set("content-type", "application/json")
+				req.Header.Set("user-id", tc.User.UserId)
+				resp, err = app.Test(req)
+				assert.Nil(t, err)
+				assert.Equal(t, 204, resp.StatusCode)
+
+				buff.Reset()
+				err = json.NewEncoder(buff).Encode(domain.Class{
+					ClassId: body.Data.ClassId,
+					Name: "foo",
+				})
+				assert.Nil(t, err)
+				p = fmt.Sprintf("/%s", body.Data.ClassId)
+				req = httptest.NewRequest("PATCH", p, buff)
+				req.Header.Set("content-type", "application/json")
+				req.Header.Set("user-id", user.UserId)
+				resp, err = app.Test(req)
+				assert.Nil(t, err)
+				assert.Equal(t, 403, resp.StatusCode)
+
 				p = fmt.Sprintf("/%s/member/%s", body.Data.ClassId, user.UserId)
 				req = httptest.NewRequest("DELETE", p, nil)
 				req.Header.Set("user-id", tc.User.UserId)

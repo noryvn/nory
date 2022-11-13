@@ -244,6 +244,18 @@ func (cst classServiceTest) testClassCreate(t *testing.T) {
 	})
 	assert.Nil(t, err)
 
+	_, err = cst.classService.UpdateClass(context.Background(), admin, &domain.Class{
+		Name: "foo",
+		ClassId: class.ClassId,
+	})
+	assert.NotNil(t, err)
+
+	_, err = cst.classService.UpdateClass(context.Background(), class.OwnerId, &domain.Class{
+		Name: "foo",
+		ClassId: class.ClassId,
+	})
+	assert.Nil(t, err)
+
 	classRes, err := cst.classService.GetClassInfo(context.Background(), class.ClassId)
 	assert.Nil(t, err)
 	assert.Equal(t, 200, classRes.Code, "failed to create class")

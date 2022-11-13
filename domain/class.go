@@ -15,7 +15,7 @@ var (
 
 type Class struct {
 	ClassId   string    `json:"classId"`                 // immutable, unique
-	OwnerId   string    `json:"ownerId" validate:"uuid"` // immutable
+	OwnerId   string    `json:"ownerId"` // immutable
 	CreatedAt time.Time `json:"createdAt"`               // immutable
 
 	Name        string `json:"name" validate:"required,max=20"` // mutable
