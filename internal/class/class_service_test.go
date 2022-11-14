@@ -48,10 +48,10 @@ func (cst classServiceTest) testClassInfo(t *testing.T) {
 	_, err := cst.classService.GetClassInfo(context.Background(), "foobarbazqux")
 	assert.ErrorContains(t, err, "can not find class with id \"foobarbazqux\"")
 	u := &domain.User{
-		UserId: uuid.NewString(),
-		Name: xid.New().String(),
+		UserId:   uuid.NewString(),
+		Name:     xid.New().String(),
 		Username: xid.New().String(),
-		Email: xid.New().String(),
+		Email:    xid.New().String(),
 	}
 
 	err = cst.classService.UserRepository.CreateUser(context.Background(), u)
@@ -245,13 +245,13 @@ func (cst classServiceTest) testClassCreate(t *testing.T) {
 	assert.Nil(t, err)
 
 	_, err = cst.classService.UpdateClass(context.Background(), admin, &domain.Class{
-		Name: "foo",
+		Name:    "foo",
 		ClassId: class.ClassId,
 	})
 	assert.NotNil(t, err)
 
 	_, err = cst.classService.UpdateClass(context.Background(), class.OwnerId, &domain.Class{
-		Name: "foo",
+		Name:    "foo",
 		ClassId: class.ClassId,
 	})
 	assert.Nil(t, err)
@@ -309,7 +309,7 @@ func (cst classServiceTest) testClassCreate(t *testing.T) {
 func (cst *classServiceTest) testCreateClassTask(t *testing.T) {
 	t.Parallel()
 	class := &domain.Class{
-		Name: "foo",
+		Name:    "foo",
 		OwnerId: uuid.NewString(),
 	}
 	_, err := cst.classService.CreateClass(context.Background(), class)
@@ -343,7 +343,7 @@ func (cst classServiceTest) testListMember(t *testing.T) {
 
 	class := &domain.Class{
 		OwnerId: uuid.NewString(),
-		Name: "foo",
+		Name:    "foo",
 	}
 	_, err := cst.classService.CreateClass(context.Background(), class)
 	assert.Nil(t, err)

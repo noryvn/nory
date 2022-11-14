@@ -50,7 +50,7 @@ func (cs *ClassService) UpdateClass(ctx context.Context, userId string, class *d
 	return response.New[any](204, nil), nil
 }
 
-func (cs *ClassService) GetClassInfoByName(ctx context.Context, username, name string)  (*response.Response[*domain.Class], error) {
+func (cs *ClassService) GetClassInfoByName(ctx context.Context, username, name string) (*response.Response[*domain.Class], error) {
 	user, err := cs.UserRepository.GetUserByUsername(ctx, username)
 	if errors.Is(err, domain.ErrUserNotExists) {
 		msg := fmt.Sprintf("can not find user with username %q", username)
@@ -272,17 +272,23 @@ const (
 
 func permissionLevelFromString(s string) permissionLevel {
 	switch s {
-	case "owner": return permissionOwner
-	case "admin": return permissionAdmin
-	default: return permissionUser
+	case "owner":
+		return permissionOwner
+	case "admin":
+		return permissionAdmin
+	default:
+		return permissionUser
 	}
 }
 
 func (p permissionLevel) String() string {
 	switch p {
-	case permissionOwner: return "owner"
-	case permissionAdmin: return "admin"
-	default: return "user"
+	case permissionOwner:
+		return "owner"
+	case permissionAdmin:
+		return "admin"
+	default:
+		return "user"
 	}
 }
 

@@ -155,7 +155,6 @@ func TestClassRouter(t *testing.T) {
 				assert.Equal(t, tc.Body.Name, body2.Data.Name)
 				assert.NotEqual(t, "", body2.Data.ClassId)
 
-
 				now := time.Now().UTC()
 				p = fmt.Sprintf("/%s/task", body.Data.ClassId)
 				buff.Reset()
@@ -310,7 +309,7 @@ func TestClassRouter(t *testing.T) {
 				buff.Reset()
 				err = json.NewEncoder(buff).Encode(domain.Class{
 					ClassId: body.Data.ClassId,
-					Name: "foo",
+					Name:    "foo",
 				})
 				assert.Nil(t, err)
 				p = fmt.Sprintf("/%s", body.Data.ClassId)
@@ -324,7 +323,7 @@ func TestClassRouter(t *testing.T) {
 				buff.Reset()
 				err = json.NewEncoder(buff).Encode(domain.Class{
 					ClassId: body.Data.ClassId,
-					Name: "foo",
+					Name:    "foo",
 				})
 				assert.Nil(t, err)
 				p = fmt.Sprintf("/%s", body.Data.ClassId)
