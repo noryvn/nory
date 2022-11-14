@@ -33,10 +33,13 @@ func (us UserService) GetUserProfile(ctx context.Context, user *domain.User) (*r
 	if err != nil {
 		return nil, err
 	}
+
 	user.UserStatistics = &domain.UserStatistics{
 		OwnedClass:  len(classes),
 		JoinedClass: len(members),
 	}
+	user.OwnedClass = classes
+
 	return response.New(200, user), nil
 }
 

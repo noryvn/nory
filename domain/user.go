@@ -22,11 +22,13 @@ type User struct {
 	UserId    string    `json:"userId"`    // immutable, unique
 	CreatedAt time.Time `json:"createdAt"` // immutable
 
-	Username string `json:"username" validate:"username"` // mutable, unique
-	Name     string `json:"name" validate:"max=32"`       // mutable
-	Email    string `json:"email" validate:"max=254"`     // immutable, unique
+	Username string `json:"username" validate:"username"`       // mutable, unique
+	Name     string `json:"name" validate:"max=32"`             // mutable
+	Email    string `json:"email,omitempty" validate:"max=254"` // immutable, unique
 
 	UserStatistics *UserStatistics `json:"userStatistics,omitempty"`
+
+	OwnedClass []*Class `json:"ownedClass,omitempty"`
 }
 
 func (u *User) Update(uu *User) {

@@ -31,7 +31,26 @@ func (cs *ClassService) GetClassInfo(ctx context.Context, classId string) (*resp
 	return response.New(200, class), nil
 }
 
-func (cs *ClassService) GetClassInfoByName(ctx context.Context, username, name string)  (*response.Response[*domain.Class], error) {
+func (cs *ClassService) UpdateClass(ctx context.Context, userId string, class *domain.Class) (*response.Response[any], error) {
+	permission := permissionAdmin
+	if class.Name != "" {
+		permission |= permissionOwner
+	}
+
+	if err := validator.ValidateStruct(class); err != nil {
+		return nil, err
+	}
+	if err := cs.AccessClass(ctx, userId, class.ClassId, permission.String()); err != nil {
+		return nil, err
+	}
+	if err := cs.ClassRepository.UpdateClass(ctx, class); err != nil {
+		return nil, err
+	}
+
+	return response.New[any](204, nil), nil
+}
+
+func (cs *ClassService) GetClassInfoByName(ctx context.Context, username, name string) (*response.Response[*domain.Class], error) {
 	user, err := cs.UserRepository.GetUserByUsername(ctx, username)
 	if errors.Is(err, domain.ErrUserNotExists) {
 		msg := fmt.Sprintf("can not find user with username %q", username)
@@ -246,16 +265,30 @@ func (cs *ClassService) GetSchedule(ctx context.Context, scheduleId string) (*re
 type permissionLevel uint8
 
 const (
-	permissionUser  permissionLevel = 1 << iota
+	permissionOwner permissionLevel = 0xff >> iota
 	permissionAdmin
-	permissionOwner
+	permissionUser
 )
 
 func permissionLevelFromString(s string) permissionLevel {
 	switch s {
-	case "owner": return permissionOwner
-	case "admin": return permissionAdmin
-	default: return permissionUser
+	case "owner":
+		return permissionOwner
+	case "admin":
+		return permissionAdmin
+	default:
+		return permissionUser
+	}
+}
+
+func (p permissionLevel) String() string {
+	switch p {
+	case permissionOwner:
+		return "owner"
+	case permissionAdmin:
+		return "admin"
+	default:
+		return "user"
 	}
 }
 

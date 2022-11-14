@@ -23,4 +23,3 @@ func (hc *HealthCheck) Handler(c *fiber.Ctx) error {
 
 	return c.SendStatus(fiber.StatusNoContent)
 }
-
