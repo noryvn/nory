@@ -192,7 +192,7 @@ func (cs *ClassService) UpdateMember(ctx context.Context, userId string, member 
 }
 
 func (cs *ClassService) DeleteClass(ctx context.Context, userId, classId string) (*response.Response[any], error) {
-	if err := cs.AccessClass(ctx, userId, classId, "admin"); err != nil {
+	if err := cs.AccessClass(ctx, userId, classId, "owner"); err != nil {
 		return nil, err
 	}
 
